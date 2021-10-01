@@ -1,0 +1,38 @@
+POST http://localhost:8000/api/token
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYxNTRkNzk5OTQxY2RjODVjYTg5YjMyYyIsImlhdCI6MTYzMzA0Mjg4NX0.rHqx-K2hKBOJIeub4NzbbtzMUgNjq1kRkcZVYiI2nOc"
+}
+
+###
+
+POST http://localhost:8000/api/signup
+Content-Type: application/json
+
+{ 
+    "name": "Hrik",
+    "email": "hrik.bhowal@gmail.co",
+    "password": "Hrik", 
+    "password_confirm": "Hrik" 
+}
+
+###
+
+DELETE http://localhost:8000/api/logout
+Content-Type: application/json
+
+{
+    "user_id": "",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYxNTRkNzk5OTQxY2RjODVjYTg5YjMyYyIsImlhdCI6MTYzMjk2OTU2OH0.5gzsGpXnt3Y4r01Z1mY-CQ_Eh5nHLYCEAA1Og82xsOE"
+}
+
+###
+
+POST http://localhost:8000/api/signin
+Content-Type: application/json
+
+{ 
+    "email": "hrik.bhowal@gmail.com",
+    "password": "Hrik"
+}
