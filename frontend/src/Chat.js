@@ -119,7 +119,6 @@ function Chat() {
       </div>
       <style></style>
       <div id="body__id" className="chat__body">
-        {console.log(messages)}
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
             {/*Checks if 10 mins has passed since last message. If it has, redisplay time*/}

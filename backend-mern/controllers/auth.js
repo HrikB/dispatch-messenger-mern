@@ -5,12 +5,15 @@ import { createAccessJWT, createRefreshJWT } from "../utils/auth.js";
 import redisClient from "../redis.js";
 
 export let signup = (req, res) => {
-  let { name, email, password, password_confirm } = req.body;
+  let { first_name, last_name, email, password, password_confirm } = req.body;
 
   //input validation
   let errors = [];
-  if (!name) {
-    errors.push({ name: "required" });
+  if (!first_name) {
+    errors.push({ first_name: "required" });
+  }
+  if (!last_name) {
+    errors.push({ last_name: "required" });
   }
   if (!email) {
     errors.push({ email: "required" });
@@ -38,7 +41,8 @@ export let signup = (req, res) => {
           .json({ errors: [{ email: "email already exists" }] });
       } else {
         const user = new User({
-          name: name,
+          first_name: first_name,
+          last_name: last_name,
           email: email,
           password: password,
         });
@@ -140,7 +144,6 @@ export let token = (req, res) => {
         return res.status(200).json({
           success: true,
           accessToken: accessToken,
-          refreshToken: refreshToken,
           message: user,
         });
       }

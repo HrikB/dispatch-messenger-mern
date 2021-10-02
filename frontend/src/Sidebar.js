@@ -23,22 +23,14 @@ function Sidebar({ setShowModal }) {
 
   useEffect(() => {
     var newNames = [];
-    console.log("input", searchInput);
     if (searchInput) {
-      console.log(names);
       origNames.forEach((e) => {
-        console.log("name", e.data.chatWithName);
-        console.log(
-          "?",
-          e.data.chatWithName.toLowerCase().includes(searchInput.toLowerCase())
-        );
         if (
           e.data.chatWithName.toLowerCase().includes(searchInput.toLowerCase())
         ) {
           newNames.push(e);
         }
       });
-      console.log("namesA", newNames);
       setNames(newNames);
     } else {
       setNames(origNames);

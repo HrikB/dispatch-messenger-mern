@@ -6,42 +6,47 @@ import { useStateValue } from "./StateProvider.js";
 import { actionTypes } from "./reducer";
 import { DeckOutlined } from "@material-ui/icons";
 import CloseIcon from "@material-ui/icons/Close";
-import { login } from "./api";
+import { login, register } from "./api";
 
 function Login() {
   const [{}, dispatch] = useStateValue();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regPassConfirm, setRegPassConfirm] = useState("");
+  const [errorMessage, setErrorMessage] = useState("/");
+  const [errVisibility, setErrVisibility] = useState("hidden");
   const [showRegModal, setShowRegModal] = useState(false);
 
   const signIn = async () => {
     const response = await login(email, password);
     if (response.data.success) {
+      setErrorMessage("/");
+      setErrVisibility("hidden");
       dispatch({
         type: actionTypes.SET_USER,
         user: response.data.message,
       });
+      localStorage.setItem("token", response.data.accessToken);
     }
     if (response.data.errors) {
-      console.log(response.data.errors[0].error);
+      setErrorMessage(response.data.errors[0].error);
+      setErrVisibility("visible");
     }
-    console.log(response.data);
-    /*dispatch({
-      type: actionTypes.SET_USER,
-      user: response,
-    });*/
-    /*auth
-      .signInWithPopup(provider)
-      .then((result) => {
-        dispatch({
-          type: actionTypes.SET_USER,
-          user: result.user,
-        });
+  };
 
-        if (result.additionalUserInfo.isNewUser) {
-        }
-      })
-      .catch((error) => alert(error.message));*/
+  const signUp = async () => {
+    const response = await register(
+      firstName,
+      lastName,
+      regEmail,
+      regPassword,
+      regPassConfirm
+    );
+    console.log(response);
   };
 
   return (
@@ -60,25 +65,49 @@ function Login() {
                 type="text"
                 className="first__name"
                 placeholder="First name"
+                value={firstName}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                }}
               />
               <input
                 type="text"
                 className="last__name"
                 placeholder="Last name"
+                value={lastName}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                }}
               />
             </div>
-            <input type="text" className="email" placeholder="Email" />
+            <input
+              type="text"
+              className="email"
+              placeholder="Email"
+              value={regEmail}
+              onChange={(e) => {
+                setRegEmail(e.target.value);
+              }}
+            />
             <input
               type="password"
               className="new__password"
               placeholder="New password"
+              value={regPassword}
+              onChange={(e) => {
+                setRegPassword(e.target.value);
+              }}
             />
             <input
               type="password"
               className="confirm__password"
               placeholder="Confirm password"
+              value={regPassConfirm}
+              onChange={(e) => {
+                setRegPassConfirm(e.target.value);
+              }}
             />
-            <button className="sign__up" onClick={(e) => e.preventDefault()}>
+            <button type="button" className="sign__up" onClick={signUp}>
               <h3>Sign Up</h3>
             </button>
           </form>
@@ -105,12 +134,17 @@ function Login() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                console.log(password);
               }}
             />
             <button className="login__button" onClick={signIn}>
               <h3>Log In</h3>
             </button>
+            <h5
+              className="error__message"
+              style={{ visibility: `${errVisibility}` }}
+            >
+              {errorMessage}
+            </h5>
           </div>
           <div className="register__container">
             <button
