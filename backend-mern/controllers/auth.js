@@ -70,7 +70,7 @@ export let signin = (req, res) => {
     .then((user) => {
       if (!user) {
         return res.status(404).json({
-          errors: [{ user: "not found" }],
+          errors: [{ error: "User/email not found" }],
         });
       } else {
         bcrypt
@@ -79,7 +79,7 @@ export let signin = (req, res) => {
             if (!isMatch) {
               return res
                 .status(400)
-                .json({ errors: [{ password: "incorrect" }] });
+                .json({ errors: [{ error: "Password is incorrect" }] });
             }
 
             const accessToken = createAccessJWT(user.email, user._id);

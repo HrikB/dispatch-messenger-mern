@@ -2,7 +2,7 @@ POST http://localhost:8000/api/token
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYxNTRkNzk5OTQxY2RjODVjYTg5YjMyYyIsImlhdCI6MTYzMzA0Mjg4NX0.rHqx-K2hKBOJIeub4NzbbtzMUgNjq1kRkcZVYiI2nOc"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYxNTRkNzk5OTQxY2RjODVjYTg5YjMyYyIsImlhdCI6MTYzMzA2MzIxNH0.Y5LtKCAjQefvSclCtZnlTtSfdo6cuMRPV8JcRzB1V2A"
 }
 
 ###
@@ -23,8 +23,8 @@ DELETE http://localhost:8000/api/logout
 Content-Type: application/json
 
 {
-    "user_id": "",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYxNTRkNzk5OTQxY2RjODVjYTg5YjMyYyIsImlhdCI6MTYzMjk2OTU2OH0.5gzsGpXnt3Y4r01Z1mY-CQ_Eh5nHLYCEAA1Og82xsOE"
+    "user_id": "6154d799941cdc85ca89b32c",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsImlhdCI6MTYzMzA2MzMzNCwiZXhwIjoxNjMzMDYzMzM5fQ.395tnZ0N_fKND-6EFWw8GIn6Lx4nmmWckWgnxnHdTA8"
 }
 
 ###

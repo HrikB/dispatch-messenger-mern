@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SearchOutlined } from "@material-ui/icons";
-import { IconButton } from "@material-ui/core";
+import { Divider, IconButton } from "@material-ui/core";
 import "./Modal.css";
 import { useStateValue } from "./StateProvider";
 
@@ -130,6 +130,7 @@ const Modal = ({ showModal, setShowModal, searchEmail, setSearchEmail }) => {
     }
     return result;
   }
+  return <div></div>;
 };
 
 export default Modal;

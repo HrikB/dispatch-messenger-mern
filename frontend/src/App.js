@@ -4,8 +4,8 @@ import "./App.css";
 import Sidebar from "./Sidebar";
 import Chat from "./Chat";
 import Login from "./Login";
-import { useStateValue } from "./StateProvider";
 import Modal from "./Modal";
+import { useStateValue } from "./StateProvider";
 
 function App() {
   const [{ user }, dispatch] = useStateValue();
@@ -16,7 +16,9 @@ function App() {
   return (
     <div className="app">
       {!user ? (
-        <Login />
+        <div className="home__body">
+          <Login />
+        </div>
       ) : (
         <div id="body" className="app__body">
           <Modal
@@ -25,6 +27,7 @@ function App() {
             searchEmail={searchEmail}
             setSearchEmail={setSearchEmail}
           />
+
           <Router>
             <Sidebar setShowModal={setShowModal} />
             <Switch>
