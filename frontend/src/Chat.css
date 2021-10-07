@@ -84,29 +84,30 @@
   align-items: center;
   height: 60px;
   padding-right: 10px;
+  width: 100%;
 }
 
 .chat__footer form {
-  flex: 1;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   border-radius: 30px;
   margin-right: 10px;
   color: blue;
   height: fit-content;
+  width: 100%;
 }
 
 .chat__footer form .input__container {
-  flex: 1;
   background-color: #2c2a2a;
   height: 39px;
   display: flex;
   justify-content: space-between;
   overflow: hidden;
-
   border-radius: 30px;
-  align-items: center;
   position: relative;
+  width: 100%;
+  align-items: center;
 }
 
 .chat__footer form .input__overlay {
@@ -128,11 +129,15 @@
   outline: none;
   width: 90%;
   background-color: #2c2a2a;
+  color: white;
 }
 
 #submitbutton {
   background-color: #000;
   border: none;
+  width: fit-content;
+  padding: 0;
+  margin: 0;
 }
 
 .time {
@@ -146,6 +151,13 @@
   right: 25px;
   height: 100px;
   width: 100px;
+}
+
+.emoji__button {
+  width: fit-content;
+  padding: 0 !important;
+  margin-right: 12px !important;
+  height: fit-content;
 }
 
 .icon__container {

@@ -23,17 +23,23 @@ function Login() {
 
   const signIn = async () => {
     const response = await login(email, password);
-    if (response.data.success) {
-      setErrorMessage("/");
-      setErrVisibility("hidden");
-      dispatch({
-        type: actionTypes.SET_USER,
-        user: response.data.message,
-      });
-      localStorage.setItem("token", response.data.accessToken);
-    }
-    if (response.data.errors) {
-      setErrorMessage(response.data.errors[0].error);
+    if (response) {
+      if (response.data.success) {
+        setErrorMessage("/");
+        setErrVisibility("hidden");
+        dispatch({
+          type: actionTypes.SET_USER,
+          user: response.data.message,
+        });
+        localStorage.setItem("token", response.data.accessToken);
+      }
+      if (response.data.errors) {
+        console.log(response.data);
+        setErrorMessage(response.data.errors[0].error);
+        setErrVisibility("visible");
+      }
+    } else {
+      setErrorMessage("Server Error");
       setErrVisibility("visible");
     }
   };

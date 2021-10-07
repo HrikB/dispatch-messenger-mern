@@ -87,8 +87,6 @@ function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  var msgArr = "";
-  let unsub;
   useEffect(() => {
     //checks if there is chatHash in the link
     if (chatHash) {
@@ -121,7 +119,7 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
-            {/*Checks if 10 mins has passed since last message. If it has, redisplay time*/}
+            {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
             <h6
               className="time"
               style={
@@ -217,10 +215,7 @@ function Chat() {
             <input
               className="input__field"
               value={input}
-              onChange={(e) => {
-                setIsInitialized(true);
-                setInput(e.target.value);
-              }}
+              onChange={(e) => setInput(e.target.value)}
               placeholder="Type a Message..."
               type="text"
             />

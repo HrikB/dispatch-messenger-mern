@@ -6,7 +6,6 @@ dotenv.config();
 
 //Import Routes
 import authRoute from "./routes/auth.js";
-import User from "./models/User.js";
 
 //App Config
 const app = express();
@@ -23,7 +22,7 @@ mongoose.connect(process.env.DATABASE).then(() => {
 });
 
 //API Endpoints
-app.get("/", (req, res) => res.status(200).send("Hello World"));
+app.get("/", (req, res) => res.status(200).send("Auth Server Up"));
 
 //Listener
 app.listen(port, () => console.log(`listening on localhost: ${port}`));

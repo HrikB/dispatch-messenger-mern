@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import "./App.css";
 import Sidebar from "./Sidebar";
@@ -6,6 +6,7 @@ import Chat from "./Chat";
 import Login from "./Login";
 import Modal from "./Modal";
 import { useStateValue } from "./StateProvider";
+import { actionTypes } from "./reducer";
 
 function App() {
   const [{ user }, dispatch] = useStateValue();
