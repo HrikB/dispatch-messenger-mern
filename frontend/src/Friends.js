@@ -5,10 +5,21 @@ import AllFriends from "./AllFriends";
 import AddFriends from "./AddFriends";
 import Pending from "./Pending";
 
-function Friends() {
-  const [currentTab, setCurrentTab] = useState(<AllFriends />);
+let friendsJson = {
+  friendsList: [
+    { first_name: "Sara", last_name: "Blake" },
+    { first_name: "Jake", last_name: "Towers" },
+    { first_name: "Lois", last_name: "Sky" },
+  ],
+};
 
+function Friends() {
+  const [friendsList, setFriendsList] = useState(friendsJson.friendsList);
+  const [currentTab, setCurrentTab] = useState(
+    <AllFriends friendsList={friendsList} />
+  );
   useEffect(() => {
+    //Handles tab highlighting
     const allButton = document.getElementsByClassName("all")[0];
     const pendingButton = document.getElementsByClassName("pending")[0];
     const addFriendsButton = document.getElementsByClassName("add__friend")[0];
@@ -35,7 +46,7 @@ function Friends() {
   }, [currentTab]);
 
   const all = () => {
-    setCurrentTab(<AllFriends />);
+    setCurrentTab(<AllFriends friendsList={friendsList} />);
   };
 
   const pending = () => {
@@ -68,7 +79,7 @@ function Friends() {
           </button>
         </div>
       </div>
-      <div className="friendBody">{currentTab}</div>
+      <div className="friend__body">{currentTab}</div>
     </div>
   );
 }

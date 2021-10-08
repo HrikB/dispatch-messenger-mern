@@ -1,0 +1,47 @@
+.addFriend h5 {
+  margin: 10px 0;
+  font-weight: lighter;
+}
+
+.friendRequest__form .input__container:focus-within {
+  border: 2px solid #4400ff;
+}
+
+.friendRequest__form .input__container {
+  box-sizing: border-box;
+  border-radius: 10px;
+  height: 55px;
+  padding: 0 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #424242;
+}
+
+.input__container input {
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  background-color: #424242;
+  margin-right: 10px;
+}
+
+.friendRequest__form .input__container button {
+  border: 2px solid #1d1d1d;
+  max-height: 75%;
+  max-width: 20%;
+  background-color: #2f00ff;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.friendRequest__form .input__container button:disabled {
+  cursor: not-allowed !important;
+}
+
+.friendRequest__form .input__container button:hover {
+  cursor: pointer;
+}

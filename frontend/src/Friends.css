@@ -50,9 +50,15 @@
 
 .friend__header button:hover {
   cursor: pointer;
+  color: #005f00;
 }
 
 .friend__header p {
   text-align: center;
   font-weight: bold;
+}
+
+.friend__body {
+  box-sizing: border-box;
+  padding: 20px 30px;
 }
