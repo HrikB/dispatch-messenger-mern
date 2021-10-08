@@ -1,0 +1,58 @@
+.friendsContainer {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  max-width: inherit;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.friend__header {
+  padding: 10px 5px;
+  display: flex;
+  align-items: center;
+  max-width: inherit;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid white;
+}
+
+.friend__header .header__left {
+  display: flex;
+  min-width: min-content;
+}
+
+.friend__header .header__right {
+  display: flex;
+}
+
+.friend__header .friends__icon {
+  display: flex;
+  min-width: fit-content;
+  padding-right: 10px;
+  margin: 0px 10px;
+  border-right: 1px solid white;
+}
+
+.friend__header .friends__icon h1 {
+  font-size: 1.5rem;
+}
+
+.friend__header button {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  margin: 0 10px;
+  background-color: black;
+}
+
+.friend__header button:hover {
+  cursor: pointer;
+}
+
+.friend__header p {
+  text-align: center;
+  font-weight: bold;
+}

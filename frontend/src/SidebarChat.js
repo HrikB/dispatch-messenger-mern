@@ -16,7 +16,7 @@ function SidebarChat({ id, name, prof_pic, last_msg }) {
   }, [id]);
 
   return (
-    <Link to={`/${id}`}>
+    <Link to={`/t/${id}`}>
       <div className="sidebarChat">
         <div className="allContainer">
           <Avatar src={profpic} id="profpic" />
