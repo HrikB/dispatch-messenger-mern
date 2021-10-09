@@ -23,6 +23,8 @@
 
 .sidebar__header h3 {
   text-align: center;
+  letter-spacing: 0.05rem;
+  font-size: 1.25rem;
   color: #4e41ff;
 }
 

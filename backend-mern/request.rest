@@ -1,4 +1,4 @@
-POST http://localhost:8000/api/token
+POST http://localhost:8000/auth/token
 Content-Type: application/json
 
 {
@@ -7,7 +7,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:8000/api/signup
+POST http://localhost:8000/auth/signup
 Content-Type: application/json
 
 { 
@@ -19,7 +19,7 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:8000/api/logout
+DELETE http://localhost:8000/auth/logout
 Content-Type: application/json
 
 {
@@ -29,10 +29,36 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:8000/api/signin
+POST http://localhost:8000/auth/signin
 Content-Type: application/json
 
 { 
     "email": "hrik.bhowal@gmail.com",
     "password": "Hrik"
 }
+
+###
+POST http://localhost:7000/api/conversation/create-chats
+Content-Type: application/json
+
+{
+    "senderId": "6154d799941cdc85ca89b32c",
+    "receiverId": "6154da8f9b5b8cd13c58c59e"
+}
+
+###
+
+GET http://localhost:7000/api/conversations/data/6157db28cc12e6cc02b57de4
+
+###
+
+POST http://localhost:7000/api/messages/send-message
+Content-Type: application/json
+
+{
+    "conversationId": "6160f0be4be65d1218fb0d0e",
+    "sender": "6154da8f9b5b8cd13c58c59e",
+    "text": "Ok Bye"
+}
+
+###

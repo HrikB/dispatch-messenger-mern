@@ -6,6 +6,7 @@ import { SearchOutlined } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
 import { io } from "socket.io-client";
+import { getConversations } from "./api.js";
 
 let jsonNames = [
   {
@@ -28,6 +29,8 @@ let jsonNames = [
   },
 ];
 
+const createConversation = () => {};
+
 const socket = io("http://localhost:7000", {
   reconnectionDelayMax: 10000,
   auth: {
@@ -40,16 +43,15 @@ function Sidebar({ setShowModal }) {
   const [chatWithPic, setChatWithPic] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
-  const openPersonFinder = () => {
-    setShowModal(true);
-  };
-
   const [{ user }, dispatch] = useStateValue();
   const [names, setNames] = useState([]);
+  const [conversations, setConversations] = useState([]);
   const [origNames, setOrigNames] = useState([]);
 
-  useEffect(() => {
-    var newNames = [];
+  useEffect(async () => {
+    const conversationsData = await getConversations(user.userId);
+    setConversations(conversationsData.data);
+    /*var newNames = [];
     if (searchInput) {
       origNames.forEach((e) => {
         if (
@@ -61,9 +63,8 @@ function Sidebar({ setShowModal }) {
       setNames(newNames);
     } else {
       setNames(origNames);
-    }
-  }, [searchInput]);
-
+    }*/
+  }, [user.userId]);
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -71,7 +72,7 @@ function Sidebar({ setShowModal }) {
           <Avatar src={user?.photoURL} className="accountPic" />
         </IconButton>
         <h3>Dispatch</h3>
-        <IconButton onClick={openPersonFinder}>
+        <IconButton onClick={createConversation}>
           <img id="compose" src={Compose} alt="Compose"></img>
         </IconButton>
       </div>
@@ -86,17 +87,11 @@ function Sidebar({ setShowModal }) {
         </div>
       </div>
       <div className="sidebar__chats">
-        {
-          /*names*/ jsonNames.map((name) => (
-            <SidebarChat
-              key={name.id}
-              id={name.id}
-              name={name.data.chatWithName}
-              prof_pic={name.data.chatWithProfPic}
-              last_msg={name.data.lastMessage}
-            />
-          ))
-        }
+        {conversations.map((conversation) => (
+          <SidebarChat
+            memberId={conversation.members.find((m) => m !== user.userId)}
+          />
+        ))}
       </div>
     </div>
   );

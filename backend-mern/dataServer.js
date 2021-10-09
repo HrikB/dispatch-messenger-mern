@@ -20,13 +20,20 @@ const io = new Server(httpServer, {
   },
 });
 
+//socket-io
 io.on("connection", (socket) => {
   console.log(socket.handshake.auth.accessToken, "is the access token");
 });
 
+//Routes Import
+import conversationsRoute from "./routes/conversations.js";
+import messageRoute from "./routes/messages.js";
+
 //Middlewares
 app.use(express.json());
 app.use(cors());
+app.use("/api/conversations", conversationsRoute);
+app.use("/api/messages", messageRoute);
 
 //DB Config
 mongoose.connect(process.env.DATABASE).then(() => {

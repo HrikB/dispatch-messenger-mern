@@ -69,7 +69,6 @@ export let signup = (req, res) => {
 
 export let signin = (req, res) => {
   let { email, password } = req.body;
-
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
@@ -180,4 +179,14 @@ export let logout = async (req, res) => {
   await redisClient.set("BL_" + user_id, token);
   //refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
   res.sendStatus(204);
+};
+
+export let getData = async (req, res) => {
+  let userId = req.params.id;
+  try {
+    const userData = await User.findOne({ _id: userId });
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

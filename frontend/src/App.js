@@ -17,34 +17,32 @@ function App() {
 
   return (
     <div className="app">
-      {
-        /*!*/ user ? (
-          <div className="home__body">
-            <Login />
-          </div>
-        ) : (
-          <div id="body" className="app__body">
-            <Modal
-              showModal={showModal}
-              setShowModal={setShowModal}
-              searchEmail={searchEmail}
-              setSearchEmail={setSearchEmail}
-            />
+      {!user ? (
+        <div className="home__body">
+          <Login />
+        </div>
+      ) : (
+        <div id="body" className="app__body">
+          <Modal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            searchEmail={searchEmail}
+            setSearchEmail={setSearchEmail}
+          />
 
-            <Router>
-              <Sidebar setShowModal={setShowModal} />
-              <Switch>
-                <Route path="/t/:chatHash">
-                  <Chat setShowEmoji={setShowEmoji} />
-                </Route>
-                <Route path="/friends">
-                  <Friends />
-                </Route>
-              </Switch>
-            </Router>
-          </div>
-        )
-      }
+          <Router>
+            <Sidebar setShowModal={setShowModal} />
+            <Switch>
+              <Route path="/t/:chatHash">
+                <Chat setShowEmoji={setShowEmoji} />
+              </Route>
+              <Route path="/friends">
+                <Friends />
+              </Route>
+            </Switch>
+          </Router>
+        </div>
+      )}
     </div>
   );
 }

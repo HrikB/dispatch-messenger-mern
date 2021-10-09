@@ -22,25 +22,20 @@ function Chat() {
   const [personName, setPersonName] = useState("");
   const [chatWithPic, setChatWithPic] = useState("");
   const [chatWithEmail, setChatWithEmail] = useState("");
+  const [openMic, setOpenMic] = useState(false);
   const [lastSentTime, setlastSentTime] = useState(new Date(0));
   const { chatHash } = useParams();
   const [{ user }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
-  const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef(null);
   const [openEmoji, setOpenEmoji] = useState(false);
-  const [openMic, setOpenMic] = useState(false);
   const inputContainer = document.getElementsByClassName("input__container")[0];
   const inputOverlay = document.getElementsByClassName("input__overlay")[0];
   const inputField = document.getElementsByClassName("input__field")[0];
   const emojiButton = document.getElementsByClassName("emoji__button")[0];
   const micIcon = document.getElementById("mic__icon");
   const deleteIcon = document.getElementById("delete__icon");
-  const useForceUpdate = () => {
-    const [value, setValue] = useState(0); // integer state
-    return () => setValue((value) => value + 1); // update the state to force render
-  };
-  const forceUpdate = useForceUpdate();
+
   const onEmojiClick = (e, emojiObject) => {
     setInput(input + emojiObject.emoji);
   };

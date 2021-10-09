@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./AddFriends.css";
 
 function AddFriends({ friendsList }) {
   const [input, setInput] = useState("");
-
-  useEffect(() => {
-    const emailInput = document.getElementsByClassName("newFriend__email")[0];
-
-    console.log(document.activeElement);
-    console.log(emailInput);
-  }, [document.activeElement]);
 
   const sendFriendRequest = (e) => {
     e.preventDefault();
