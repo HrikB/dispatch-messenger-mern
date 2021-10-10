@@ -13,7 +13,6 @@ export let sendMessage = async (req, res) => {
 
 export let getMessage = async (req, res) => {
   try {
-    console.log("a");
     const messages = await Message.find({
       conversationId: req.params.conversationId,
     });

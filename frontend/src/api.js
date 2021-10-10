@@ -50,3 +50,25 @@ export const getUserData = async (userId) => {
     return err.response;
   }
 };
+
+export const getMessages = async (conversationId) => {
+  try {
+    return await axios.get(
+      "http://localhost:7000/api/messages/get-message/" + conversationId
+    );
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const sendMessageDatabase = async (conversationId, sender, message) => {
+  try {
+    return await axios.post("http://localhost:7000/api/messages/send-message", {
+      conversationId: conversationId,
+      sender: sender,
+      text: message,
+    });
+  } catch (err) {
+    return err.response;
+  }
+};

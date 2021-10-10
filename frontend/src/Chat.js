@@ -16,6 +16,7 @@ import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { getMessages, sendMessageDatabase } from "./api.js";
 
 function Chat() {
   const [input, setInput] = useState("");
@@ -24,7 +25,7 @@ function Chat() {
   const [chatWithEmail, setChatWithEmail] = useState("");
   const [openMic, setOpenMic] = useState(false);
   const [lastSentTime, setlastSentTime] = useState(new Date(0));
-  const { chatHash } = useParams();
+  const { conversationId } = useParams();
   const [{ user }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -82,14 +83,24 @@ function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    //checks if there is chatHash in the link
-    if (chatHash) {
+  useEffect(async () => {
+    //checks if there is conversationId in the link
+    if (conversationId) {
+      const messages = await getMessages(conversationId);
+      setMessages(messages.data);
     }
-  }, [chatHash]);
+  }, [conversationId]);
 
   const sendMessage = (e) => {
     e.preventDefault();
+
+    //send message to Database
+    try {
+      sendMessageDatabase(conversationId, user.userId, input);
+    } catch (err) {
+      console.error(err);
+    }
+
     setOpenMic(false);
     setInput("");
     scrollToBottomSmooth();
@@ -114,8 +125,9 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
+            {console.log("message", message)}
             {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
-            <h6
+            {/* <h6
               className="time"
               style={
                 messages[i].timestamp
@@ -137,22 +149,25 @@ function Chat() {
                 : new Date(Date.now()).toDateString() +
                   " " +
                   new Date(Date.now()).toTimeString()}
-            </h6>
+                </h6>*/}
             <p
               className={`chat__message ${
-                message.senderEmail === user.email && "chat__reciever"
+                message.sender == user.userId && "chat__reciever"
               } ${
+                /*
                 messages[i - 1]?.senderEmail == messages[i].senderEmail &&
                 !(messages[i].timestamp
                   ? messages[i]?.timestamp.valueOf() > new Date(0).valueOf()
                   : Date.now() > lastSentTime.valueOf() + 600000) &&
                 "same__sender"
+                */ true
               }`}
             >
               <h6 className="chat__name">
                 {message.senderEmail !== user.email ? message.name : ""}
               </h6>
-              {message.message}
+
+              {message.text}
             </p>
           </div>
         ))}

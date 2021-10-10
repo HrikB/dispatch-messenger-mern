@@ -5,20 +5,24 @@ import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
 import { getConversations, getUserData } from "./api.js";
 
-function SidebarChat({ memberId }) {
+function SidebarChat({ conversationId, memberId }) {
   const [messages, setMessages] = useState("");
   const [{ user }, dispatch] = useStateValue();
   const [conversations, setConversations] = useState([]);
   const [profpic, setProfpic] = useState("");
 
   useEffect(async () => {
-    const memberData = await getUserData(memberId);
-    setConversations(memberData.data);
+    try {
+      const memberData = await getUserData(memberId);
+      setConversations(memberData.data);
+    } catch (err) {
+      console.error(err);
+    }
   }, [conversations]);
 
   return (
     <div>
-      <Link to={`/t/${conversations._id}`}>
+      <Link to={`/t/${conversationId}`}>
         <div className="sidebarChat">
           <div className="allContainer">
             <Avatar id="profpic" />

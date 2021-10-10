@@ -89,6 +89,8 @@ function Sidebar({ setShowModal }) {
       <div className="sidebar__chats">
         {conversations.map((conversation) => (
           <SidebarChat
+            key={conversation.members.find((m) => m !== user.userId)}
+            conversationId={conversation._id}
             memberId={conversation.members.find((m) => m !== user.userId)}
           />
         ))}

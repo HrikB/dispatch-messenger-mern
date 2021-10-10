@@ -33,7 +33,7 @@ function App() {
           <Router>
             <Sidebar setShowModal={setShowModal} />
             <Switch>
-              <Route path="/t/:chatHash">
+              <Route path="/t/:conversationId">
                 <Chat setShowEmoji={setShowEmoji} />
               </Route>
               <Route path="/friends">
