@@ -112,7 +112,7 @@ function Chat() {
     });
     socket?.on("getMessage", (data) => {
       setArrivingMessage({
-        sender: data.senderId,
+        sender: data.sender,
         receiver: user.userId,
         text: data.text,
         createdAt: Date.now(),
@@ -141,10 +141,10 @@ function Chat() {
     e.preventDefault();
     const receiverId = conversation?.members.find((m) => m !== user.userId);
     let outgoingMessage = {
-      senderId: user.userId,
-      receiverId: receiverId,
+      conversationId: conversationId,
+      sender: user.userId,
+      receiver: receiverId,
       text: input,
-      createdAt: Date.now(),
     };
     socket.emit("sendMessage", outgoingMessage);
 
@@ -185,6 +185,7 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
+            {console.log(message)}
             {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
             {/* <h6
               className="time"

@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import axios from "axios";
 dotenv.config();
 
 const authenticateToken = (req, res, next) => {
@@ -49,13 +50,23 @@ io.on("connection", (socket) => {
   });
 
   //sending and getting message
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+  socket.on("sendMessage", ({ conversationId, sender, receiver, text }) => {
     //if user is undefined, the client to recieve the message is offline
-    const user = getUser(receiverId);
-    console.log(user);
-    io.to(user.socketId).emit("getMessage", {
-      senderId,
-      text,
+    const user = getUser(receiver);
+    if (user) {
+      io.to(user.socketId).emit("getMessage", {
+        sender,
+        text,
+      });
+    } else {
+      console.log(receiver, "is currently offline");
+    }
+
+    //message sent to database asynchronously
+    axios.post("http://localhost:7000/api/messages/send-message", {
+      conversationId: conversationId,
+      sender: sender,
+      text: text,
     });
   });
 
