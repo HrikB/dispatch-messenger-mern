@@ -10,6 +10,7 @@ const authenticateToken = (req, res, next) => {
   next();
 };
 
+//OK for now... eventually, move this array onto redis
 let users = [];
 const addUser = (userId, socketId) => {
   !users.some((user) => user.userId === userId) &&
@@ -18,6 +19,10 @@ const addUser = (userId, socketId) => {
 
 const removeUser = (socketId) => {
   users = users.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  return users.find((user) => user.userId === userId);
 };
 
 //App Config
@@ -34,6 +39,8 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   //console.log(socket.handshake.auth.accessToken, "is the access token");
   io.emit("welcome", "This is the socket. Hi!");
+
+  //take the userId and socketId from client
   socket.on("sendUser", (userId) => {
     console.log(userId, "connected!");
 
@@ -41,6 +48,18 @@ io.on("connection", (socket) => {
     io.emit("getUsers", users);
   });
 
+  //sending and getting message
+  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+    //if user is undefined, the client to recieve the message is offline
+    const user = getUser(receiverId);
+    console.log(user);
+    io.to(user.socketId).emit("getMessage", {
+      senderId,
+      text,
+    });
+  });
+
+  //when client disconnects from the socket
   socket.on("disconnect", () => {
     console.log(socket.id, "disconnected!");
     removeUser(socket.id);

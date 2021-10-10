@@ -14,12 +14,12 @@ export let createConversation = async (req, res) => {
   }
 };
 
-export let getConversation = async (req, res) => {
+export let getConversations = async (req, res) => {
   try {
-    const conversation = await Conversation.find({
+    const conversations = await Conversation.find({
       members: { $in: [req.params.userId] },
     });
-    res.status(200).json(conversation);
+    res.status(200).json(conversations);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -42,6 +42,17 @@ export let getMessages = async (req, res) => {
       conversationId: req.params.conversationId,
     });
     res.status(200).json(messages);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+export let getConversation = async (req, res) => {
+  try {
+    const conversation = await Conversation.findOne({
+      _id: req.params.conversationId,
+    });
+    res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
   }

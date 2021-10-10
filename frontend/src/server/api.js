@@ -33,10 +33,21 @@ export const register = async (
   }
 };
 
+export const getConversation = async (conversationId) => {
+  try {
+    return await axios.get(
+      "http://localhost:7000/api/conversations/conversation-data/" +
+        conversationId
+    );
+  } catch (err) {
+    return err.response;
+  }
+};
+
 export const getConversations = async (userId) => {
   try {
     return await axios.get(
-      "http://localhost:7000/api/conversations/data/" + userId
+      "http://localhost:7000/api/conversations/all-conversations/" + userId
     );
   } catch (err) {
     return err.response;

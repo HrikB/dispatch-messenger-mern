@@ -16,7 +16,11 @@ import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { getMessages, sendMessageDatabase } from "./server/api.js";
+import {
+  getConversation,
+  getMessages,
+  sendMessageDatabase,
+} from "./server/api.js";
 import socket from "./server/socketio";
 
 import { io } from "socket.io-client";
@@ -35,9 +39,11 @@ function Chat() {
   const [chatWithEmail, setChatWithEmail] = useState("");
   const [openMic, setOpenMic] = useState(false);
   const [lastSentTime, setlastSentTime] = useState(new Date(0));
+  const [conversation, setConversation] = useState({});
   const { conversationId } = useParams();
   const [{ user }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
+  const [arrivingMessage, setArrivingMessage] = useState(null);
   const messagesEndRef = useRef(null);
   const [openEmoji, setOpenEmoji] = useState(false);
   const inputContainer = document.getElementsByClassName("input__container")[0];
@@ -104,6 +110,14 @@ function Chat() {
     socket?.on("getUsers", (users) => {
       console.log(users);
     });
+    socket?.on("getMessage", (data) => {
+      setArrivingMessage({
+        sender: data.senderId,
+        receiver: user.userId,
+        text: data.text,
+        createdAt: Date.now(),
+      });
+    });
   }, [user]);
 
   //loads messages from the database
@@ -111,23 +125,41 @@ function Chat() {
     //checks if there is conversationId in the link
     if (conversationId) {
       const messages = await getMessages(conversationId);
+      const conversation = await getConversation(conversationId);
       setMessages(messages.data);
+      setConversation(conversation.data);
     }
   }, [conversationId]);
 
+  useEffect(() => {
+    arrivingMessage &&
+      conversation?.members.includes(arrivingMessage.sender) &&
+      setMessages((prev) => [...prev, arrivingMessage]);
+  }, [arrivingMessage, conversation]);
+
   const sendMessage = (e) => {
     e.preventDefault();
+    const receiverId = conversation?.members.find((m) => m !== user.userId);
+    let outgoingMessage = {
+      senderId: user.userId,
+      receiverId: receiverId,
+      text: input,
+      createdAt: Date.now(),
+    };
+    socket.emit("sendMessage", outgoingMessage);
+
+    setMessages((prev) => [...prev, outgoingMessage]);
 
     //send message to Database asynchrounsly
     //is it more performative or sercure if instead of
     //storing to database from client while sending, I picked up the
     //data from the socket server side and had the server send to
     //database directly??
-    try {
+    /*try {
       sendMessageDatabase(conversationId, user.userId, input);
     } catch (err) {
       console.error(err);
-    }
+    }*/
 
     setOpenMic(false);
     setInput("");

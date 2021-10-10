@@ -38,17 +38,21 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:7000/api/conversation/create-chats
+
+GET http://localhost:8000/auth/data/61618299a8d80ef737f940c6
+
+###
+POST http://localhost:7000/api/conversations/create-chat
 Content-Type: application/json
 
 {
     "senderId": "6154d799941cdc85ca89b32c",
-    "receiverId": "6154da8f9b5b8cd13c58c59e"
+    "receiverId": "6161832f8a93cbc8f1ec8ecd"
 }
 
 ###
 
-GET http://localhost:7000/api/conversations/data/6157db28cc12e6cc02b57de4
+GET http://localhost:7000/api/conversations/all-conversations/6154d799941cdc85ca89b32c
 
 ###
 
@@ -56,9 +60,13 @@ POST http://localhost:7000/api/messages/send-message
 Content-Type: application/json
 
 {
-    "conversationId": "6160f0be4be65d1218fb0d0e",
-    "sender": "6154da8f9b5b8cd13c58c59e",
-    "text": "Ok Bye"
+    "conversationId": "616191f552806676b11ced80",
+    "sender": "6154d799941cdc85ca89b32c",
+    "text": "wbu"
 }
 
 ###
+GET http://localhost:7000/api/messages/get-message/616191f552806676b11ced80
+
+###
+GET http://localhost:7000/api/conversations/conversation-data/616191f552806676b11ced80
