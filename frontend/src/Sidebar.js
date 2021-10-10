@@ -5,8 +5,8 @@ import { Avatar, IconButton } from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
-import { io } from "socket.io-client";
-import { getConversations } from "./api.js";
+import { getConversations } from "./server/api.js";
+import socket from "./server/socketio.js";
 
 let jsonNames = [
   {
@@ -30,13 +30,6 @@ let jsonNames = [
 ];
 
 const createConversation = () => {};
-
-const socket = io("http://localhost:7000", {
-  reconnectionDelayMax: 10000,
-  auth: {
-    accessToken: localStorage.getItem("token"),
-  },
-});
 
 function Sidebar({ setShowModal }) {
   const [chatWithName, setChatWithName] = useState("");

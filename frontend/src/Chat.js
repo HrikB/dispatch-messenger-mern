@@ -16,7 +16,17 @@ import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { getMessages, sendMessageDatabase } from "./api.js";
+import { getMessages, sendMessageDatabase } from "./server/api.js";
+import socket from "./server/socketio";
+
+import { io } from "socket.io-client";
+
+/*const socket = io("http://localhost:7000", {
+  reconnectionDelayMax: 10000,
+  auth: {
+    accessToken: localStorage.getItem("token"),
+  },
+});*/
 
 function Chat() {
   const [input, setInput] = useState("");
@@ -40,6 +50,7 @@ function Chat() {
   const onEmojiClick = (e, emojiObject) => {
     setInput(input + emojiObject.emoji);
   };
+
   const onMicClick = () => {
     setOpenMic(true);
     //replace typing section
@@ -80,9 +91,22 @@ function Chat() {
   };
 
   const scrollToBottomSmooth = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  //checks for data from socket
+  useEffect(() => {
+    socket?.on("welcome", () => {
+      console.log("Welcome this is the socket server");
+    });
+    console.log("id", user.userId);
+    socket?.emit("sendUser", user.userId);
+    socket?.on("getUsers", (users) => {
+      console.log(users);
+    });
+  }, [user]);
+
+  //loads messages from the database
   useEffect(async () => {
     //checks if there is conversationId in the link
     if (conversationId) {
@@ -94,7 +118,11 @@ function Chat() {
   const sendMessage = (e) => {
     e.preventDefault();
 
-    //send message to Database
+    //send message to Database asynchrounsly
+    //is it more performative or sercure if instead of
+    //storing to database from client while sending, I picked up the
+    //data from the socket server side and had the server send to
+    //database directly??
     try {
       sendMessageDatabase(conversationId, user.userId, input);
     } catch (err) {
@@ -125,7 +153,6 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
-            {console.log("message", message)}
             {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
             {/* <h6
               className="time"

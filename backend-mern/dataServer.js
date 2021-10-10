@@ -10,6 +10,16 @@ const authenticateToken = (req, res, next) => {
   next();
 };
 
+let users = [];
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) &&
+    users.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  users = users.filter((user) => user.socketId !== socketId);
+};
+
 //App Config
 const app = express();
 const port = 7000;
@@ -22,7 +32,20 @@ const io = new Server(httpServer, {
 
 //socket-io
 io.on("connection", (socket) => {
-  console.log(socket.handshake.auth.accessToken, "is the access token");
+  //console.log(socket.handshake.auth.accessToken, "is the access token");
+  io.emit("welcome", "This is the socket. Hi!");
+  socket.on("sendUser", (userId) => {
+    console.log(userId, "connected!");
+
+    addUser(userId, socket.id);
+    io.emit("getUsers", users);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(socket.id, "disconnected!");
+    removeUser(socket.id);
+    io.emit("getUsers", users);
+  });
 });
 
 //Routes Import

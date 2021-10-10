@@ -3,7 +3,7 @@ import "./SidebarChat.css";
 import { Avatar } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
-import { getConversations, getUserData } from "./api.js";
+import { getConversations, getUserData } from "./server/api.js";
 
 function SidebarChat({ conversationId, memberId }) {
   const [messages, setMessages] = useState("");

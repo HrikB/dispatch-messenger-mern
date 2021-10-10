@@ -6,7 +6,7 @@ import { useStateValue } from "./StateProvider.js";
 import { actionTypes } from "./reducer";
 import { DeckOutlined } from "@material-ui/icons";
 import CloseIcon from "@material-ui/icons/Close";
-import { login, register } from "./api";
+import { login, register } from "./server/api";
 
 function Login() {
   const [{}, dispatch] = useStateValue();
