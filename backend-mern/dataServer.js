@@ -63,11 +63,15 @@ io.on("connection", (socket) => {
     }
 
     //message sent to database asynchronously
-    axios.post("http://localhost:7000/api/messages/send-message", {
-      conversationId: conversationId,
-      sender: sender,
-      text: text,
-    });
+    try {
+      axios.post("http://localhost:7000/api/messages/send-message", {
+        conversationId: conversationId,
+        sender: sender,
+        text: text,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   });
 
   //when client disconnects from the socket
@@ -81,12 +85,14 @@ io.on("connection", (socket) => {
 //Routes Import
 import conversationsRoute from "./routes/conversations.js";
 import messageRoute from "./routes/messages.js";
+import requestRoute from "./routes/friendsRequests.js";
 
 //Middlewares
 app.use(express.json());
 app.use(cors());
 app.use("/api/conversations", conversationsRoute);
 app.use("/api/messages", messageRoute);
+app.use("/api/requests", requestRoute);
 
 //DB Config
 mongoose.connect(process.env.DATABASE).then(() => {

@@ -2,17 +2,19 @@ import express from "express";
 import mongoose from "mongoose";
 
 let friendRequestSchema = new mongoose.Schema({
-  requester: {
-    type: int,
+  requesterId: {
+    type: String,
     required: true,
   },
-  recipient: {
-    type: int,
+  recipientId: {
+    type: String,
     required: true,
   },
-  status: {
-    type: int,
-    required: true,
+  requesterName: {
+    type: String,
+  },
+  recipientName: {
+    type: String,
   },
 });
 

@@ -46,8 +46,8 @@ POST http://localhost:7000/api/conversations/create-chat
 Content-Type: application/json
 
 {
-    "senderId": "6154d799941cdc85ca89b32c",
-    "receiverId": "6161832f8a93cbc8f1ec8ecd"
+    "senderId": "61639307187a61187b5e20b1",
+    "receiverId": "6163933a187a61187b5e20b4"
 }
 
 ###
@@ -70,3 +70,14 @@ GET http://localhost:7000/api/messages/get-message/616191f552806676b11ced80
 
 ###
 GET http://localhost:7000/api/conversations/conversation-data/616191f552806676b11ced80
+
+###
+POST http://localhost:7000/api/requests/send-request
+Content-Type: application/json
+
+{
+  "requesterId": "61639307187a61187b5e20b1",
+  "recipientId": "6163933a187a61187b5e20b4",
+  "requesterName": "h",
+  "recipientName": "o"
+}
