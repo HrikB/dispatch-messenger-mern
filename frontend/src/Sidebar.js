@@ -42,7 +42,7 @@ function Sidebar({ setShowModal }) {
   const [origNames, setOrigNames] = useState([]);
 
   useEffect(async () => {
-    const conversationsData = await getConversations(user.userId);
+    const conversationsData = await getConversations(user._id);
     setConversations(conversationsData.data);
     /*var newNames = [];
     if (searchInput) {
@@ -57,7 +57,7 @@ function Sidebar({ setShowModal }) {
     } else {
       setNames(origNames);
     }*/
-  }, [user.userId]);
+  }, [user._id]);
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -82,9 +82,9 @@ function Sidebar({ setShowModal }) {
       <div className="sidebar__chats">
         {conversations.map((conversation) => (
           <SidebarChat
-            key={conversation.members.find((m) => m !== user.userId)}
+            key={conversation.members.find((m) => m !== user._id)}
             conversationId={conversation._id}
-            memberId={conversation.members.find((m) => m !== user.userId)}
+            memberId={conversation.members.find((m) => m !== user._id)}
           />
         ))}
       </div>

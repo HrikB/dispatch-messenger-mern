@@ -1,11 +1,24 @@
 import React, { useState } from "react";
 import "./AddFriends.css";
+import { useStateValue } from "./StateProvider";
+import { sendFriendRequest } from "./server/api.js";
+import socket from "./server/socketio";
 
 function AddFriends({ friendsList }) {
   const [input, setInput] = useState("");
+  const [{ user }, dispatch] = useStateValue();
 
-  const sendFriendRequest = (e) => {
+  const sendFriendRequests = async (e) => {
+    console.log(user);
     e.preventDefault();
+    let outgoingRequest = {
+      senderId: user._id,
+      senderName: user.first_name + " " + user.last_name,
+      receiverEmail: input,
+    };
+    socket.emit("sendFriendRequest", outgoingRequest);
+    console.log("going");
+    setInput("");
   };
 
   return (
@@ -24,7 +37,7 @@ function AddFriends({ friendsList }) {
           <button
             disabled={!input.trim()}
             className="submitFriend__request"
-            onClick={sendFriendRequest}
+            onClick={sendFriendRequests}
             type="submit"
           >
             <p>Send Friend Request</p>

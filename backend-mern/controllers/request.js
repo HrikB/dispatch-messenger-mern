@@ -1,5 +1,5 @@
 import FriendRequest from "../models/FriendRequest.js";
-
+import User from "../models/User.js";
 export const getRequest = async (req, res) => {
   try {
     const requests = await FriendRequest.find({
@@ -15,10 +15,19 @@ export const getRequest = async (req, res) => {
 };
 
 export const sendRequest = async (req, res) => {
-  const newRequest = new FriendRequest(req.body);
+  const { userId, userName, receiverEmail } = req.body;
   //need to send error msg if friendRequest in either
   //direction has already been sent
+  console.log("email", userId);
   try {
+    const receiverData = await User.findOne({ email: receiverEmail });
+    console.log(receiverData);
+    const newRequest = new FriendRequest({
+      requesterId: userId,
+      recipientId: receiverData._id,
+      requesterName: userName,
+      recipientName: receiverData.first_name + " " + receiverData.last_name,
+    });
     const existingRequest = await FriendRequest.findOne({
       $or: [
         {
@@ -31,7 +40,6 @@ export const sendRequest = async (req, res) => {
         },
       ],
     });
-    console.log(existingRequest);
     if (!existingRequest) {
       const sentRequest = await newRequest.save();
       res.status(200).json(sentRequest);
@@ -45,10 +53,7 @@ export const sendRequest = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
-};
-
-export const requestResponse = async (req, res) => {
-  const response = req.body;
 };

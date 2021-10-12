@@ -62,6 +62,14 @@ export const getUserData = async (userId) => {
   }
 };
 
+export const getUserDataByEmail = async (email) => {
+  try {
+    return await axios.get("http://localhost:8000/auth/data-email/" + email);
+  } catch (err) {
+    return err.response;
+  }
+};
+
 export const getMessages = async (conversationId) => {
   try {
     return await axios.get(
@@ -79,6 +87,28 @@ export const sendMessageDatabase = async (conversationId, sender, message) => {
       sender: sender,
       text: message,
     });
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const sendFriendRequest = async (userId, userName, receiverEmail) => {
+  try {
+    return await axios.post("http://localhost:7000/api/requests/send-request", {
+      userId: userId,
+      userName: userName,
+      receiverEmail: receiverEmail,
+    });
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const getFriendRequests = async (userId) => {
+  try {
+    return await axios.get(
+      "http://localhost:7000/api/requests/get-request/" + userId
+    );
   } catch (err) {
     return err.response;
   }

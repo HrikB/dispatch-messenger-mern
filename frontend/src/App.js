@@ -7,7 +7,6 @@ import Login from "./Login";
 import Modal from "./Modal";
 import Friends from "./Friends";
 import { useStateValue } from "./StateProvider";
-import { actionTypes } from "./reducer";
 
 function App() {
   const [{ user }, dispatch] = useStateValue();

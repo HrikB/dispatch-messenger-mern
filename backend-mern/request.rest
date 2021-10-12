@@ -39,7 +39,10 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8000/auth/data/61618299a8d80ef737f940c6
+GET http://localhost:8000/auth/data/61639307187a61187b5e20b1
+
+###
+GET http://localhost:8000/auth/data-email/h
 
 ###
 POST http://localhost:7000/api/conversations/create-chat
@@ -52,7 +55,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:7000/api/conversations/all-conversations/6154d799941cdc85ca89b32c
+GET http://localhost:7000/api/conversations/all-conversations/61639307187a61187b5e20b1
 
 ###
 
@@ -76,8 +79,11 @@ POST http://localhost:7000/api/requests/send-request
 Content-Type: application/json
 
 {
-  "requesterId": "61639307187a61187b5e20b1",
-  "recipientId": "6163933a187a61187b5e20b4",
-  "requesterName": "h",
-  "recipientName": "o"
+  "userId": "61639307187a61187b5e20b1",
+  "userName": "h",
+  "receiverEmail": "o"
 }
+
+###
+
+GET http://localhost:7000/api/requests/get-request/6163933a187a61187b5e20b4

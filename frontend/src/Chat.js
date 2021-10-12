@@ -105,15 +105,15 @@ function Chat() {
     socket?.on("welcome", () => {
       console.log("Welcome this is the socket server");
     });
-    console.log("id", user.userId);
-    socket?.emit("sendUser", user.userId);
+    console.log("id", user._id);
+    socket?.emit("sendUser", user._id);
     socket?.on("getUsers", (users) => {
       console.log(users);
     });
     socket?.on("getMessage", (data) => {
       setArrivingMessage({
         sender: data.sender,
-        receiver: user.userId,
+        receiver: user._id,
         text: data.text,
         createdAt: Date.now(),
       });
@@ -139,10 +139,10 @@ function Chat() {
 
   const sendMessage = (e) => {
     e.preventDefault();
-    const receiverId = conversation?.members.find((m) => m !== user.userId);
+    const receiverId = conversation?.members.find((m) => m !== user._id);
     let outgoingMessage = {
       conversationId: conversationId,
-      sender: user.userId,
+      sender: user._id,
       receiver: receiverId,
       text: input,
     };
@@ -156,7 +156,7 @@ function Chat() {
     //data from the socket server side and had the server send to
     //database directly??
     /*try {
-      sendMessageDatabase(conversationId, user.userId, input);
+      sendMessageDatabase(conversationId, user._id, input);
     } catch (err) {
       console.error(err);
     }*/
@@ -212,7 +212,7 @@ function Chat() {
                 </h6>*/}
             <p
               className={`chat__message ${
-                message.sender == user.userId && "chat__reciever"
+                message.sender == user._id && "chat__reciever"
               } ${
                 /*
                 messages[i - 1]?.senderEmail == messages[i].senderEmail &&

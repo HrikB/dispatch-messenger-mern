@@ -45,6 +45,7 @@ export let signup = (req, res) => {
           last_name: last_name,
           email: email,
           password: password,
+          friendsList: [],
         });
 
         const hash = await bcrypt.hash(password, 10);
@@ -95,11 +96,11 @@ export let signin = (req, res) => {
             jwt.verify(
               accessToken,
               process.env.ACCESS_TOKEN_SECRET,
-              (err, user) => {
+              (err, decoded) => {
                 if (err) {
                   res.status(500).json({ errors: err });
                 }
-                if (user) {
+                if (decoded) {
                   return res.status(200).json({
                     success: true,
                     accessToken: accessToken,
@@ -185,6 +186,16 @@ export let getData = async (req, res) => {
   let userId = req.params.id;
   try {
     const userData = await User.findOne({ _id: userId });
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+export let getDataByEmail = async (req, res) => {
+  let userEmail = req.params.email;
+  try {
+    const userData = await User.findOne({ email: userEmail });
     res.status(200).json(userData);
   } catch (err) {
     res.status(500).json(err);

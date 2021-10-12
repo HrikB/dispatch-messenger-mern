@@ -19,6 +19,10 @@ let userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    friendsList: {
+      type: Array,
+      required: true,
+    },
   },
   {
     timestamps: true,

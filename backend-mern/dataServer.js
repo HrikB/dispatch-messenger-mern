@@ -5,6 +5,9 @@ import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import axios from "axios";
+import User from "./models/User.js";
+import Message from "./models/Message.js";
+import FriendRequest from "./models/FriendRequest.js";
 dotenv.config();
 
 const authenticateToken = (req, res, next) => {
@@ -23,7 +26,7 @@ const removeUser = (socketId) => {
 };
 
 const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
+  return users.find((user) => user.userId == userId);
 };
 
 //App Config
@@ -64,15 +67,64 @@ io.on("connection", (socket) => {
 
     //message sent to database asynchronously
     try {
-      axios.post("http://localhost:7000/api/messages/send-message", {
+      const savedMessage = new Message({
         conversationId: conversationId,
         sender: sender,
         text: text,
-      });
+      }).save();
     } catch (err) {
       console.error(err);
     }
   });
+
+  //sending and getting friend requests
+  socket.on(
+    "sendFriendRequest",
+    async ({ senderId, senderName, receiverEmail }) => {
+      //get receiver object with the email
+      const receiver = await User.findOne({ email: receiverEmail });
+
+      //if receiver email exists in database
+      if (receiver) {
+        const user = getUser(receiver._id);
+
+        const existingRequest = await FriendRequest.findOne({
+          $or: [
+            {
+              requesterId: senderId,
+              recipientId: receiver._id,
+            },
+            {
+              requesterId: receiver._id,
+              recipientId: senderId,
+            },
+          ],
+        });
+        if (!existingRequest) {
+          const savedFriendRequest = new FriendRequest({
+            requesterId: senderId,
+            recipientId: receiver._id,
+            requesterName: senderName,
+            recipientName: receiver.first_name + " " + receiver.last_name,
+          }).save();
+
+          //if user is connected to socket
+          if (user) {
+            io.to(user.socketId).emit("getFriendRequest", {
+              senderId,
+              senderName,
+            });
+          }
+        } else {
+          //emit error that request already exists
+          console.log("Already exists");
+        }
+      } else {
+        //the receiverEmail search did not yield a user
+        //emit an error
+      }
+    }
+  );
 
   //when client disconnects from the socket
   socket.on("disconnect", () => {

@@ -61,4 +61,6 @@
 .friend__body {
   box-sizing: border-box;
   padding: 20px 30px;
+  overflow-y: scroll;
+  height: 100%;
 }

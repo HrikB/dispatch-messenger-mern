@@ -4,6 +4,8 @@ import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import AllFriends from "./AllFriends";
 import AddFriends from "./AddFriends";
 import Pending from "./Pending";
+import socket from "./server/socketio";
+import { useStateValue } from "./StateProvider";
 
 let friendsJson = {
   friendsList: [
@@ -14,10 +16,15 @@ let friendsJson = {
 };
 
 function Friends() {
+  const [{ user }, dispatch] = useStateValue();
+
   const [friendsList, setFriendsList] = useState(friendsJson.friendsList);
   const [currentTab, setCurrentTab] = useState(
     <AllFriends friendsList={friendsList} />
   );
+  useEffect(() => {
+    socket?.emit("sendUser", user._id);
+  }, []);
   useEffect(() => {
     //Handles tab highlighting
     const allButton = document.getElementsByClassName("all")[0];
