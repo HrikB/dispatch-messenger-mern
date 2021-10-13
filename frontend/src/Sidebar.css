@@ -1,9 +1,39 @@
 .sidebar {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-width: 20rem;
   background-color: #171717;
+  align-items: center;
+}
+
+.sidebar a {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 15px;
+}
+
+.friends__tab {
+  box-sizing: border-box;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  margin: 10px 0;
+  padding: 5px;
+}
+
+.friends__tab:hover {
+  cursor: pointer;
+  background-color: #403d3d;
+}
+
+.friends__tab p {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .sidebar__header {
@@ -60,5 +90,10 @@
 
 .sidebar__chats {
   overflow-y: scroll;
-  margin-top: 10px;
+  width: 100%;
+}
+
+.sidebar__chats h3 {
+  font-size: 0.75rem;
+  margin-left: 10px;
 }

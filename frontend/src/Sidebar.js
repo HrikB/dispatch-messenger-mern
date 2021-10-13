@@ -7,6 +7,8 @@ import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
 import { getConversations } from "./server/api.js";
 import socket from "./server/socketio.js";
+import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
+import { Link } from "react-router-dom";
 
 let jsonNames = [
   {
@@ -79,11 +81,18 @@ function Sidebar({ setShowModal }) {
           <SearchOutlined />
         </div>
       </div>
+      <Link to="/friends">
+        <div className="friends__tab">
+          <EmojiPeopleIcon style={{ fontSize: 30 }}></EmojiPeopleIcon>
+          <p>Friends</p>
+        </div>
+      </Link>
       <div className="sidebar__chats">
+        <h3>PRIVATE MESSAGES</h3>
         {conversations.map((conversation) => (
           <SidebarChat
             key={conversation.members.find((m) => m !== user._id)}
-            conversationId={conversation._id}
+            convId={conversation._id}
             memberId={conversation.members.find((m) => m !== user._id)}
           />
         ))}

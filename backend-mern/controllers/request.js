@@ -21,7 +21,6 @@ export const sendRequest = async (req, res) => {
   console.log("email", userId);
   try {
     const receiverData = await User.findOne({ email: receiverEmail });
-    console.log(receiverData);
     const newRequest = new FriendRequest({
       requesterId: userId,
       recipientId: receiverData._id,
@@ -54,6 +53,17 @@ export const sendRequest = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    res.status(500).json(err);
+  }
+};
+
+export const getAllFriends = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.userId });
+
+    const friends = await User.find({ _id: { $in: user.friendsList } });
+    res.status(200).json(friends);
+  } catch (err) {
     res.status(500).json(err);
   }
 };

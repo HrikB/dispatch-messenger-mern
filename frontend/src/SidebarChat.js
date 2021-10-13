@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
 import { getConversations, getUserData } from "./server/api.js";
 
-function SidebarChat({ conversationId, memberId }) {
+function SidebarChat({ convId, memberId }) {
   const [messages, setMessages] = useState("");
   const [{ user }, dispatch] = useStateValue();
   const [conversations, setConversations] = useState([]);
@@ -22,9 +22,9 @@ function SidebarChat({ conversationId, memberId }) {
 
   return (
     <div>
-      <Link to={`/t/${conversationId}`}>
+      <Link to={`/t/${convId}`}>
         <div className="sidebarChat">
-          <div className="allContainer">
+          <div id={convId} className="allContainer">
             <Avatar id="profpic" />
             <div className="infoContainer">
               <h4 className="name">

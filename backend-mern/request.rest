@@ -87,3 +87,9 @@ Content-Type: application/json
 ###
 
 GET http://localhost:7000/api/requests/get-request/6163933a187a61187b5e20b4
+
+###
+PUT http://localhost:7000/api/requests/respond/
+
+###
+GET http://localhost:7000/api/requests/friends/6163935d187a61187b5e20b7

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./AddFriends.css";
 import { useStateValue } from "./StateProvider";
-import { sendFriendRequest } from "./server/api.js";
 import socket from "./server/socketio";
 
 function AddFriends({ friendsList }) {
@@ -9,7 +8,6 @@ function AddFriends({ friendsList }) {
   const [{ user }, dispatch] = useStateValue();
 
   const sendFriendRequests = async (e) => {
-    console.log(user);
     e.preventDefault();
     let outgoingRequest = {
       senderId: user._id,
@@ -17,7 +15,6 @@ function AddFriends({ friendsList }) {
       receiverEmail: input,
     };
     socket.emit("sendFriendRequest", outgoingRequest);
-    console.log("going");
     setInput("");
   };
 

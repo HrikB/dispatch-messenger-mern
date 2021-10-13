@@ -113,3 +113,13 @@ export const getFriendRequests = async (userId) => {
     return err.response;
   }
 };
+
+export const getAllFriends = async (userId) => {
+  try {
+    return await axios.get(
+      "http://localhost:7000/api/requests/friends/" + userId
+    );
+  } catch (err) {
+    return err.response;
+  }
+};

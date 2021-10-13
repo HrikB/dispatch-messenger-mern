@@ -17,7 +17,6 @@ let friendsJson = {
 
 function Friends() {
   const [{ user }, dispatch] = useStateValue();
-
   const [friendsList, setFriendsList] = useState(friendsJson.friendsList);
   const [currentTab, setCurrentTab] = useState(
     <AllFriends friendsList={friendsList} />

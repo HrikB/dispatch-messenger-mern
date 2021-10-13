@@ -1,0 +1,57 @@
+.allFriends__heading {
+  margin-bottom: 10px;
+}
+
+.friendComponent__container {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid grey;
+}
+
+.friendComponent__container .friend__info {
+  display: flex;
+  align-items: center;
+  width: 50%;
+  justify-content: flex-start;
+}
+
+.friendComponent__container .friend__info .accountPic {
+  width: 3rem;
+  height: 3rem;
+  margin: 5px;
+}
+
+.friendComponent__container .friend__info .info__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.friendComponent__container .friend__info .info__text .friend__name {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.friendComponent__container .friend__info .info__text .online__status {
+  font-weight: lighter;
+  font-size: 12px;
+}
+
+.friendComponent__container .friend__options {
+  display: flex;
+  width: 50%;
+  justify-content: flex-end;
+}
+
+.friendComponent__container .friend__options .MuiIconButton-root {
+  padding: 0;
+  width: fit-content;
+  margin: 0 10px;
+}
+
+.friendComponent__container
+  .friend__options
+  .MuiIconButton-root
+  .MuiSvgIcon-root {
+  fill: rgba(216, 216, 216, 0.4) !important;
+}

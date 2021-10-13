@@ -4,6 +4,7 @@
 }
 
 *::-webkit-scrollbar {
+  position: absolute;
   width: 10px;
   background: #0f0f0f;
 }
@@ -27,6 +28,7 @@
   width: 90vw;
   height: 90vh;
   box-shadow: 0px 0px 40px 6px #000;
+  border-radius: 15px;
 }
 .home__body {
   width: 100%;

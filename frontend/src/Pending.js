@@ -64,19 +64,29 @@ function Pending() {
 
     socket?.on("getFriendRequest", (data) => {
       setArrivingRequest({
+        _id: data.id,
         requesterId: data.senderId,
         recipientId: user._id,
         requesterName: data.senderName,
         recipientName: user.first_name + " " + user.last_name,
       });
     });
-
     setPending(friendRequests);
   }, [user]);
 
   useEffect(() => {
     arrivingRequest && setPending((prev) => [arrivingRequest, ...prev]);
   }, [arrivingRequest]);
+
+  const responseToReq = (friendRequest, response) => {
+    setPending(pending.filter((prev) => prev._id != friendRequest._id));
+    socket.emit("respondToRequest", {
+      requestId: friendRequest._id,
+      requesterId: friendRequest.requesterId,
+      recipientId: friendRequest.recipientId,
+      response: response,
+    });
+  };
 
   return (
     <div className="pending">
@@ -100,6 +110,7 @@ function Pending() {
           </div>
           <div className="request__response">
             <IconButton
+              onClick={() => responseToReq(friendRequest, 1)}
               style={
                 friendRequest.requesterId != user._id
                   ? { visbility: "visible" }
@@ -109,7 +120,7 @@ function Pending() {
               <CheckCircle style={{ fontSize: 40 }} />
             </IconButton>
 
-            <IconButton>
+            <IconButton onClick={() => responseToReq(friendRequest, 0)}>
               <Cancel style={{ fontSize: 40 }} />
             </IconButton>
           </div>

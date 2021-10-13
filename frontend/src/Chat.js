@@ -22,7 +22,6 @@ import {
   sendMessageDatabase,
 } from "./server/api.js";
 import socket from "./server/socketio";
-
 import { io } from "socket.io-client";
 
 /*const socket = io("http://localhost:7000", {
@@ -105,11 +104,8 @@ function Chat() {
     socket?.on("welcome", () => {
       console.log("Welcome this is the socket server");
     });
-    console.log("id", user._id);
     socket?.emit("sendUser", user._id);
-    socket?.on("getUsers", (users) => {
-      console.log(users);
-    });
+    socket?.on("getUsers", (users) => {});
     socket?.on("getMessage", (data) => {
       setArrivingMessage({
         sender: data.sender,
@@ -124,6 +120,10 @@ function Chat() {
   useEffect(async () => {
     //checks if there is conversationId in the link
     if (conversationId) {
+      const allContainer = document.getElementById(conversationId);
+      allContainer
+        ? (allContainer.style.background = "#403d3d")
+        : (allContainer.style.background = "#171717");
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
       setMessages(messages.data);
@@ -185,7 +185,6 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
-            {console.log(message)}
             {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
             {/* <h6
               className="time"

@@ -83,11 +83,9 @@ io.on("connection", (socket) => {
     async ({ senderId, senderName, receiverEmail }) => {
       //get receiver object with the email
       const receiver = await User.findOne({ email: receiverEmail });
-
       //if receiver email exists in database
       if (receiver) {
         const user = getUser(receiver._id);
-
         const existingRequest = await FriendRequest.findOne({
           $or: [
             {
@@ -100,28 +98,63 @@ io.on("connection", (socket) => {
             },
           ],
         });
-        if (!existingRequest) {
-          const savedFriendRequest = new FriendRequest({
-            requesterId: senderId,
-            recipientId: receiver._id,
-            requesterName: senderName,
-            recipientName: receiver.first_name + " " + receiver.last_name,
-          }).save();
-
-          //if user is connected to socket
-          if (user) {
-            io.to(user.socketId).emit("getFriendRequest", {
-              senderId,
-              senderName,
-            });
+        if (!receiver.friendsList.includes(senderId)) {
+          if (!existingRequest) {
+            const id = mongoose.Types.ObjectId();
+            const savedFriendRequest = new FriendRequest({
+              _id: id,
+              requesterId: senderId,
+              recipientId: receiver._id,
+              requesterName: senderName,
+              recipientName: receiver.first_name + " " + receiver.last_name,
+            }).save();
+            //if user is connected to socket
+            if (user) {
+              io.to(user.socketId).emit("getFriendRequest", {
+                id,
+                senderId,
+                senderName,
+              });
+            }
+          } else {
+            //emit error that request already exists
+            console.log("Already exists");
           }
         } else {
-          //emit error that request already exists
-          console.log("Already exists");
+          //emit error that the requester and receiver are already friends
+          console.log("Already friends");
         }
       } else {
         //the receiverEmail search did not yield a user
         //emit an error
+      }
+    }
+  );
+
+  socket.on(
+    "respondToRequest",
+    async ({ requestId, requesterId, recipientId, response }) => {
+      //console.log(requestId, requesterId, recipientId, response);
+      //response was rejected, delete from database
+
+      await FriendRequest.deleteOne({ _id: requestId });
+      if (response == 1) {
+        const requester = getUser(requesterId);
+        const receiver = getUser(recipientId);
+        const requesterObject = await User.findOneAndUpdate(
+          { _id: requesterId },
+          { $addToSet: { friendsList: recipientId } }
+        );
+        const receiverObject = await User.findOneAndUpdate(
+          { _id: recipientId },
+          { $addToSet: { friendsList: requesterId } }
+        );
+        if (requester) {
+          io.to(requester.socketId).emit("newFriend", requesterObject);
+        }
+        if (receiver) {
+          io.to(receiver.socketId).emit("newFriend", receiverObject);
+        }
       }
     }
   );
@@ -153,7 +186,6 @@ mongoose.connect(process.env.DATABASE).then(() => {
 
 //API Endpoints
 app.get("/", (req, res) => res.status(200).send("Data Server Up"));
-app.get("/friends", authenticateToken, (req, res) => {});
 
 //Listener
 httpServer.listen(port, () => console.log(`listening on localhost: ${port}`));
