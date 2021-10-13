@@ -33,7 +33,7 @@ export const register = async (
   }
 };
 
-export const createConversation = async(userId);
+//export const createConversation = async(userId);
 
 export const getConversation = async (conversationId) => {
   try {

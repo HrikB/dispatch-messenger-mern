@@ -111,7 +111,7 @@ function Chat() {
         sender: data.sender,
         receiver: user._id,
         text: data.text,
-        createdAt: Date.now(),
+        createdAt: data.createdAt,
       });
     });
   }, [user]);
@@ -141,6 +141,7 @@ function Chat() {
       sender: user._id,
       receiver: receiverId,
       text: input,
+      createdAt: Date.now(),
     };
     socket.emit("sendMessage", outgoingMessage);
 
@@ -181,10 +182,12 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
+            {console.log(new Date(message.createdAt))}
             {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
-            {/* <h6
-              className="time"
-              style={
+            {
+              <h6
+                className="time"
+                /*style={
                 messages[i].timestamp
                   ? messages[i]?.timestamp.valueOf() > new Date(0, 0).valueOf()
                     ? {}
@@ -194,28 +197,32 @@ function Chat() {
                       600000
                   ? {}
                   : { display: "none" }
-              }
-            >
-              {messages[i].timestamp
-                ? new Date(
-                    messages[i].timestamp.seconds * 1000 +
-                      messages[i].timestamp.nanoseconds / 1000000
-                  ).toString()
-                : new Date(Date.now()).toDateString() +
-                  " " +
-                  new Date(Date.now()).toTimeString()}
-                </h6>*/}
+              }*/
+              >
+                {(!messages[i - 1] ||
+                  new Date(
+                    new Date(messages[i - 1]?.createdAt).getTime() + 10 * 60000
+                  ) < new Date(new Date(messages[i].createdAt).getTime())) &&
+                  new Date(message.createdAt).toLocaleTimeString([], {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })}
+              </h6>
+            }
             <p
               className={`chat__message ${
                 message.sender == user._id && "chat__reciever"
               } ${
-                /*
-                messages[i - 1]?.senderEmail == messages[i].senderEmail &&
-                !(messages[i].timestamp
-                  ? messages[i]?.timestamp.valueOf() > new Date(0).valueOf()
-                  : Date.now() > lastSentTime.valueOf() + 600000) &&
+                !(
+                  new Date(
+                    new Date(messages[i - 1]?.createdAt).getTime() + 10 * 60000
+                  ) < new Date(new Date(messages[i].createdAt).getTime())
+                ) &&
+                messages[i - 1]?.sender == messages[i].sender &&
                 "same__sender"
-                */ true
               }`}
             >
               <h6 className="chat__name">

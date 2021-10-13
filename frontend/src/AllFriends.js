@@ -32,7 +32,6 @@ function AllFriends() {
     });
     //
     socket?.on("openMessage", (data) => {
-      console.log("d", data);
       history.push({ pathname: `/t/${data._id}` });
     });
     setFriendsList(allFriends.data);

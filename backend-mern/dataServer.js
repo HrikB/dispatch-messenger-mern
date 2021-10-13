@@ -56,29 +56,34 @@ io.on("connection", (socket) => {
   });
 
   //sending and getting message
-  socket.on("sendMessage", ({ conversationId, sender, receiver, text }) => {
-    //if user is undefined, the client to recieve the message is offline
-    const user = getUser(receiver);
-    if (user) {
-      io.to(user.socketId).emit("getMessage", {
-        sender,
-        text,
-      });
-    } else {
-      console.log(receiver, "is currently offline");
-    }
+  socket.on(
+    "sendMessage",
+    ({ conversationId, sender, receiver, text, createdAt }) => {
+      //if user is undefined, the client to recieve the message is offline
+      const user = getUser(receiver);
+      if (user) {
+        io.to(user.socketId).emit("getMessage", {
+          sender,
+          text,
+          createdAt,
+        });
+      } else {
+        console.log(receiver, "is currently offline");
+      }
 
-    //message sent to database asynchronously
-    try {
-      const savedMessage = new Message({
-        conversationId: conversationId,
-        sender: sender,
-        text: text,
-      }).save();
-    } catch (err) {
-      console.error(err);
+      //message sent to database asynchronously
+      try {
+        const savedMessage = new Message({
+          conversationId: conversationId,
+          sender: sender,
+          text: text,
+          createdAt: createdAt,
+        }).save();
+      } catch (err) {
+        console.error(err);
+      }
     }
-  });
+  );
 
   //sending and getting friend requests
   socket.on(
