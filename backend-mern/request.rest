@@ -49,8 +49,8 @@ POST http://localhost:7000/api/conversations/create-chat
 Content-Type: application/json
 
 {
-    "senderId": "61639307187a61187b5e20b1",
-    "receiverId": "6163933a187a61187b5e20b4"
+    "senderId": "6163933a187a61187b5e20b4",
+    "receiverId": "61639307187a61187b5e20b1"
 }
 
 ###

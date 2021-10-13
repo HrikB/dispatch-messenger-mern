@@ -7,6 +7,7 @@ import Login from "./Login";
 import Modal from "./Modal";
 import Friends from "./Friends";
 import { useStateValue } from "./StateProvider";
+import socket from "./server/socketio.js";
 
 function App() {
   const [{ user }, dispatch] = useStateValue();

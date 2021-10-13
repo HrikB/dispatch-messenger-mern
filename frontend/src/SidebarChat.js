@@ -25,19 +25,15 @@ function SidebarChat({ convId, memberId, friendsTab }) {
       }
     }
     if (friendsTab) {
-      console.log("a", friendsTab.id, path[1]);
       if (friendsTab.id != path[1]) {
-        console.log("b", friendsTab.id, path[1]);
         friendsTab.style.background = "#171717";
       } else {
-        console.log("c", friendsTab.id, path[1]);
         friendsTab.style.background = "#403d3d";
       }
     }
   }, [window.location.pathname]);
 
   useEffect(async () => {
-    //console.log(window.location.pathname.split("/")[2]);
     try {
       const memberData = await getUserData(memberId);
       setConversations(memberData.data);

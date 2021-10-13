@@ -170,11 +170,11 @@ io.on("connection", (socket) => {
 
   //client attempting to create 1 to 1 chat
   socket.on("newPrivateChat", async ({ senderId, receiverId }) => {
-    const existingConversation = await Conversation.find({
+    const existingConversation = await Conversation.findOne({
       members: { $size: 2, $all: [senderId, receiverId] },
     });
-    if (existingConversation.length === 0) {
-      const user = getUser(receiverId);
+    const user = getUser(receiverId);
+    if (!existingConversation) {
       const _id = mongoose.Types.ObjectId();
       const newConversation = new Conversation({
         _id: _id,
@@ -185,13 +185,16 @@ io.on("connection", (socket) => {
       //checks if receiver is connected to socket
 
       if (user) {
+        console.log("Sent to other receiver");
         io.to(user.socketId).emit("getNewChat", newConversation);
       }
       io.to(getUser(senderId).socketId).emit("getNewChat", newConversation);
       newConversation.save();
+      io.to(getUser(senderId).socketId).emit("openMessage", { _id });
     } else {
-      //conversation between these two users already exists, simply make visible
-      console.log("already exists");
+      //conversation between these two users already exists, simply open
+      const _id = existingConversation._id;
+      io.to(getUser(senderId).socketId).emit("openMessage", { _id });
     }
   });
 

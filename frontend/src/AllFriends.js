@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router";
 import "./AllFriends.css";
 import { Avatar, IconButton } from "@material-ui/core";
 import MoreVert from "@material-ui/icons/MoreVert";
@@ -11,6 +12,7 @@ function AllFriends() {
   const [friendsList, setFriendsList] = useState([]);
   const [arrivingFriend, setArrivingFriend] = useState();
   const [{ user }, dispatch] = useStateValue();
+  const history = useHistory();
 
   const createChat = (friend) => {
     socket.emit("newPrivateChat", {
@@ -27,6 +29,11 @@ function AllFriends() {
         first_name: data.first,
         last_name: data.last,
       });
+    });
+    //
+    socket?.on("openMessage", (data) => {
+      console.log("d", data);
+      history.push({ pathname: `/t/${data._id}` });
     });
     setFriendsList(allFriends.data);
   }, [user]);
