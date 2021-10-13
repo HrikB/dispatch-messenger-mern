@@ -1,16 +1,6 @@
 import Message from "../models/Message.js";
 
-export let sendMessage = async (req, res) => {
-  const newMessage = new Message(req.body);
-
-  try {
-    const savedMessage = await newMessage.save();
-    res.status(200).json(savedMessage);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-};
-
+//api routes
 export let getMessage = async (req, res) => {
   try {
     const messages = await Message.find({
@@ -19,5 +9,31 @@ export let getMessage = async (req, res) => {
     res.status(200).json(messages);
   } catch (err) {
     res.status(500).json(err);
+  }
+};
+
+//socket functions
+export let sendMessage = ({ conversationId, sender, receiver, text }) => {
+  //if user is undefined, the client to recieve the message is offline
+  const user = getUser(receiver);
+
+  if (user) {
+    io.to(user.socketId).emit("getMessage", {
+      sender,
+      text,
+    });
+  } else {
+    console.log(receiver, "is currently offline");
+  }
+
+  //message sent to database asynchronously
+  try {
+    const savedMessage = new Message({
+      conversationId: conversationId,
+      sender: sender,
+      text: text,
+    }).save();
+  } catch (err) {
+    console.error(err);
   }
 };

@@ -14,10 +14,11 @@
   display: flex;
   align-items: center;
   padding: 10px;
+  margin-top: 5px;
 }
 
 .allContainer:hover {
-  background-color: #403d3d;
+  background-color: #403d3d !important;
 }
 
 .infoContainer {

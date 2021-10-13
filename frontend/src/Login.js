@@ -34,7 +34,6 @@ function Login() {
         localStorage.setItem("token", response.data.accessToken);
       }
       if (response.data.errors) {
-        console.log(response.data);
         setErrorMessage(response.data.errors[0].error);
         setErrVisibility("visible");
       }

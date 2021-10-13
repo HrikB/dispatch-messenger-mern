@@ -41,10 +41,16 @@ function Sidebar({ setShowModal }) {
   const [{ user }, dispatch] = useStateValue();
   const [names, setNames] = useState([]);
   const [conversations, setConversations] = useState([]);
+  const [arrivingConversation, setArrivingConversation] = useState();
   const [origNames, setOrigNames] = useState([]);
 
   useEffect(async () => {
     const conversationsData = await getConversations(user._id);
+
+    socket?.on("getNewChat", (data) => {
+      setArrivingConversation(data);
+    });
+
     setConversations(conversationsData.data);
     /*var newNames = [];
     if (searchInput) {
@@ -60,6 +66,11 @@ function Sidebar({ setShowModal }) {
       setNames(origNames);
     }*/
   }, [user._id]);
+
+  useEffect(() => {
+    arrivingConversation &&
+      setConversations((prev) => [arrivingConversation, ...prev]);
+  }, [arrivingConversation]);
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -81,19 +92,21 @@ function Sidebar({ setShowModal }) {
           <SearchOutlined />
         </div>
       </div>
-      <Link to="/friends">
-        <div className="friends__tab">
-          <EmojiPeopleIcon style={{ fontSize: 30 }}></EmojiPeopleIcon>
-          <p>Friends</p>
-        </div>
-      </Link>
+
       <div className="sidebar__chats">
+        <Link to="/friends">
+          <div id="friends" className="friends__tab">
+            <EmojiPeopleIcon style={{ fontSize: 30 }}></EmojiPeopleIcon>
+            <p>Friends</p>
+          </div>
+        </Link>
         <h3>PRIVATE MESSAGES</h3>
         {conversations.map((conversation) => (
           <SidebarChat
             key={conversation.members.find((m) => m !== user._id)}
             convId={conversation._id}
             memberId={conversation.members.find((m) => m !== user._id)}
+            friendsTab={document.getElementById("friends")}
           />
         ))}
       </div>

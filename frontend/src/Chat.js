@@ -120,10 +120,6 @@ function Chat() {
   useEffect(async () => {
     //checks if there is conversationId in the link
     if (conversationId) {
-      const allContainer = document.getElementById(conversationId);
-      allContainer
-        ? (allContainer.style.background = "#403d3d")
-        : (allContainer.style.background = "#171717");
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
       setMessages(messages.data);

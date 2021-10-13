@@ -8,6 +8,9 @@ import axios from "axios";
 import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
+import Conversation from "./models/Conversation.js";
+import { respondToRequest, sendRequest } from "./controllers/request.js";
+import { sendMessage } from "./controllers/messages.js";
 dotenv.config();
 
 const authenticateToken = (req, res, next) => {
@@ -150,14 +153,47 @@ io.on("connection", (socket) => {
           { $addToSet: { friendsList: requesterId } }
         );
         if (requester) {
-          io.to(requester.socketId).emit("newFriend", requesterObject);
+          const _id = receiverObject._id;
+          const first = receiverObject.first_name;
+          const last = receiverObject.last_name;
+          io.to(requester.socketId).emit("newFriend", { _id, first, last });
         }
         if (receiver) {
-          io.to(receiver.socketId).emit("newFriend", receiverObject);
+          const _id = requesterObject._id;
+          const first = requesterObject.first_name;
+          const last = requesterObject.last_name;
+          io.to(receiver.socketId).emit("newFriend", { _id, first, last });
         }
       }
     }
   );
+
+  //client attempting to create 1 to 1 chat
+  socket.on("newPrivateChat", async ({ senderId, receiverId }) => {
+    const existingConversation = await Conversation.find({
+      members: { $size: 2, $all: [senderId, receiverId] },
+    });
+    if (existingConversation.length === 0) {
+      const user = getUser(receiverId);
+      const _id = mongoose.Types.ObjectId();
+      const newConversation = new Conversation({
+        _id: _id,
+        members: [senderId, receiverId],
+        messages: [],
+        hidden: false,
+      });
+      //checks if receiver is connected to socket
+
+      if (user) {
+        io.to(user.socketId).emit("getNewChat", newConversation);
+      }
+      io.to(getUser(senderId).socketId).emit("getNewChat", newConversation);
+      newConversation.save();
+    } else {
+      //conversation between these two users already exists, simply make visible
+      console.log("already exists");
+    }
+  });
 
   //when client disconnects from the socket
   socket.on("disconnect", () => {

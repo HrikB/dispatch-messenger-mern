@@ -12,13 +12,28 @@ function AllFriends() {
   const [arrivingFriend, setArrivingFriend] = useState();
   const [{ user }, dispatch] = useStateValue();
 
+  const createChat = (friend) => {
+    socket.emit("newPrivateChat", {
+      senderId: user._id,
+      receiverId: friend._id,
+    });
+  };
+
   useEffect(async () => {
     const allFriends = await getAllFriends(user._id);
     socket?.on("newFriend", (data) => {
-      setArrivingFriend();
+      setArrivingFriend({
+        _id: data._id,
+        first_name: data.first,
+        last_name: data.last,
+      });
     });
     setFriendsList(allFriends.data);
   }, [user]);
+
+  useEffect(() => {
+    arrivingFriend && setFriendsList((prev) => [...prev, arrivingFriend]);
+  }, [arrivingFriend]);
 
   return (
     <div className="allFriends">
@@ -37,7 +52,7 @@ function AllFriends() {
             </div>
           </div>
           <div className="friend__options">
-            <IconButton>
+            <IconButton onClick={() => createChat(friend)}>
               <ModeComment style={{ fontSize: 30 }} />
             </IconButton>
 
