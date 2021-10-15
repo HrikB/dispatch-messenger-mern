@@ -2,74 +2,80 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { createAccessJWT, createRefreshJWT } from "../utils/auth.js";
-import redisClient from "../redis.js";
+import redisClient from "../helpers/redis.js";
+import createError from "http-errors";
+import {
+  registerSchema,
+  loginSchema,
+} from "../helpers/userValidationSchema.js";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from "../helpers/jwt.js";
 
-export let signup = (req, res) => {
-  let { first_name, last_name, email, password, password_confirm } = req.body;
+export let signup = async (req, res, next) => {
+  try {
+    //input validation
+    /*if (!first_name)
+      throw createError.BadRequest("You must enter your first name");
+    if (!last_name)
+      throw createError.BadRequest("You must enter your last name");
+    if (!email) throw createError.BadRequest("You must enter an email ");
+    if (!password) throw createError.BadRequest("You must enter a password");
+    if (!password_confirm)
+      throw createError.BadRequest("You must confirm your password");*/
+    const validation = await registerSchema.validateAsync(req.body);
 
-  //input validation
-  let errors = [];
-  if (!first_name) {
-    errors.push({ first_name: "required" });
-  }
-  if (!last_name) {
-    errors.push({ last_name: "required" });
-  }
-  if (!email) {
-    errors.push({ email: "required" });
-  }
-  if (!password) {
-    errors.push({ password: "required" });
-  }
-  if (!password_confirm) {
-    errors.push({
-      password_confirmation: "required",
-    });
-  }
-  if (password != password_confirm) {
-    errors.push({ password: "mismatch" });
-  }
-  if (errors.length > 0) {
-    return res.status(422).json({ errors: errors });
-  }
+    //checks if email is already in use
+    const userExists = await User.findOne({ email: validation.email });
+    if (userExists)
+      throw createError.Conflict(
+        `The email "${validation.email}" is already in use.`
+      );
 
-  User.findOne({ email: email })
-    .then(async (user) => {
-      if (user) {
-        return res
-          .status(422)
-          .json({ errors: [{ email: "email already exists" }] });
-      } else {
-        const user = new User({
-          first_name: first_name,
-          last_name: last_name,
-          email: email,
-          password: password,
-          friendsList: [],
-        });
+    //creates new user object
+    const user = new User(validation);
+    /*const user = new User({
+      first_name,
+      last_name,
+      email,
+      password,
+      password_confirm,
+      friendsList: [],
+    });*/
 
-        const hash = await bcrypt.hash(password, 10);
-        user.password = hash;
-        user
-          .save()
-          .then((response) => {
-            res.status(200).json({
-              success: true,
-              result: response,
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({ errors: [{ error: err }] });
-          });
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ errors: [{ error: err }] });
-    });
+    const savedUser = await user.save();
+    const accessToken = await signAccessToken(savedUser.id);
+    res.send({ accessToken });
+  } catch (err) {
+    if (err.isJoi === true) err.status = 422;
+    next(err);
+  }
 };
 
-export let signin = (req, res) => {
-  let { email, password } = req.body;
+export let signin = async (req, res, next) => {
+  try {
+    //input validation
+    const validation = await loginSchema.validateAsync(req.body);
+    const user = await User.findOne({ email: validation.email });
+    if (!user) throw createError.NotFound("User not registered");
+
+    const isValidPassword = await user.validatePassword(validation.password);
+    if (!isValidPassword)
+      throw createError.Unauthorized("Username/Password not valid");
+
+    const accessToken = await signAccessToken(user._id);
+    const refreshToken = await signRefreshToken(user._id);
+
+    res.send({ accessToken, refreshToken });
+  } catch (err) {
+    if (err.isJoi === true)
+      return next(createError.BadRequest("Invalid Username/Password"));
+    next(err);
+  }
+
+  /*let { email, password } = req.body;
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
@@ -118,68 +124,49 @@ export let signin = (req, res) => {
     })
     .catch((err) => {
       res.status(500).json({ errors: err });
-    });
+    });*/
 };
 
-export let token = (req, res) => {
-  const refreshToken = req.body.token;
-  if (refreshToken == null) return res.sendStatus(401);
+export let token = async (req, res, next) => {
   try {
-    const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    redisClient.get(user.userId, (err, data) => {
-      if (err) throw err;
-      if (data == null)
-        return res.status(401).json({
-          status: false,
-          message: "Invalid request. Token is not in store.",
-        });
-      if (JSON.parse(data).token != refreshToken) {
-        return res.status(401).json({
-          status: false,
-          message: "Invalid request. Token is not in store.",
-        });
-      }
-      const accessToken = createAccessJWT(user.email, user._id);
-      if (user) {
-        return res.status(200).json({
-          success: true,
-          accessToken: accessToken,
-          message: user,
-        });
-      }
-    });
-  } catch (err) {
-    return res.status(401).json({
-      status: true,
-      message: "Your session is not valid",
-      data: error,
-    });
-  }
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw createError.BadRequest();
+    const userId = await verifyRefreshToken(refreshToken);
 
-  /*
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    const accessToken = createAccessJWT(user.email, user._id);
-    if (user) {
-      return res.status(200).json({
-        success: true,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        message: user,
-      });
-    }
-  });*/
+    const accessToken = await signAccessToken(userId);
+    const refToken = await signRefreshToken(userId);
+
+    res.send({ accessToken, refreshToken: refToken });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export let logout = async (req, res) => {
-  let { user_id, token } = req.body;
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw createError.BadRequest();
+    const userId = await verifyRefreshToken(refreshToken);
+
+    redisClient.DEL(userId, (err, reply) => {
+      if (err) {
+        console.log(err);
+        throw createError.InternalServerError();
+      }
+      console.log(reply);
+      res.sendStatus(204);
+    });
+  } catch (err) {
+    next(err);
+  }
+
+  /*let { user_id, token } = req.body;
   await redisClient.del(user_id.toString());
 
   //blacklist current access token
   await redisClient.set("BL_" + user_id, token);
   //refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
-  res.sendStatus(204);
+  res.sendStatus(204);*/
 };
 
 export let getData = async (req, res) => {

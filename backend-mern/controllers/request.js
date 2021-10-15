@@ -1,8 +1,9 @@
 import FriendRequest from "../models/FriendRequest.js";
 import User from "../models/User.js";
+import createError from "http-errors";
 
 //api routes
-export const getRequest = async (req, res) => {
+export const getRequest = async (req, res, next) => {
   try {
     const requests = await FriendRequest.find({
       $or: [
@@ -12,18 +13,20 @@ export const getRequest = async (req, res) => {
     });
     res.status(200).json(requests);
   } catch (err) {
-    res.status(500).json(err);
+    console.log(err.message);
+    next(createError.InternalServerError());
   }
 };
 
-export const getAllFriends = async (req, res) => {
+export const getAllFriends = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.userId });
 
     const friends = await User.find({ _id: { $in: user.friendsList } });
     res.status(200).json(friends);
   } catch (err) {
-    res.status(500).json(err);
+    console.log(err.message);
+    next(createError.InternalServerError());
   }
 };
 

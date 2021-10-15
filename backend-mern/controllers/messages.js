@@ -1,14 +1,15 @@
 import Message from "../models/Message.js";
 
 //api routes
-export let getMessage = async (req, res) => {
+export let getMessage = async (req, res, next) => {
   try {
     const messages = await Message.find({
       conversationId: req.params.conversationId,
     });
     res.status(200).json(messages);
   } catch (err) {
-    res.status(500).json(err);
+    console.log(err.message);
+    next(createError.InternalServerError());
   }
 };
 

@@ -16,11 +16,7 @@ import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {
-  getConversation,
-  getMessages,
-  sendMessageDatabase,
-} from "./server/api.js";
+import { getConversation, getMessages, getUserData } from "./server/api.js";
 import socket from "./server/socketio";
 import { io } from "socket.io-client";
 
@@ -33,6 +29,7 @@ import { io } from "socket.io-client";
 
 function Chat() {
   const [input, setInput] = useState("");
+  const [receiver, setReceiver] = useState({});
   const [personName, setPersonName] = useState("");
   const [chatWithPic, setChatWithPic] = useState("");
   const [chatWithEmail, setChatWithEmail] = useState("");
@@ -122,8 +119,12 @@ function Chat() {
     if (conversationId) {
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
+      const receiverData = await getUserData(
+        conversation.data?.members.find((m) => m !== user._id)
+      );
       setMessages(messages.data);
       setConversation(conversation.data);
+      setReceiver(receiverData.data);
     }
   }, [conversationId]);
 
@@ -168,7 +169,7 @@ function Chat() {
       <div className="chat__header">
         <Avatar src={chatWithPic} />
         <div className="chat__headerInfo">
-          <h3>{personName}</h3>
+          <h3>{receiver.first_name + " " + receiver.last_name}</h3>
           <h6>Last seen at...</h6>
         </div>
 
@@ -182,23 +183,9 @@ function Chat() {
       <div id="body__id" className="chat__body">
         {messages.map((message, i) => (
           <div id="container__id" className="dateMessageContainer">
-            {console.log(new Date(message.createdAt))}
             {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
             {
-              <h6
-                className="time"
-                /*style={
-                messages[i].timestamp
-                  ? messages[i]?.timestamp.valueOf() > new Date(0, 0).valueOf()
-                    ? {}
-                    : { display: "none" }
-                  : Date.now() >
-                    (lastSentTime ? lastSentTime : new Date(0)).valueOf() +
-                      600000
-                  ? {}
-                  : { display: "none" }
-              }*/
-              >
+              <h6 className="time">
                 {(!messages[i - 1] ||
                   new Date(
                     new Date(messages[i - 1]?.createdAt).getTime() + 10 * 60000

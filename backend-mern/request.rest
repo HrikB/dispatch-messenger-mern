@@ -2,7 +2,7 @@ POST http://localhost:8000/auth/token
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYxNTRkNzk5OTQxY2RjODVjYTg5YjMyYyIsImlhdCI6MTYzMzA2MzIxNH0.Y5LtKCAjQefvSclCtZnlTtSfdo6cuMRPV8JcRzB1V2A"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MTY4MjUyNzM2ZjU5ZDY1YWI2MTY1MGYiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpYXQiOjE2MzQyMjMxNjEsImV4cCI6MTY2NTc4MDc2MX0.C97Asx9eyflbjPe521X65Mz8mt4hYlf2JFM94v-8HiA"
 }
 
 ###
@@ -11,10 +11,11 @@ POST http://localhost:8000/auth/signup
 Content-Type: application/json
 
 { 
-    "name": "Hrik",
-    "email": "hrik.bhowal@gmail.co",
-    "password": "Hrik", 
-    "password_confirm": "Hrik" 
+    "first_name": "a",
+    "last_name": "a",
+    "email": "hrik.bhowal@gmail.com",
+    "password": "aaaaaaaa", 
+    "password_confirm": "aaaaaaaa" 
 }
 
 ###
@@ -24,7 +25,7 @@ Content-Type: application/json
 
 {
     "user_id": "6154d799941cdc85ca89b32c",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhyaWsuYmhvd2FsQGdtYWlsLmNvbSIsImlhdCI6MTYzMzA2MzMzNCwiZXhwIjoxNjMzMDYzMzM5fQ.395tnZ0N_fKND-6EFWw8GIn6Lx4nmmWckWgnxnHdTA8"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MTY4MjUyNzM2ZjU5ZDY1YWI2MTY1MGYiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpYXQiOjE2MzQyNTkxNDgsImV4cCI6MTY2NTgxNjc0OH0.6vTGP3Vo_MH1eetH8QU8Vk4h_mycsNL_jBpCrvN7PtE"
 }\
 
 ###
@@ -34,9 +35,14 @@ Content-Type: application/json
 
 { 
     "email": "hrik.bhowal@gmail.com",
-    "password": "Hrik"
+    "password": "aaaaaaaa"
 }
 
+###
+
+###
+GET http://localhost:7000/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MTY4MjUyNzM2ZjU5ZDY1YWI2MTY1MGYiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpYXQiOjE2MzQyMjMxNjEsImV4cCI6MTYzNDIyMzE3Nn0.6iOEyohxljEAsgCj1wQiH82J_HEErIAp14JqUU_86O0
 ###
 
 GET http://localhost:8000/auth/data/61639307187a61187b5e20b1
@@ -93,3 +99,5 @@ PUT http://localhost:7000/api/requests/respond/
 
 ###
 GET http://localhost:7000/api/requests/friends/61639307187a61187b5e20b1
+
+###

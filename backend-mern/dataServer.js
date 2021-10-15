@@ -11,11 +11,19 @@ import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
 import { respondToRequest, sendRequest } from "./controllers/request.js";
 import { sendMessage } from "./controllers/messages.js";
+import "./helpers/mongodb.js";
+import { verifyAccessToken } from "./helpers/jwt.js";
 dotenv.config();
 
-const authenticateToken = (req, res, next) => {
-  next();
-};
+//App Config
+const app = express();
+const port = 7000;
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
 
 //OK for now... eventually, move this array onto redis
 let users = [];
@@ -31,16 +39,6 @@ const removeUser = (socketId) => {
 const getUser = (userId) => {
   return users.find((user) => user.userId == userId);
 };
-
-//App Config
-const app = express();
-const port = 7000;
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-  },
-});
 
 //socket-io
 io.on("connection", (socket) => {
@@ -219,17 +217,27 @@ import requestRoute from "./routes/friendsRequests.js";
 //Middlewares
 app.use(express.json());
 app.use(cors());
+app.use(verifyAccessToken);
+
+//API Endpoints
+app.get("/", async (req, res) => {
+  res.status(200).send("Data Server Up");
+});
+
 app.use("/api/conversations", conversationsRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/requests", requestRoute);
 
-//DB Config
-mongoose.connect(process.env.DATABASE).then(() => {
-  console.log("DB Connected");
+//Error handling middleware
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.send({
+    error: {
+      status: err.status || 500,
+      message: err.message,
+    },
+  });
 });
-
-//API Endpoints
-app.get("/", (req, res) => res.status(200).send("Data Server Up"));
 
 //Listener
 httpServer.listen(port, () => console.log(`listening on localhost: ${port}`));
