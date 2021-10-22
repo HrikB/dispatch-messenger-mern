@@ -48,7 +48,7 @@ function Sidebar({ setShowModal }) {
     socket?.emit("sendUser", user._id);
 
     const conversationsData = await getConversations(user._id);
-
+    console.log(conversationsData);
     socket?.on("getNewChat", (data) => {
       setArrivingConversation(data);
     });

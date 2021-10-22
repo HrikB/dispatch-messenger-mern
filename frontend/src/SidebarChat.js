@@ -3,7 +3,7 @@ import "./SidebarChat.css";
 import { Avatar } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
-import { getUserData } from "./server/api.js";
+import { getUserDataById } from "./server/api.js";
 
 function SidebarChat({ convId, memberId, friendsTab }) {
   const [messages, setMessages] = useState("");
@@ -35,12 +35,12 @@ function SidebarChat({ convId, memberId, friendsTab }) {
 
   useEffect(async () => {
     try {
-      const memberData = await getUserData(memberId);
+      const memberData = await getUserDataById(memberId);
       setConversations(memberData.data);
     } catch (err) {
       console.error(err);
     }
-  }, [conversations]);
+  }, [memberId]);
 
   return (
     <div>

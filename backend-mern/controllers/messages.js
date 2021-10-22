@@ -8,7 +8,7 @@ export let getMessage = async (req, res, next) => {
     });
     res.status(200).json(messages);
   } catch (err) {
-    console.log(err.message);
+    console.log("5", err.message);
     next(createError.InternalServerError());
   }
 };

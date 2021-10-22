@@ -16,7 +16,7 @@ import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { getConversation, getMessages, getUserData } from "./server/api.js";
+import { getConversation, getMessages, getUserDataById } from "./server/api.js";
 import socket from "./server/socketio";
 import { io } from "socket.io-client";
 
@@ -119,7 +119,7 @@ function Chat() {
     if (conversationId) {
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
-      const receiverData = await getUserData(
+      const receiverData = await getUserDataById(
         conversation.data?.members.find((m) => m !== user._id)
       );
       setMessages(messages.data);

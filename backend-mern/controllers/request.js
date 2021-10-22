@@ -13,7 +13,7 @@ export const getRequest = async (req, res, next) => {
     });
     res.status(200).json(requests);
   } catch (err) {
-    console.log(err.message);
+    console.log("2", err.message);
     next(createError.InternalServerError());
   }
 };
@@ -25,7 +25,6 @@ export const getAllFriends = async (req, res, next) => {
     const friends = await User.find({ _id: { $in: user.friendsList } });
     res.status(200).json(friends);
   } catch (err) {
-    console.log(err.message);
     next(createError.InternalServerError());
   }
 };

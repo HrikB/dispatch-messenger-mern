@@ -20,7 +20,7 @@ export const signAccessToken = (userId) => {
       options,
       (err, token) => {
         if (err) {
-          console.log(err);
+          console.log("??", err);
           reject(createError.InternalServerError());
         }
         resolve(token);
@@ -45,10 +45,9 @@ export const signRefreshToken = (userId) => {
       options,
       (err, token) => {
         if (err) {
-          console.log(err.message);
+          console.log("?", err.message);
           reject(createError.InternalServerError());
         }
-
         redisClient.SET(
           userId.toString(),
           token,
@@ -56,7 +55,7 @@ export const signRefreshToken = (userId) => {
           365 * 24 * 3600,
           (err, reply) => {
             if (err) {
-              console.log(err);
+              console.log("/", err);
               reject(createError.InternalServerError());
               return;
             }
@@ -68,20 +67,24 @@ export const signRefreshToken = (userId) => {
   });
 };
 
-export const verifyAccessToken = (req, res, next) => {
+export const verifyAccessToken = async (req, res, next) => {
   if (!req.headers["authorization"]) return next(createError.Unauthorized());
   const authHeader = req.headers["authorization"].split(" ");
   const accessToken = authHeader[1];
-  JWT.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-    if (err) {
-      if (err.name === "JsonWebTokenError") {
-        return next(createError.Unauthorized());
-      }
-      return next(createError.Unauthorized(err.message));
-    }
+  try {
+    const payload = await JWT.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
     req.payload = payload;
     next();
-  });
+  } catch (err) {
+    if (err.name === "JsonWebTokenError") {
+      return next(createError.Unauthorized());
+    }
+
+    return next(createError.Unauthorized(err.message));
+  }
 };
 
 export const verifyRefreshToken = (refreshToken) => {
@@ -90,16 +93,19 @@ export const verifyRefreshToken = (refreshToken) => {
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
       (err, payload) => {
-        if (err) return reject(createError.Unauthorized());
+        if (err) {
+          console.log("err1", err.message);
+          return reject(createError.Unauthorized());
+        }
         const userId = payload.sub;
         redisClient.GET(userId, (err, result) => {
           if (err) {
-            console.log(err.message);
+            console.log("err2", err.message);
             reject(createError.InternalServerError());
             return;
           }
           if (refreshToken === result) return resolve(userId);
-          reject(createError.Unauthorized());
+          reject(createError.Unauthorized("err3"));
         });
       }
     );

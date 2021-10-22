@@ -19,10 +19,12 @@ app.use(express.json());
 app.use(cors());
 
 //API Endpoints
-app.use("/auth", authRoute);
 app.get("/", (req, res) => {
   res.status(200).send("Auth Server Up");
 });
+
+//Route imports
+app.use("/auth", authRoute);
 
 //Error handling middleware
 app.use(async (req, res, next) => {

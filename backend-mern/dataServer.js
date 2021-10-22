@@ -4,7 +4,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import axios from "axios";
 import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
@@ -12,6 +11,8 @@ import Conversation from "./models/Conversation.js";
 import { respondToRequest, sendRequest } from "./controllers/request.js";
 import { sendMessage } from "./controllers/messages.js";
 import "./helpers/mongodb.js";
+import createError from "http-errors";
+import jwt from "jsonwebtoken";
 import { verifyAccessToken } from "./helpers/jwt.js";
 dotenv.config();
 
@@ -41,8 +42,21 @@ const getUser = (userId) => {
 };
 
 //socket-io
-io.on("connection", (socket) => {
-  //console.log(socket.handshake.auth.accessToken, "is the access token");
+io.use((socket, next) => {
+  if (socket.handshake.auth && socket.handshake.auth.accessToken) {
+    jwt.verify(
+      socket.handshake.auth.accessToken,
+      process.env.ACCESS_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err) return next(createError.Unauthorized());
+        socket.decoded = decoded;
+        next();
+      }
+    );
+  } else {
+    next(createError.Unauthorized());
+  }
+}).on("connection", (socket) => {
   io.emit("welcome", "This is the socket. Hi!");
 
   //take the userId and socketId from client
@@ -213,6 +227,7 @@ io.on("connection", (socket) => {
 import conversationsRoute from "./routes/conversations.js";
 import messageRoute from "./routes/messages.js";
 import requestRoute from "./routes/friendsRequests.js";
+import userRoute from "./routes/user.js";
 
 //Middlewares
 app.use(express.json());
@@ -227,6 +242,7 @@ app.get("/", async (req, res) => {
 app.use("/api/conversations", conversationsRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/requests", requestRoute);
+app.use("/api/user", userRoute);
 
 //Error handling middleware
 app.use((err, req, res, next) => {

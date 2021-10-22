@@ -4,12 +4,13 @@ import createError from "http-errors";
 //api routes
 export let getConversations = async (req, res, next) => {
   try {
+    console.log(req.params.userId);
     const conversations = await Conversation.find({
       members: { $in: [req.params.userId] },
     });
     res.status(200).json(conversations);
   } catch (err) {
-    console.log(err.message);
+    console.log("3", err.message);
     next(createError.InternalServerError());
   }
 };
@@ -21,7 +22,7 @@ export let getConversation = async (req, res, next) => {
     });
     res.status(200).json(conversation);
   } catch (err) {
-    console.log(err.message);
+    console.log("4", err.message);
     next(createError.InternalServerError());
   }
 };

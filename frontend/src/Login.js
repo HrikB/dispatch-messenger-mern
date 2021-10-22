@@ -23,18 +23,19 @@ function Login() {
 
   const signIn = async () => {
     const response = await login(email, password);
+    console.log(response);
     if (response) {
-      if (response.data.success) {
+      if (response.status === 200) {
         setErrorMessage("/");
         setErrVisibility("hidden");
         dispatch({
           type: actionTypes.SET_USER,
-          user: response.data.message,
+          user: response.data.user,
         });
-        localStorage.setItem("token", response.data.accessToken);
-      }
-      if (response.data.errors) {
-        setErrorMessage(response.data.errors[0].error);
+        localStorage.setItem("accessToken", response.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+      } else {
+        setErrorMessage(response.data.error.message);
         setErrVisibility("visible");
       }
     } else {
@@ -51,7 +52,6 @@ function Login() {
       regPassword,
       regPassConfirm
     );
-    console.log(response);
   };
 
   return (
