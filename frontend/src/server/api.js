@@ -163,6 +163,16 @@ export const getAllFriends = async (userId) => {
   }
 };
 
+export const logOutAPI = async () => {
+  try {
+    return await axios.delete(`${_authUrl}/auth/logout`, {
+      data: { refreshToken: sessionStorage.getItem("refreshToken") },
+    });
+  } catch (err) {
+    return err.response;
+  }
+};
+
 export const refreshAccessToken = async () => {
   try {
     return await instance.post(`${_authUrl}/auth/token`, {

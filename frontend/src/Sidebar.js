@@ -5,10 +5,11 @@ import { Avatar, IconButton } from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
-import { getConversations } from "./server/api.js";
+import { getConversations, logOutAPI } from "./server/api.js";
 //import socket from "./server/socketio.js";
 import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import { Link } from "react-router-dom";
+import { actionTypes } from "./reducer";
 
 let jsonNames = [
   {
@@ -45,13 +46,27 @@ function Sidebar({ setShowModal }) {
 
   const createConversation = () => {};
 
+  const logOut = async () => {
+    const res = await logOutAPI();
+    console.log(res);
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("refreshToken");
+    dispatch({
+      type: actionTypes.SET_USER,
+      user: null,
+    });
+    dispatch({
+      type: actionTypes.SET_SOCKET,
+      socket: null,
+    });
+  };
+
   const profileOptions = () => {
     setProfileOptMenu(!profileOptMenu);
   };
 
   useEffect(() => {
     const closeMenus = (e) => {
-      console.log(ref);
       if (profileOptMenu && ref.current && !ref.current.contains(e.target)) {
         setProfileOptMenu(false);
       }
@@ -103,7 +118,9 @@ function Sidebar({ setShowModal }) {
           {profileOptMenu && (
             <div className="profile__options">
               <button>Update Profile</button>
-              <button className="logOut__button">Log Out</button>
+              <button className="logOut__button" onClick={logOut}>
+                Log Out
+              </button>
             </div>
           )}
         </IconButton>
