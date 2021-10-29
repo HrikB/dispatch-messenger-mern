@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Sidebar.css";
 import Compose from "./Compose.svg";
 import { Avatar, IconButton } from "@material-ui/core";
@@ -31,22 +31,40 @@ let jsonNames = [
   },
 ];
 
-const createConversation = () => {};
-
 function Sidebar({ setShowModal }) {
   const [chatWithName, setChatWithName] = useState("");
   const [chatWithPic, setChatWithPic] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
   const [{ user, socket }, dispatch] = useStateValue();
   const [names, setNames] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [arrivingConversation, setArrivingConversation] = useState();
+  const [profileOptMenu, setProfileOptMenu] = useState(false);
   const [origNames, setOrigNames] = useState([]);
+  const ref = useRef();
+
+  const createConversation = () => {};
+
+  const profileOptions = () => {
+    setProfileOptMenu(!profileOptMenu);
+  };
+
+  useEffect(() => {
+    const closeMenus = (e) => {
+      console.log(ref);
+      if (profileOptMenu && ref.current && !ref.current.contains(e.target)) {
+        setProfileOptMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeMenus);
+
+    return () => {
+      document.removeEventListener("mousedown", closeMenus);
+    };
+  }, [profileOptMenu]);
 
   useEffect(async () => {
-    //socket.emit("sendUser", user._id);
-
     const conversationsData = await getConversations(user._id);
     socket.on("getNewChat", (data) => {
       console.log("getNewChat", data);
@@ -76,8 +94,18 @@ function Sidebar({ setShowModal }) {
   return (
     <div className="sidebar">
       <div className="sidebar__header">
-        <IconButton>
-          <Avatar src={user?.photoURL} className="accountPic" />
+        <IconButton ref={ref}>
+          <Avatar
+            src={user?.photoURL}
+            className="accountPic"
+            onClick={profileOptions}
+          />
+          {profileOptMenu && (
+            <div className="profile__options">
+              <button>Update Profile</button>
+              <button className="logOut__button">Log Out</button>
+            </div>
+          )}
         </IconButton>
         <h3>Dispatch</h3>
         <IconButton onClick={createConversation}>

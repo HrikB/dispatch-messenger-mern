@@ -15,13 +15,12 @@ function SidebarChat({ convId, memberId, friendsTab }) {
 
   //there has to be a better way to implement selection
   useEffect(() => {
-    console.log("highlight changer");
     const allContainer = document.getElementsByClassName("allContainer");
     const path = window.location.pathname.split("/");
     if (allContainer) {
       for (let e of allContainer) {
         if (e.id != path[2]) {
-          e.style.background = "#171717";
+          e.style.background = "#252525";
         } else {
           e.style.background = "#403d3d";
         }
@@ -29,7 +28,7 @@ function SidebarChat({ convId, memberId, friendsTab }) {
     }
     if (friendsTab) {
       if (friendsTab.id != path[1]) {
-        friendsTab.style.background = "#171717";
+        friendsTab.style.background = "#252525";
       } else {
         friendsTab.style.background = "#403d3d";
       }

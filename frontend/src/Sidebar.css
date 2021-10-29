@@ -5,7 +5,7 @@
   flex-direction: column;
   height: 100%;
   min-width: 20rem;
-  background-color: #171717;
+  background-color: #252525;
   align-items: center;
 }
 
@@ -46,6 +46,7 @@
 }
 
 .sidebar__header .accountPic {
+  position: relative;
   max-width: 32px;
   max-height: 32px;
 }
@@ -95,4 +96,36 @@
 .sidebar__chats h3 {
   font-size: 0.75rem;
   margin-left: 10px;
+}
+
+.profile__options {
+  box-sizing: border-box;
+  padding: 7px;
+  position: absolute;
+  background-color: #171717;
+  top: 100%;
+  left: 50%;
+  width: 120px;
+  cursor: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+}
+
+.profile__options button {
+  margin: 3px 0;
+  box-sizing: border-box;
+  height: fit-content;
+  background-color: transparent;
+  padding: 5px;
+  color: white;
+}
+
+.profile__options .logOut__button {
+  color: red !important;
+}
+
+.profile__options button:hover {
+  background-color: #403d3d !important;
+  cursor: pointer;
 }
