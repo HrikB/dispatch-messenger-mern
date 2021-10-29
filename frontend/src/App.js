@@ -26,6 +26,7 @@ function App() {
         const userId = JSON.parse(
           window.atob(sessionStorage.getItem("accessToken").split(".")[1])
         ).sub;
+        //this also refreshes token through interceptor if it is expired
         const user = await getUserDataById(userId);
         const socket = io("http://localhost:7000", {
           reconnectionDelayMax: 10000,
@@ -53,11 +54,19 @@ function App() {
             socket: null,
           });
         }
-        setLoadingComponents(false);
       } catch (err) {
         console.log("Invalid Access Token");
+        dispatch({
+          type: actionTypes.SET_USER,
+          user: null,
+        });
+        dispatch({
+          type: actionTypes.SET_SOCKET,
+          socket: null,
+        });
       }
     }
+    setLoadingComponents(false);
   }, []);
 
   return (

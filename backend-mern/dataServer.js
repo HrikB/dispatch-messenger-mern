@@ -228,6 +228,7 @@ io.use((socket, next) => {
     } else {
       //conversation between these two users already exists, simply open
       const _id = existingConversation._id;
+      console.log("openMessage emitted");
       io.to(getUser(senderId).socketId).emit("openMessage", { _id });
     }
   });

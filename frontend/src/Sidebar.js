@@ -45,7 +45,7 @@ function Sidebar({ setShowModal }) {
   const [origNames, setOrigNames] = useState([]);
 
   useEffect(async () => {
-    socket.emit("sendUser", user._id);
+    //socket.emit("sendUser", user._id);
 
     const conversationsData = await getConversations(user._id);
     socket.on("getNewChat", (data) => {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useParams } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import "./SidebarChat.css";
 import { Avatar } from "@material-ui/core";
 import { Link } from "react-router-dom";
@@ -10,9 +11,11 @@ function SidebarChat({ convId, memberId, friendsTab }) {
   const [{ user }, dispatch] = useStateValue();
   const [conversations, setConversations] = useState([]);
   const [profpic, setProfpic] = useState("");
+  const location = useLocation();
 
   //there has to be a better way to implement selection
   useEffect(() => {
+    console.log("highlight changer");
     const allContainer = document.getElementsByClassName("allContainer");
     const path = window.location.pathname.split("/");
     if (allContainer) {
@@ -31,7 +34,7 @@ function SidebarChat({ convId, memberId, friendsTab }) {
         friendsTab.style.background = "#403d3d";
       }
     }
-  }, [window.location.pathname]);
+  }, [location]);
 
   useEffect(async () => {
     try {

@@ -29,10 +29,7 @@ function Login() {
       if (response.status === 200) {
         setErrorMessage("/");
         setErrVisibility("hidden");
-        dispatch({
-          type: actionTypes.SET_USER,
-          user: response.data.user,
-        });
+
         sessionStorage.setItem("accessToken", response.data.accessToken);
         sessionStorage.setItem("refreshToken", response.data.refreshToken);
 
@@ -49,6 +46,10 @@ function Login() {
           });
           socket?.emit("sendUser", response.data.user._id);
         }
+        dispatch({
+          type: actionTypes.SET_USER,
+          user: response.data.user,
+        });
       } else {
         setErrorMessage(response.data.error.message);
         setErrVisibility("visible");

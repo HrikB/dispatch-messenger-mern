@@ -93,7 +93,7 @@ function Chat() {
     socket?.on("welcome", () => {
       console.log("Welcome this is the socket server");
     });
-    socket?.emit("sendUser", user._id);
+    //socket?.emit("sendUser", user._id);
     socket?.on("getUsers", (users) => {});
     socket?.on("getMessage", (data) => {
       setArrivingMessage({

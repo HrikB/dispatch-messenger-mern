@@ -22,7 +22,7 @@ function Friends() {
     <AllFriends friendsList={friendsList} />
   );
   useEffect(() => {
-    socket?.emit("sendUser", user._id);
+    //socket.emit("sendUser", user._id);
   }, []);
   useEffect(() => {
     //Handles tab highlighting
