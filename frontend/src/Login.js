@@ -7,9 +7,11 @@ import { actionTypes } from "./reducer";
 import { DeckOutlined } from "@material-ui/icons";
 import CloseIcon from "@material-ui/icons/Close";
 import { login, register } from "./server/api";
+import { io } from "socket.io-client";
+//import socket, { connectSocket } from "./server/socketio";
 
 function Login() {
-  const [{}, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -23,7 +25,6 @@ function Login() {
 
   const signIn = async () => {
     const response = await login(email, password);
-    console.log(response);
     if (response) {
       if (response.status === 200) {
         setErrorMessage("/");
@@ -32,8 +33,22 @@ function Login() {
           type: actionTypes.SET_USER,
           user: response.data.user,
         });
-        localStorage.setItem("accessToken", response.data.accessToken);
-        localStorage.setItem("refreshToken", response.data.refreshToken);
+        sessionStorage.setItem("accessToken", response.data.accessToken);
+        sessionStorage.setItem("refreshToken", response.data.refreshToken);
+
+        if (!socket) {
+          const socket = io("http://localhost:7000", {
+            reconnectionDelayMax: 10000,
+            auth: {
+              accessToken: sessionStorage.getItem("accessToken"),
+            },
+          });
+          dispatch({
+            type: actionTypes.SET_SOCKET,
+            socket: socket,
+          });
+          socket?.emit("sendUser", response.data.user._id);
+        }
       } else {
         setErrorMessage(response.data.error.message);
         setErrVisibility("visible");

@@ -17,15 +17,7 @@ import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { getConversation, getMessages, getUserDataById } from "./server/api.js";
-import socket from "./server/socketio";
-import { io } from "socket.io-client";
-
-/*const socket = io("http://localhost:7000", {
-  reconnectionDelayMax: 10000,
-  auth: {
-    accessToken: localStorage.getItem("token"),
-  },
-});*/
+//import socket from "./server/socketio";
 
 function Chat() {
   const [input, setInput] = useState("");
@@ -37,7 +29,7 @@ function Chat() {
   const [lastSentTime, setlastSentTime] = useState(new Date(0));
   const [conversation, setConversation] = useState({});
   const { conversationId } = useParams();
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
   const [arrivingMessage, setArrivingMessage] = useState(null);
   const messagesEndRef = useRef(null);

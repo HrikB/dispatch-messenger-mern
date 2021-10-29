@@ -6,7 +6,7 @@ import { SearchOutlined } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
 import { getConversations } from "./server/api.js";
-import socket from "./server/socketio.js";
+//import socket from "./server/socketio.js";
 import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import { Link } from "react-router-dom";
 
@@ -38,18 +38,18 @@ function Sidebar({ setShowModal }) {
   const [chatWithPic, setChatWithPic] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
   const [names, setNames] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [arrivingConversation, setArrivingConversation] = useState();
   const [origNames, setOrigNames] = useState([]);
 
   useEffect(async () => {
-    socket?.emit("sendUser", user._id);
+    socket.emit("sendUser", user._id);
 
     const conversationsData = await getConversations(user._id);
-    console.log(conversationsData);
-    socket?.on("getNewChat", (data) => {
+    socket.on("getNewChat", (data) => {
+      console.log("getNewChat", data);
       setArrivingConversation(data);
     });
 

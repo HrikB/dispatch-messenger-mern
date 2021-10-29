@@ -4,7 +4,7 @@ import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import AllFriends from "./AllFriends";
 import AddFriends from "./AddFriends";
 import Pending from "./Pending";
-import socket from "./server/socketio";
+//import socket from "./server/socketio";
 import { useStateValue } from "./StateProvider";
 
 let friendsJson = {
@@ -16,7 +16,7 @@ let friendsJson = {
 };
 
 function Friends() {
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
   const [friendsList, setFriendsList] = useState(friendsJson.friendsList);
   const [currentTab, setCurrentTab] = useState(
     <AllFriends friendsList={friendsList} />

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "./AddFriends.css";
 import { useStateValue } from "./StateProvider";
-import socket from "./server/socketio";
+//import socket from "./server/socketio";
 
 function AddFriends({ friendsList }) {
   const [input, setInput] = useState("");
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
 
   const sendFriendRequests = async (e) => {
     e.preventDefault();

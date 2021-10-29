@@ -43,12 +43,16 @@ const getUser = (userId) => {
 
 //socket-io
 io.use((socket, next) => {
+  console.log("middleware running", socket.id);
   if (socket.handshake.auth && socket.handshake.auth.accessToken) {
+    console.log("tokens found");
     jwt.verify(
       socket.handshake.auth.accessToken,
       process.env.ACCESS_TOKEN_SECRET,
       (err, decoded) => {
+        console.log("err??", err);
         if (err) return next(createError.Unauthorized());
+        console.log("valid jwt");
         socket.decoded = decoded;
         next();
       }
@@ -57,6 +61,7 @@ io.use((socket, next) => {
     next(createError.Unauthorized());
   }
 }).on("connection", (socket) => {
+  console.log("connect!!");
   io.emit("welcome", "This is the socket. Hi!");
 
   //take the userId and socketId from client
@@ -71,9 +76,11 @@ io.use((socket, next) => {
   socket.on(
     "sendMessage",
     ({ conversationId, sender, receiver, text, createdAt }) => {
+      console.log("sendMessage received");
       //if user is undefined, the client to recieve the message is offline
       const user = getUser(receiver);
       if (user) {
+        console.log("sendMessage emitted");
         io.to(user.socketId).emit("getMessage", {
           sender,
           text,
@@ -101,6 +108,7 @@ io.use((socket, next) => {
   socket.on(
     "sendFriendRequest",
     async ({ senderId, senderName, receiverEmail }) => {
+      console.log("sendFriendRequest received");
       //get receiver object with the email
       const receiver = await User.findOne({ email: receiverEmail });
       //if receiver email exists in database
@@ -119,7 +127,9 @@ io.use((socket, next) => {
           ],
         });
         if (!receiver.friendsList.includes(senderId)) {
+          console.log("11");
           if (!existingRequest) {
+            console.log("22");
             const id = mongoose.Types.ObjectId();
             const savedFriendRequest = new FriendRequest({
               _id: id,
@@ -130,6 +140,7 @@ io.use((socket, next) => {
             }).save();
             //if user is connected to socket
             if (user) {
+              console.log("emitting Friend request");
               io.to(user.socketId).emit("getFriendRequest", {
                 id,
                 senderId,
@@ -156,6 +167,7 @@ io.use((socket, next) => {
     async ({ requestId, requesterId, recipientId, response }) => {
       //console.log(requestId, requesterId, recipientId, response);
       //response was rejected, delete from database
+      console.log("respondToRequest received");
 
       await FriendRequest.deleteOne({ _id: requestId });
       if (response == 1) {
@@ -170,12 +182,14 @@ io.use((socket, next) => {
           { $addToSet: { friendsList: requesterId } }
         );
         if (requester) {
+          console.log("respondToRequest emitted");
           const _id = receiverObject._id;
           const first = receiverObject.first_name;
           const last = receiverObject.last_name;
           io.to(requester.socketId).emit("newFriend", { _id, first, last });
         }
         if (receiver) {
+          console.log("respondToRequest emitted");
           const _id = requesterObject._id;
           const first = requesterObject.first_name;
           const last = requesterObject.last_name;
@@ -187,6 +201,8 @@ io.use((socket, next) => {
 
   //client attempting to create 1 to 1 chat
   socket.on("newPrivateChat", async ({ senderId, receiverId }) => {
+    console.log("newPrivateChat emitted");
+
     const existingConversation = await Conversation.findOne({
       members: { $size: 2, $all: [senderId, receiverId] },
     });
@@ -202,9 +218,10 @@ io.use((socket, next) => {
       //checks if receiver is connected to socket
 
       if (user) {
-        console.log("Sent to other receiver");
+        console.log("otherPerson emitted");
         io.to(user.socketId).emit("getNewChat", newConversation);
       }
+      console.log("samePerson emitted");
       io.to(getUser(senderId).socketId).emit("getNewChat", newConversation);
       newConversation.save();
       io.to(getUser(senderId).socketId).emit("openMessage", { _id });

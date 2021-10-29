@@ -4,7 +4,9 @@ import "./index.css";
 import App from "./App";
 import reducer, { initialState } from "./reducer";
 import { StateProvider } from "./StateProvider";
-import axios from "axios";
+import user from "./reducer";
+import { injectUser } from "./server/api.js";
+injectUser(user);
 
 ReactDOM.render(
   <React.StrictMode>

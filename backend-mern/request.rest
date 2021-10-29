@@ -44,7 +44,7 @@ GET http://localhost:7000/
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MTY4MjUyNzM2ZjU5ZDY1YWI2MTY1MGYiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpYXQiOjE2MzQyMjMxNjEsImV4cCI6MTYzNDIyMzE3Nn0.6iOEyohxljEAsgCj1wQiH82J_HEErIAp14JqUU_86O0
 ###
 
-GET http://localhost:8000/auth/data/61639307187a61187b5e20b1
+GET http://localhost:7000/api/user/user-id/61730b08b41a3c7787d10edd
 
 ###
 GET http://localhost:8000/auth/data-email/h
@@ -77,16 +77,16 @@ Content-Type: application/json
 GET http://localhost:7000/api/messages/get-message/616191f552806676b11ced80
 
 ###
-GET http://localhost:7000/api/conversations/conversation-data/616191f552806676b11ced80
+GET http://localhost:7000/api/conversations/conversation-data/61730b08b41a3c7787d10edd
 
 ###
 POST http://localhost:7000/api/requests/send-request
 Content-Type: application/json
 
 {
-  "userId": "61639307187a61187b5e20b1",
-  "userName": "h",
-  "receiverEmail": "o"
+  "userId": "61730b08b41a3c7787d10edd",
+  "userName": "borispopov10@yahoo.com",
+  "receiverEmail": "hrik.bhowal@gmail.com"
 }
 
 ###

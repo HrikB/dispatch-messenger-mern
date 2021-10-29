@@ -4,7 +4,7 @@ import "./Pending.css";
 import { useStateValue } from "./StateProvider";
 import CheckCircle from "@material-ui/icons/CheckCircle";
 import Cancel from "@material-ui/icons/Cancel";
-import socket from "./server/socketio";
+//import socket from "./server/socketio";
 import { getFriendRequests } from "./server/api.js";
 
 let jsonPending = [
@@ -43,7 +43,7 @@ let jsonPending = [
 ];
 
 function Pending() {
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
   const [pending, setPending] = useState([]);
   const [arrivingRequest, setArrivingRequest] = useState(null);
 

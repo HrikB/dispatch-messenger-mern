@@ -6,12 +6,13 @@ import MoreVert from "@material-ui/icons/MoreVert";
 import ModeComment from "@material-ui/icons/ModeComment";
 import { getAllFriends } from "./server/api.js";
 import { useStateValue } from "./StateProvider";
-import socket from "./server/socketio";
+//import socket from "./server/socketio";
+import { ContactPhoneOutlined } from "@material-ui/icons";
 
 function AllFriends() {
   const [friendsList, setFriendsList] = useState([]);
   const [arrivingFriend, setArrivingFriend] = useState();
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, socket }, dispatch] = useStateValue();
   const history = useHistory();
 
   const createChat = (friend) => {
@@ -24,6 +25,7 @@ function AllFriends() {
   useEffect(async () => {
     const allFriends = await getAllFriends(user._id);
     socket?.on("newFriend", (data) => {
+      console.log("socketNewFriend");
       setArrivingFriend({
         _id: data._id,
         first_name: data.first,

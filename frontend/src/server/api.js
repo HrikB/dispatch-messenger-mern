@@ -1,15 +1,22 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import { useStateValue } from "../StateProvider.js";
+
 dotenv.config();
 
 const _authUrl = "http://localhost:8000";
 const _dataUrl = "http://localhost:7000";
 const instance = axios.create();
+let user;
+
+export const injectUser = (_user) => {
+  user = _user;
+};
 
 axios.interceptors.request.use(
   (request) => {
     request.headers["Authorization"] =
-      "Bearer " + localStorage.getItem("accessToken");
+      "Bearer " + sessionStorage.getItem("accessToken");
     return request;
   },
   (err) => {
@@ -26,10 +33,11 @@ axios.interceptors.response.use(undefined, async (err) => {
   if (status === 401) {
     const newTokenPair = await refreshAccessToken();
     if (newTokenPair.data.error) {
+      user.dispatch({ type: "SET_USER", user: null });
+      return Promise.resolve({ data: [] });
     } else {
-      localStorage.setItem("accessToken", newTokenPair.data.accessToken);
-      localStorage.setItem("refreshToken", newTokenPair.data.refreshToken);
-      console.log("d", config);
+      sessionStorage.setItem("accessToken", newTokenPair.data.accessToken);
+      sessionStorage.setItem("refreshToken", newTokenPair.data.refreshToken);
       if (config.method === "get") {
         return await axios.get(`${config.url}`);
       }
@@ -158,7 +166,7 @@ export const getAllFriends = async (userId) => {
 export const refreshAccessToken = async () => {
   try {
     return await instance.post(`${_authUrl}/auth/token`, {
-      refreshToken: localStorage.getItem("refreshToken"),
+      refreshToken: sessionStorage.getItem("refreshToken"),
     });
   } catch (err) {
     return err.response;

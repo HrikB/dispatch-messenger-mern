@@ -4,7 +4,6 @@ import createError from "http-errors";
 //api routes
 export let getConversations = async (req, res, next) => {
   try {
-    console.log(req.params.userId);
     const conversations = await Conversation.find({
       members: { $in: [req.params.userId] },
     });
