@@ -48,9 +48,9 @@ function Sidebar({ setShowModal }) {
 
   const logOut = async () => {
     const res = await logOutAPI();
-    console.log(res);
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("refreshToken");
+    socket.disconnect();
     dispatch({
       type: actionTypes.SET_USER,
       user: null,

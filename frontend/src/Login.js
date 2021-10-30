@@ -33,6 +33,7 @@ function Login() {
         sessionStorage.setItem("accessToken", response.data.accessToken);
         sessionStorage.setItem("refreshToken", response.data.refreshToken);
 
+        console.log(socket);
         if (!socket) {
           const socket = io("http://localhost:7000", {
             reconnectionDelayMax: 10000,
