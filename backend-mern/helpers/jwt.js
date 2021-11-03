@@ -79,6 +79,7 @@ export const verifyAccessToken = async (req, res, next) => {
     req.payload = payload;
     next();
   } catch (err) {
+    console.log("jwt-err", err.message);
     if (err.name === "JsonWebTokenError") {
       return next(createError.Unauthorized());
     }

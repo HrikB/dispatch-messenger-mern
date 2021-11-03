@@ -143,7 +143,6 @@ export let token = async (req, res, next) => {
 export let logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
-    console.log(req);
     if (!refreshToken) throw createError.BadRequest();
     const userId = await verifyRefreshToken(refreshToken);
 

@@ -29,7 +29,6 @@ axios.interceptors.response.use(undefined, async (err) => {
     config,
     response: { status },
   } = err;
-
   if (status === 401) {
     const newTokenPair = await refreshAccessToken();
     if (newTokenPair.data.error) {
@@ -40,6 +39,10 @@ axios.interceptors.response.use(undefined, async (err) => {
       sessionStorage.setItem("refreshToken", newTokenPair.data.refreshToken);
       if (config.method === "get") {
         return await axios.get(`${config.url}`);
+      }
+      if (config.method === "put") {
+        console.log("c.d", JSON.parse(config.data));
+        return await axios.put(`${config.url}`, JSON.parse(config.data));
       }
     }
   }
@@ -108,6 +111,17 @@ export const getUserDataById = async (userId) => {
 export const getUserDataByEmail = async (email) => {
   try {
     return await axios.get(`${_dataUrl}/api/user/user-email/${email}`);
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const updateProfilePic = async (userId, picData) => {
+  try {
+    return await axios.put(`${_dataUrl}/api/user/update-profile/pic`, {
+      userId,
+      profPic: picData,
+    });
   } catch (err) {
     return err.response;
   }

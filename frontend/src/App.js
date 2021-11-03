@@ -6,7 +6,6 @@ import "./App.css";
 import Sidebar from "./Sidebar";
 import Chat from "./Chat";
 import Login from "./Login";
-import Modal from "./Modal";
 import Friends from "./Friends";
 import Loading from "./Loading";
 import { useStateValue } from "./StateProvider";
@@ -14,13 +13,11 @@ import { getUserDataById } from "./server/api.js";
 
 function App() {
   const [{ user, socket }, dispatch] = useStateValue();
-  const [showModal, setShowModal] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [searchEmail, setSearchEmail] = useState(() => {});
   const [loadingComponents, setLoadingComponents] = useState(true);
 
   useEffect(async () => {
-    console.log("reconnecting");
     if (sessionStorage.getItem("accessToken")) {
       try {
         const userId = JSON.parse(
@@ -81,15 +78,8 @@ function App() {
         </div>
       ) : (
         <div id="body" className="app__body">
-          <Modal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            searchEmail={searchEmail}
-            setSearchEmail={setSearchEmail}
-          />
-
           <Router>
-            <Sidebar setShowModal={setShowModal} />
+            <Sidebar />
             <Switch>
               <Route path="/t/:conversationId">
                 <Chat setShowEmoji={setShowEmoji} />

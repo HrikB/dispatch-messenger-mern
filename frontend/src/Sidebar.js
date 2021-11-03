@@ -1,48 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef } from "react";
 import "./Sidebar.css";
 import Compose from "./Compose.svg";
-import { Avatar, IconButton } from "@material-ui/core";
-import { SearchOutlined } from "@material-ui/icons";
+import { Avatar, IconButton, Slider } from "@material-ui/core";
+import { SearchOutlined, Photo } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
 import { getConversations, logOutAPI } from "./server/api.js";
-//import socket from "./server/socketio.js";
 import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import { Link } from "react-router-dom";
 import { actionTypes } from "./reducer";
+import UpdateProfile from "./UpdateProfile";
 
-let jsonNames = [
-  {
-    id: 1,
-    data: {
-      chatWithName: "Sara",
-      chatWithProfPic:
-        "https://images.news18.com/ibnlive/uploads/2021/06/1622715559_disha.jpg?impolicy=website&width=510&height=356",
-      lastMessage: "Byebye",
-    },
-  },
-  {
-    id: 2,
-    data: {
-      chatWithName: "Jake",
-      chatWithProfPic:
-        "https://apod.nasa.gov/apod/image/2109/SunSpotHill_Coy_960.jpg",
-      lastMessage: "wtf",
-    },
-  },
-];
-
-function Sidebar({ setShowModal }) {
-  const [chatWithName, setChatWithName] = useState("");
-  const [chatWithPic, setChatWithPic] = useState("");
+function Sidebar() {
   const [searchInput, setSearchInput] = useState("");
+  const [profPic, setProfPic] = useState("");
   const [{ user, socket }, dispatch] = useStateValue();
   const [names, setNames] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [arrivingConversation, setArrivingConversation] = useState();
   const [profileOptMenu, setProfileOptMenu] = useState(false);
+  const [updateProfWin, setUpdateProfWin] = useState(false);
+  const [viewPreview, setViewPreview] = useState(false);
   const [origNames, setOrigNames] = useState([]);
-  const ref = useRef();
+  const updateProfMenu = useRef();
+  const profOptionsMenu = useRef();
 
   const createConversation = () => {};
 
@@ -61,21 +42,38 @@ function Sidebar({ setShowModal }) {
     });
   };
 
+  const upProfile = () => {
+    setUpdateProfWin(!updateProfWin);
+    setProfileOptMenu(false);
+  };
+
   const profileOptions = () => {
     setProfileOptMenu(!profileOptMenu);
   };
 
   useEffect(() => {
-    const closeMenus = (e) => {
-      if (profileOptMenu && ref.current && !ref.current.contains(e.target)) {
+    const updateMenus = (e) => {
+      if (
+        updateProfMenu &&
+        updateProfMenu.current &&
+        !updateProfMenu.current.contains(e.target)
+      ) {
+        setUpdateProfWin(false);
+        setViewPreview(false);
+      }
+      if (
+        profileOptMenu &&
+        profOptionsMenu.current &&
+        !profOptionsMenu.current.contains(e.target)
+      ) {
         setProfileOptMenu(false);
       }
     };
 
-    document.addEventListener("mousedown", closeMenus);
+    document.addEventListener("mousedown", updateMenus);
 
     return () => {
-      document.removeEventListener("mousedown", closeMenus);
+      document.removeEventListener("mousedown", updateMenus);
     };
   }, [profileOptMenu]);
 
@@ -85,7 +83,7 @@ function Sidebar({ setShowModal }) {
       console.log("getNewChat", data);
       setArrivingConversation(data);
     });
-
+    setProfPic(user.prof_pic);
     setConversations(conversationsData.data);
     /*var newNames = [];
     if (searchInput) {
@@ -108,16 +106,23 @@ function Sidebar({ setShowModal }) {
   }, [arrivingConversation]);
   return (
     <div className="sidebar">
+      {updateProfWin && (
+        <UpdateProfile
+          ref={updateProfMenu}
+          profPic={profPic}
+          setProfPic={setProfPic}
+        />
+      )}
       <div className="sidebar__header">
-        <IconButton ref={ref}>
+        <IconButton ref={profOptionsMenu}>
           <Avatar
-            src={user?.photoURL}
+            src={profPic}
             className="accountPic"
             onClick={profileOptions}
           />
           {profileOptMenu && (
             <div className="profile__options">
-              <button>Update Profile</button>
+              <button onClick={upProfile}>Update Profile</button>
               <button className="logOut__button" onClick={logOut}>
                 Log Out
               </button>

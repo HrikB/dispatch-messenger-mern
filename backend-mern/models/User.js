@@ -22,6 +22,9 @@ let userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    prof_pic: {
+      type: String,
+    },
     friendsList: {
       type: Array,
       required: true,

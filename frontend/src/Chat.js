@@ -159,7 +159,7 @@ function Chat() {
   return (
     <div id="chatid" className="chat">
       <div className="chat__header">
-        <Avatar src={chatWithPic} />
+        <Avatar src={receiver.prof_pic} />
         <div className="chat__headerInfo">
           <h3>{receiver.first_name + " " + receiver.last_name}</h3>
           <h6>Last seen at...</h6>

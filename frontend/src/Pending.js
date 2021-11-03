@@ -94,7 +94,7 @@ function Pending() {
       {pending.map((friendRequest) => (
         <div className="request__container">
           <div className="request__info">
-            <Avatar src={friendRequest?.photoURL} className="accountPic" />
+            <Avatar src={friendRequest?.prof_pic} className="accountPic" />
             <div className="info__text">
               <p className="request__name">
                 {user._id == friendRequest.requesterId

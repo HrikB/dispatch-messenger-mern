@@ -51,7 +51,7 @@ function AllFriends() {
       {friendsList.map((friend) => (
         <div className="friendComponent__container">
           <div className="friend__info">
-            <Avatar src={friend?.photoURL} className="accountPic" />
+            <Avatar src={friend?.prof_pic} className="accountPic" />
             <div className="info__text">
               <p className="friend__name">
                 {friend.first_name + " " + friend.last_name}

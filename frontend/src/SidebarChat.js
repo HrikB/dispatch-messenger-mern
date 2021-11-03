@@ -49,7 +49,7 @@ function SidebarChat({ convId, memberId, friendsTab }) {
       <Link to={`/t/${convId}`}>
         <div className="sidebarChat">
           <div id={convId} className="allContainer">
-            <Avatar id="profpic" />
+            <Avatar src={conversations.prof_pic} id="profpic" />
             <div className="infoContainer">
               <h4 className="name">
                 {conversations.first_name + " " + conversations.last_name}

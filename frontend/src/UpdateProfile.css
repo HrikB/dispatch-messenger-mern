@@ -1,0 +1,165 @@
+.updateProfile__window {
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 10px;
+  position: absolute;
+  width: 31.25rem;
+  display: table;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: #171717;
+  z-index: 100;
+  animation: fadeIn 0.2s;
+  -webkit-animation: fadeIn 0.2s;
+  -moz-animation: fadeIn 0.2s;
+  -o-animation: fadeIn 0.2s;
+  -ms-animation: fadeIn 0.2s;
+}
+
+.updateProfile__window .first__name {
+}
+
+.updateProfile__window .last__name {
+}
+
+.updateProfile__window .email {
+}
+
+.updateProfile__window label .MuiIconButton-root {
+  position: relative;
+  width: fit-content;
+  padding: 0;
+  z-index: -1;
+}
+
+.updateProfile__window label .overlay {
+  pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  height: 50%;
+  width: 100%;
+  transition: 0.2s ease;
+  opacity: 0;
+  background-color: darkslategrey;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.updateProfile__window label:hover .overlay {
+  opacity: 1;
+}
+
+.updateProfile__window label:hover {
+  cursor: pointer;
+}
+
+.updateProfile__window .preview__container {
+  display: table-row;
+  box-sizing: border-box;
+  max-height: 50vh;
+}
+
+.updateProfile__window .preview__container #preview {
+  margin: 10px auto;
+  max-height: 80%;
+  background-color: #403d3d;
+  border-radius: 5px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.updateProfile__window .preview__container .slider__container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: relative;
+  width: 80%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.updateProfile__window .preview__container .slider__container #slider {
+  margin: 5px 20px;
+  width: 75%;
+}
+
+.updateProfile__window .preview__container .button__container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.updateProfile__window .preview__container .button__container button {
+  margin: 10px 3px;
+  width: 5rem;
+  color: white;
+  height: fit-content;
+}
+
+.updateProfile__window .cancel__button {
+  background-color: transparent;
+}
+
+.updateProfile__window .cancel__button:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.updateProfile__window .save__button {
+  background-color: purple;
+}
+
+.updateProfile__window .save__button:hover {
+  background-color: rgb(85, 0, 85);
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
