@@ -24,34 +24,35 @@ function Login() {
   const [showRegModal, setShowRegModal] = useState(false);
 
   const signIn = async () => {
-    const response = await login(email, password);
-    if (response) {
-      if (response.status === 200) {
+    const logResponse = await login(email, password);
+    if (logResponse) {
+      if (logResponse.status === 200) {
         setErrorMessage("/");
         setErrVisibility("hidden");
 
-        sessionStorage.setItem("accessToken", response.data.accessToken);
-        sessionStorage.setItem("refreshToken", response.data.refreshToken);
+        sessionStorage.setItem("accessToken", logResponse.data.accessToken);
+        sessionStorage.setItem("refreshToken", logResponse.data.refreshToken);
 
         if (!socket) {
           const socket = io("http://localhost:7000", {
             reconnectionDelayMax: 10000,
             auth: {
               accessToken: sessionStorage.getItem("accessToken"),
+              userId: logResponse.data.user._id,
             },
           });
           dispatch({
             type: actionTypes.SET_SOCKET,
             socket: socket,
           });
-          socket?.emit("sendUser", response.data.user._id);
+          socket?.emit("sendUser", logResponse.data.user._id);
         }
         dispatch({
           type: actionTypes.SET_USER,
-          user: response.data.user,
+          user: logResponse.data.user,
         });
       } else {
-        setErrorMessage(response.data.error.message);
+        setErrorMessage(logResponse.data.error.message);
         setErrVisibility("visible");
       }
     } else {
@@ -61,7 +62,7 @@ function Login() {
   };
 
   const signUp = async () => {
-    const response = await register(
+    const regResponse = await register(
       firstName,
       lastName,
       regEmail,

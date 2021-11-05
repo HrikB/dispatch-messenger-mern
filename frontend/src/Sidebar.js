@@ -85,19 +85,6 @@ function Sidebar() {
     });
     setProfPic(user.prof_pic);
     setConversations(conversationsData.data);
-    /*var newNames = [];
-    if (searchInput) {
-      origNames.forEach((e) => {
-        if (
-          e.data.chatWithName.toLowerCase().includes(searchInput.toLowerCase())
-        ) {
-          newNames.push(e);
-        }
-      });
-      setNames(newNames);
-    } else {
-      setNames(origNames);
-    }*/
   }, [user]);
 
   useEffect(() => {
@@ -159,6 +146,7 @@ function Sidebar() {
             convId={conversation._id}
             memberId={conversation.members.find((m) => m !== user._id)}
             friendsTab={document.getElementById("friends")}
+            searchInput={searchInput}
           />
         ))}
       </div>

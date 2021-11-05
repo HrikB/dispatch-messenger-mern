@@ -29,6 +29,7 @@ function App() {
           reconnectionDelayMax: 10000,
           auth: {
             accessToken: sessionStorage.getItem("accessToken"),
+            userId,
           },
         });
         if (user.status === 200) {

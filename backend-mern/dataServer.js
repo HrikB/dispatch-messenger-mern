@@ -10,6 +10,7 @@ import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
 import { respondToRequest, sendRequest } from "./controllers/request.js";
 import { sendMessage } from "./controllers/messages.js";
+import redisClient from "./helpers/redis.js";
 import "./helpers/mongodb.js";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
@@ -29,16 +30,19 @@ const io = new Server(httpServer, {
 //OK for now... eventually, move this array onto redis
 let users = [];
 const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
+  redisClient.hset("socketConns", userId, socketId);
+  //!users.some((user) => user.userId === userId) &&
+  //  users.push({ userId, socketId });
 };
 
-const removeUser = (socketId) => {
-  users = users.filter((user) => user.socketId !== socketId);
+const removeUser = (userId) => {
+  redisClient.hdel("socketConns", userId);
+  //users = users.filter((user) => user.socketId !== socketId);
 };
 
 const getUser = (userId) => {
-  return users.find((user) => user.userId == userId);
+  return redisClient.hget("socketConns", userId);
+  //return users.find((user) => user.userId == userId);
 };
 
 //socket-io
@@ -78,10 +82,10 @@ io.use((socket, next) => {
     ({ conversationId, sender, receiver, text, createdAt }) => {
       console.log("sendMessage received");
       //if user is undefined, the client to recieve the message is offline
-      const user = getUser(receiver);
-      if (user) {
+      const userSocket = getUser(receiver);
+      if (userSocket) {
         console.log("sendMessage emitted");
-        io.to(user.socketId).emit("getMessage", {
+        io.to(userSocket).emit("getMessage", {
           sender,
           text,
           createdAt,
@@ -113,7 +117,7 @@ io.use((socket, next) => {
       const receiver = await User.findOne({ email: receiverEmail });
       //if receiver email exists in database
       if (receiver) {
-        const user = getUser(receiver._id);
+        const receiverSocket = getUser(receiver._id);
         const existingRequest = await FriendRequest.findOne({
           $or: [
             {
@@ -138,10 +142,10 @@ io.use((socket, next) => {
               requesterName: senderName,
               recipientName: receiver.first_name + " " + receiver.last_name,
             }).save();
-            //if user is connected to socket
-            if (user) {
+            //if receiver is connected to socket
+            if (receiverSocket) {
               console.log("emitting Friend request");
-              io.to(user.socketId).emit("getFriendRequest", {
+              io.to(receiverSocket).emit("getFriendRequest", {
                 id,
                 senderId,
                 senderName,
@@ -171,8 +175,8 @@ io.use((socket, next) => {
 
       await FriendRequest.deleteOne({ _id: requestId });
       if (response == 1) {
-        const requester = getUser(requesterId);
-        const receiver = getUser(recipientId);
+        const requesterSocket = getUser(requesterId);
+        const receiverSocket = getUser(recipientId);
         const requesterObject = await User.findOneAndUpdate(
           { _id: requesterId },
           { $addToSet: { friendsList: recipientId } }
@@ -181,19 +185,19 @@ io.use((socket, next) => {
           { _id: recipientId },
           { $addToSet: { friendsList: requesterId } }
         );
-        if (requester) {
+        if (requesterSocket) {
           console.log("respondToRequest emitted");
           const _id = receiverObject._id;
           const first = receiverObject.first_name;
           const last = receiverObject.last_name;
-          io.to(requester.socketId).emit("newFriend", { _id, first, last });
+          io.to(requesterSocket).emit("newFriend", { _id, first, last });
         }
-        if (receiver) {
+        if (receiverSocket) {
           console.log("respondToRequest emitted");
           const _id = requesterObject._id;
           const first = requesterObject.first_name;
           const last = requesterObject.last_name;
-          io.to(receiver.socketId).emit("newFriend", { _id, first, last });
+          io.to(receiverSocket).emit("newFriend", { _id, first, last });
         }
       }
     }
@@ -206,7 +210,7 @@ io.use((socket, next) => {
     const existingConversation = await Conversation.findOne({
       members: { $size: 2, $all: [senderId, receiverId] },
     });
-    const user = getUser(receiverId);
+    const receiverSocket = getUser(receiverId);
     if (!existingConversation) {
       const _id = mongoose.Types.ObjectId();
       const newConversation = new Conversation({
@@ -217,26 +221,26 @@ io.use((socket, next) => {
       });
       //checks if receiver is connected to socket
 
-      if (user) {
+      if (receiverSocket) {
         console.log("otherPerson emitted");
-        io.to(user.socketId).emit("getNewChat", newConversation);
+        io.to(receiverSocket).emit("getNewChat", newConversation);
       }
       console.log("samePerson emitted");
-      io.to(getUser(senderId).socketId).emit("getNewChat", newConversation);
+      io.to(getUser(senderId)).emit("getNewChat", newConversation);
       newConversation.save();
-      io.to(getUser(senderId).socketId).emit("openMessage", { _id });
+      io.to(getUser(senderId)).emit("openMessage", { _id });
     } else {
       //conversation between these two users already exists, simply open
       const _id = existingConversation._id;
       console.log("openMessage emitted");
-      io.to(getUser(senderId).socketId).emit("openMessage", { _id });
+      io.to(getUser(senderId)).emit("openMessage", { _id });
     }
   });
 
   //when client disconnects from the socket
   socket.on("disconnect", () => {
-    console.log(socket.id, "disconnected!");
-    removeUser(socket.id);
+    console.log(socket.handshake.auth.userId, "disconnected!");
+    removeUser(socket.handshake.auth.userId);
     io.emit("getUsers", users);
   });
 });
