@@ -35,11 +35,22 @@ function Login() {
 
         if (!socket) {
           const socket = io("http://localhost:7000", {
-            reconnectionDelayMax: 10000,
+            reconnection: false,
             auth: {
               accessToken: sessionStorage.getItem("accessToken"),
               userId: logResponse.data.user._id,
             },
+          });
+          socket?.on("disconnect", () => {
+            sessionStorage.clear();
+            dispatch({
+              type: actionTypes.SET_SOCKET,
+              socket: null,
+            });
+            dispatch({
+              type: actionTypes.SET_USER,
+              user: null,
+            });
           });
           dispatch({
             type: actionTypes.SET_SOCKET,

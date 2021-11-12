@@ -93,7 +93,7 @@ function Chat() {
     socket?.on("welcome", () => {
       console.log("Welcome this is the socket server");
     });
-    //socket?.emit("sendUser", user._id);
+    //getUsers to get online users
     socket?.on("getUsers", (users) => {});
     socket?.on("getMessage", (data) => {
       setArrivingMessage({
@@ -139,17 +139,6 @@ function Chat() {
     socket.emit("sendMessage", outgoingMessage);
 
     setMessages((prev) => [...prev, outgoingMessage]);
-
-    //send message to Database asynchrounsly
-    //is it more performative or sercure if instead of
-    //storing to database from client while sending, I picked up the
-    //data from the socket server side and had the server send to
-    //database directly??
-    /*try {
-      sendMessageDatabase(conversationId, user._id, input);
-    } catch (err) {
-      console.error(err);
-    }*/
 
     setOpenMic(false);
     setInput("");

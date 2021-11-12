@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import createError from "http-errors";
+import cookieParser from "cookie-parser";
 dotenv.config();
 import "./helpers/mongodb.js";
 
@@ -16,7 +17,13 @@ const port = process.env.PORT || 8000;
 
 //Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 
 //API Endpoints
 app.get("/", (req, res) => {

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
 import { getUserDataById } from "./server/api.js";
 
-function SidebarChat({ convId, memberId, friendsTab }) {
+function SidebarChat({ convId, memberId, friendsTab, searchInput }) {
   const [messages, setMessages] = useState("");
   const [{ user }, dispatch] = useStateValue();
   const [conversations, setConversations] = useState([]);
@@ -43,6 +43,10 @@ function SidebarChat({ convId, memberId, friendsTab }) {
       console.error(err);
     }
   }, [memberId]);
+
+  useEffect(() => {
+    //setConversations(conversations.filter(prev => p)
+  }, [searchInput]);
 
   return (
     <div>

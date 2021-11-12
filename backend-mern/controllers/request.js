@@ -29,6 +29,25 @@ export const getAllFriends = async (req, res, next) => {
   }
 };
 
+export const removeFriend = async (req, res, next) => {
+  try {
+    const { removerId, toRemoveId } = req.body;
+    if (!(removerId && toRemoveId)) throw createError.BadRequest();
+    const resRemover = await User.updateOne(
+      { _id: removerId },
+      { $pull: { friendsList: toRemoveId } }
+    );
+    const resToRemove = await User.updateOne(
+      { _id: toRemoveId },
+      { $pull: { friendsList: removerId } }
+    );
+    res.status(202).send({ resRemover, resToRemove });
+  } catch (err) {
+    console.log("removing err", err.message);
+    next(err);
+  }
+};
+
 //socket functions
 export const sendRequest = async ({ senderId, senderName, receiverEmail }) => {
   //get receiver object with the email

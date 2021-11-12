@@ -13,15 +13,6 @@ import {
 
 export let signup = async (req, res, next) => {
   try {
-    //input validation
-    /*if (!first_name)
-      throw createError.BadRequest("You must enter your first name");
-    if (!last_name)
-      throw createError.BadRequest("You must enter your last name");
-    if (!email) throw createError.BadRequest("You must enter an email ");
-    if (!password) throw createError.BadRequest("You must enter a password");
-    if (!password_confirm)
-      throw createError.BadRequest("You must confirm your password");*/
     const validation = await registerSchema.validateAsync(req.body);
 
     //checks if email is already in use
@@ -33,14 +24,6 @@ export let signup = async (req, res, next) => {
 
     //creates new user object
     const user = new User(validation);
-    /*const user = new User({
-      first_name,
-      last_name,
-      email,
-      password,
-      password_confirm,
-      friendsList: [],
-    });*/
 
     const savedUser = await user.save();
     const accessToken = await signAccessToken(savedUser.id);
@@ -64,64 +47,24 @@ export let signin = async (req, res, next) => {
 
     const accessToken = await signAccessToken(user._id);
     const refreshToken = await signRefreshToken(user._id);
-
-    res.send({ user, accessToken, refreshToken });
+    console.log("signedin");
+    res
+      .cookie("accessToken", accessToken, {
+        sameSite: "lax",
+        httpOnly: true,
+      })
+      .cookie("authSession", true)
+      .cookie("refreshToken", refreshToken, {
+        sameSite: "lax",
+        httpOnly: true,
+      })
+      .cookie("refreshTokenID", true)
+      .send({ user, accessToken, refreshToken });
   } catch (err) {
     if (err.isJoi === true)
       return next(createError.BadRequest("Invalid Username/Password"));
     next(err);
   }
-
-  /*let { email, password } = req.body;
-  User.findOne({ email: email })
-    .then((user) => {
-      if (!user) {
-        return res.status(404).json({
-          errors: [{ error: "User/email not found" }],
-        });
-      } else {
-        bcrypt
-          .compare(password, user.password)
-          .then((isMatch) => {
-            if (!isMatch) {
-              return res
-                .status(400)
-                .json({ errors: [{ error: "Password is incorrect" }] });
-            }
-
-            const accessToken = createAccessJWT(user.email, user._id);
-            const refreshToken = createRefreshJWT(user.email, user._id);
-            redisClient.set(
-              user._id.toString(),
-              JSON.stringify({ token: refreshToken })
-            );
-
-            jwt.verify(
-              accessToken,
-              process.env.ACCESS_TOKEN_SECRET,
-              (err, decoded) => {
-                if (err) {
-                  res.status(500).json({ errors: err });
-                }
-                if (decoded) {
-                  return res.status(200).json({
-                    success: true,
-                    accessToken: accessToken,
-                    refreshToken: refreshToken,
-                    message: user,
-                  });
-                }
-              }
-            );
-          })
-          .catch((err) => {
-            res.status(500).json({ errors: err });
-          });
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ errors: err });
-    });*/
 };
 
 export let token = async (req, res, next) => {

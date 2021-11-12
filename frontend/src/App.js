@@ -13,6 +13,7 @@ import { getUserDataById } from "./server/api.js";
 
 function App() {
   const [{ user, socket }, dispatch] = useStateValue();
+  const [connected, setConnected] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [searchEmail, setSearchEmail] = useState(() => {});
   const [loadingComponents, setLoadingComponents] = useState(true);
@@ -26,12 +27,25 @@ function App() {
         //this also refreshes token through interceptor if it is expired
         const user = await getUserDataById(userId);
         const socket = io("http://localhost:7000", {
-          reconnectionDelayMax: 10000,
+          reconnection: false,
           auth: {
             accessToken: sessionStorage.getItem("accessToken"),
             userId,
           },
         });
+
+        socket?.on("disconnect", () => {
+          sessionStorage.clear();
+          dispatch({
+            type: actionTypes.SET_SOCKET,
+            socket: null,
+          });
+          dispatch({
+            type: actionTypes.SET_USER,
+            user: null,
+          });
+        });
+
         if (user.status === 200) {
           dispatch({
             type: actionTypes.SET_USER,
@@ -53,7 +67,7 @@ function App() {
           });
         }
       } catch (err) {
-        console.log("Invalid Access Token");
+        console.log(err, "Invalid Access Token");
         dispatch({
           type: actionTypes.SET_USER,
           user: null,

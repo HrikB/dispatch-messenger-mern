@@ -100,3 +100,19 @@ PUT http://localhost:7000/api/requests/respond/
 GET http://localhost:7000/api/requests/friends/61639307187a61187b5e20b1
 
 ###
+PUT http://localhost:7000/api/user/update-profile/first-name
+Content-Type: application/json
+
+{
+    "userId": "617c40aa0cc7aeca24fc9f81",
+    "firstName": "Bor"
+}
+
+###
+PUT http://localhost:7000/api/requests/remove
+Content-Type: application/json
+
+{
+    "removerId": "617c40aa0cc7aeca24fc9f81",
+    "toRemoveId": "61834d99d229d18317176be3" 
+}

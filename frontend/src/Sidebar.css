@@ -47,6 +47,7 @@
 
 .sidebar__header .accountPic {
   position: relative;
+
   max-width: 32px;
   max-height: 32px;
 }

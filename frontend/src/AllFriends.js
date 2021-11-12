@@ -4,13 +4,13 @@ import "./AllFriends.css";
 import { Avatar, IconButton } from "@material-ui/core";
 import MoreVert from "@material-ui/icons/MoreVert";
 import ModeComment from "@material-ui/icons/ModeComment";
-import { getAllFriends } from "./server/api.js";
+import { getAllFriends, removeFriend } from "./server/api.js";
 import { useStateValue } from "./StateProvider";
-//import socket from "./server/socketio";
 import { ContactPhoneOutlined } from "@material-ui/icons";
 
 function AllFriends() {
   const [friendsList, setFriendsList] = useState([]);
+  const [openFriendOptions, setOpenFriendOptions] = useState(false);
   const [arrivingFriend, setArrivingFriend] = useState();
   const [{ user, socket }, dispatch] = useStateValue();
   const history = useHistory();
@@ -20,6 +20,14 @@ function AllFriends() {
       senderId: user._id,
       receiverId: friend._id,
     });
+  };
+
+  const friendOptions = () => {
+    setOpenFriendOptions(!openFriendOptions);
+  };
+
+  const remove = async (friendId) => {
+    await removeFriend(user._id, friendId);
   };
 
   useEffect(async () => {
@@ -64,8 +72,15 @@ function AllFriends() {
               <ModeComment style={{ fontSize: 30 }} />
             </IconButton>
 
-            <IconButton>
+            <IconButton onClick={friendOptions}>
               <MoreVert style={{ fontSize: 30 }} />
+              {openFriendOptions && (
+                <div className="friendOptions__menu">
+                  <button onClick={() => remove(friend._id)}>
+                    Remove Friend
+                  </button>
+                </div>
+              )}
             </IconButton>
           </div>
         </div>

@@ -4,9 +4,10 @@ import { useStateValue } from "../StateProvider.js";
 
 dotenv.config();
 
-const _authUrl = "http://localhost:8000";
+const _authUrl = `${window.location.origin}`;
 const _dataUrl = "http://localhost:7000";
 const instance = axios.create();
+axios.defaults.withCredentials = true;
 let user;
 
 export const injectUser = (_user) => {
@@ -41,7 +42,6 @@ axios.interceptors.response.use(undefined, async (err) => {
         return await axios.get(`${config.url}`);
       }
       if (config.method === "put") {
-        console.log("c.d", JSON.parse(config.data));
         return await axios.put(`${config.url}`, JSON.parse(config.data));
       }
     }
@@ -172,6 +172,17 @@ export const getFriendRequests = async (userId) => {
 export const getAllFriends = async (userId) => {
   try {
     return await axios.get(`${_dataUrl}/api/requests/friends/${userId}`);
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const removeFriend = async (removerId, toRemoveId) => {
+  try {
+    return await axios.put(`${_dataUrl}/api/requests/remove`, {
+      removerId,
+      toRemoveId,
+    });
   } catch (err) {
     return err.response;
   }

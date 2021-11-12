@@ -25,7 +25,9 @@ function Sidebar() {
   const updateProfMenu = useRef();
   const profOptionsMenu = useRef();
 
-  const createConversation = () => {};
+  const createConversation = () => {
+    console.log(socket.connected);
+  };
 
   const logOut = async () => {
     const res = await logOutAPI();

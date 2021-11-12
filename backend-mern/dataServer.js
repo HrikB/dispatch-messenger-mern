@@ -15,6 +15,8 @@ import "./helpers/mongodb.js";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
 import { verifyAccessToken } from "./helpers/jwt.js";
+import cookieParser from "cookie-parser";
+import util from "util";
 dotenv.config();
 
 //App Config
@@ -29,27 +31,28 @@ const io = new Server(httpServer, {
 
 //OK for now... eventually, move this array onto redis
 let users = [];
-const addUser = (userId, socketId) => {
-  redisClient.hset("socketConns", userId, socketId);
-  //!users.some((user) => user.userId === userId) &&
-  //  users.push({ userId, socketId });
+const addUser = async (userId, socketId) => {
+  redisClient.hset = util.promisify(redisClient.hset);
+  await redisClient.hset("socketConns", userId, socketId);
 };
 
-const removeUser = (userId) => {
-  redisClient.hdel("socketConns", userId);
-  //users = users.filter((user) => user.socketId !== socketId);
+const removeUser = async (userId) => {
+  redisClient.hdel = util.promisify(redisClient.hdel);
+  await redisClient.hdel("socketConns", userId);
 };
 
-const getUser = (userId) => {
-  return redisClient.hget("socketConns", userId);
-  //return users.find((user) => user.userId == userId);
+const getUser = async (userId) => {
+  redisClient.hget = util.promisify(redisClient.hget);
+  const socketId = await redisClient.hget("socketConns", userId);
+  console.log("sId", socketId);
+  return socketId;
 };
 
 //socket-io
 io.use((socket, next) => {
   console.log("middleware running", socket.id);
+  console.log(socket.handshake.auth);
   if (socket.handshake.auth && socket.handshake.auth.accessToken) {
-    console.log("tokens found");
     jwt.verify(
       socket.handshake.auth.accessToken,
       process.env.ACCESS_TOKEN_SECRET,
@@ -69,20 +72,20 @@ io.use((socket, next) => {
   io.emit("welcome", "This is the socket. Hi!");
 
   //take the userId and socketId from client
-  socket.on("sendUser", (userId) => {
+  socket.on("sendUser", async (userId) => {
     console.log(userId, "connected!");
 
-    addUser(userId, socket.id);
+    await addUser(userId, socket.id);
     io.emit("getUsers", users);
   });
 
   //sending and getting message
   socket.on(
     "sendMessage",
-    ({ conversationId, sender, receiver, text, createdAt }) => {
+    async ({ conversationId, sender, receiver, text, createdAt }) => {
       console.log("sendMessage received");
       //if user is undefined, the client to recieve the message is offline
-      const userSocket = getUser(receiver);
+      const userSocket = await getUser(receiver);
       if (userSocket) {
         console.log("sendMessage emitted");
         io.to(userSocket).emit("getMessage", {
@@ -117,7 +120,8 @@ io.use((socket, next) => {
       const receiver = await User.findOne({ email: receiverEmail });
       //if receiver email exists in database
       if (receiver) {
-        const receiverSocket = getUser(receiver._id);
+        const receiverSocket = await getUser(receiver._id.toString());
+        console.log("rSock", receiverSocket);
         const existingRequest = await FriendRequest.findOne({
           $or: [
             {
@@ -175,8 +179,8 @@ io.use((socket, next) => {
 
       await FriendRequest.deleteOne({ _id: requestId });
       if (response == 1) {
-        const requesterSocket = getUser(requesterId);
-        const receiverSocket = getUser(recipientId);
+        const requesterSocket = await getUser(requesterId.toString());
+        const receiverSocket = await getUser(recipientId.toString());
         const requesterObject = await User.findOneAndUpdate(
           { _id: requesterId },
           { $addToSet: { friendsList: recipientId } }
@@ -210,7 +214,7 @@ io.use((socket, next) => {
     const existingConversation = await Conversation.findOne({
       members: { $size: 2, $all: [senderId, receiverId] },
     });
-    const receiverSocket = getUser(receiverId);
+    const receiverSocket = await getUser(receiverId.toString());
     if (!existingConversation) {
       const _id = mongoose.Types.ObjectId();
       const newConversation = new Conversation({
@@ -226,22 +230,27 @@ io.use((socket, next) => {
         io.to(receiverSocket).emit("getNewChat", newConversation);
       }
       console.log("samePerson emitted");
-      io.to(getUser(senderId)).emit("getNewChat", newConversation);
+      io.to(await getUser(senderId.toString())).emit(
+        "getNewChat",
+        newConversation
+      );
       newConversation.save();
-      io.to(getUser(senderId)).emit("openMessage", { _id });
+      io.to(await getUser(senderId.toString())).emit("openMessage", { _id });
     } else {
       //conversation between these two users already exists, simply open
       const _id = existingConversation._id;
       console.log("openMessage emitted");
-      io.to(getUser(senderId)).emit("openMessage", { _id });
+      io.to(await getUser(senderId.toString())).emit("openMessage", { _id });
     }
   });
 
   //when client disconnects from the socket
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     console.log(socket.handshake.auth.userId, "disconnected!");
-    removeUser(socket.handshake.auth.userId);
-    io.emit("getUsers", users);
+    const disconnecting = await getUser(socket.handshake.auth.userId);
+    console.log(disconnecting);
+    io.to(disconnecting).emit("disconnectClient");
+    await removeUser(socket.handshake.auth.userId);
   });
 });
 
@@ -253,7 +262,13 @@ import userRoute from "./routes/user.js";
 
 //Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 app.use(verifyAccessToken);
 
 //API Endpoints
