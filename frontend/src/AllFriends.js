@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router";
 import "./AllFriends.css";
 import { Avatar, IconButton } from "@material-ui/core";
@@ -10,8 +10,10 @@ import { ContactPhoneOutlined } from "@material-ui/icons";
 
 function AllFriends() {
   const [friendsList, setFriendsList] = useState([]);
-  const [openFriendOptions, setOpenFriendOptions] = useState(false);
+  const [openFriendOptions, setOpenFriendOptions] = useState(-1);
+  const openFriendMenu = useRef();
   const [arrivingFriend, setArrivingFriend] = useState();
+  const [toRemoveFriend, setToRemoveFriend] = useState();
   const [{ user, socket }, dispatch] = useStateValue();
   const history = useHistory();
 
@@ -22,13 +24,32 @@ function AllFriends() {
     });
   };
 
-  const friendOptions = () => {
-    setOpenFriendOptions(!openFriendOptions);
+  const friendOptions = (i) => {
+    setOpenFriendOptions(i);
   };
 
   const remove = async (friendId) => {
+    socket?.emit("removeFriend", { removerId: user._id, toRemoveId: friendId });
     await removeFriend(user._id, friendId);
   };
+
+  useEffect(() => {
+    const updateMenus = (e) => {
+      if (
+        openFriendMenu &&
+        openFriendMenu.current &&
+        !openFriendMenu.current.contains(e.target)
+      ) {
+        setOpenFriendOptions(-1);
+      }
+    };
+
+    document.addEventListener("mousedown", updateMenus);
+
+    return () => {
+      document.removeEventListener("mousedown", updateMenus);
+    };
+  }, [openFriendOptions]);
 
   useEffect(async () => {
     const allFriends = await getAllFriends(user._id);
@@ -40,9 +61,11 @@ function AllFriends() {
         last_name: data.last,
       });
     });
-    //
     socket?.on("openMessage", (data) => {
       history.push({ pathname: `/t/${data._id}` });
+    });
+    socket?.on("friendRemoved", (toRemoveId) => {
+      setToRemoveFriend(toRemoveId);
     });
     setFriendsList(allFriends.data);
   }, [user]);
@@ -51,12 +74,16 @@ function AllFriends() {
     arrivingFriend && setFriendsList((prev) => [...prev, arrivingFriend]);
   }, [arrivingFriend]);
 
+  useEffect(() => {
+    setFriendsList(friendsList.filter((prev) => prev._id != toRemoveFriend));
+  }, [toRemoveFriend]);
+
   return (
     <div className="allFriends">
       <h4 className="allFriends_heading">
         All Friends - {`${friendsList.length}`}
       </h4>
-      {friendsList.map((friend) => (
+      {friendsList.map((friend, i) => (
         <div className="friendComponent__container">
           <div className="friend__info">
             <Avatar src={friend?.prof_pic} className="accountPic" />
@@ -72,10 +99,10 @@ function AllFriends() {
               <ModeComment style={{ fontSize: 30 }} />
             </IconButton>
 
-            <IconButton onClick={friendOptions}>
+            <IconButton onClick={() => friendOptions(i)}>
               <MoreVert style={{ fontSize: 30 }} />
-              {openFriendOptions && (
-                <div className="friendOptions__menu">
+              {openFriendOptions === i && (
+                <div className="friendOptions__menu" ref={openFriendMenu}>
                   <button onClick={() => remove(friend._id)}>
                     Remove Friend
                   </button>

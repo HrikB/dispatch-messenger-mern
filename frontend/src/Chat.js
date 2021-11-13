@@ -94,7 +94,9 @@ function Chat() {
       console.log("Welcome this is the socket server");
     });
     //getUsers to get online users
-    socket?.on("getUsers", (users) => {});
+    socket?.on("getUsers", (users) => {
+      console.log("gotten");
+    });
     socket?.on("getMessage", (data) => {
       setArrivingMessage({
         sender: data.sender,

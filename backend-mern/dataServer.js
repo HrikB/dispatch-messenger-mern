@@ -2,24 +2,29 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import util from "util";
+import createError from "http-errors";
+import jwt from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
-import { respondToRequest, sendRequest } from "./controllers/request.js";
-import { sendMessage } from "./controllers/messages.js";
+import {
+  removeFriend,
+  respondToRequest,
+  sendRequest,
+} from "./controllers/request.js";
 import redisClient from "./helpers/redis.js";
-import "./helpers/mongodb.js";
-import createError from "http-errors";
-import jwt from "jsonwebtoken";
+import { sendMessage } from "./controllers/messages.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
-import cookieParser from "cookie-parser";
-import util from "util";
+import "./helpers/mongodb.js";
+
 dotenv.config();
 
-//App Config
+//App Config`x
 const app = express();
 const port = 7000;
 const httpServer = createServer(app);
@@ -30,7 +35,6 @@ const io = new Server(httpServer, {
 });
 
 //OK for now... eventually, move this array onto redis
-let users = [];
 const addUser = async (userId, socketId) => {
   redisClient.hset = util.promisify(redisClient.hset);
   await redisClient.hset("socketConns", userId, socketId);
@@ -44,14 +48,12 @@ const removeUser = async (userId) => {
 const getUser = async (userId) => {
   redisClient.hget = util.promisify(redisClient.hget);
   const socketId = await redisClient.hget("socketConns", userId);
-  console.log("sId", socketId);
   return socketId;
 };
 
 //socket-io
 io.use((socket, next) => {
   console.log("middleware running", socket.id);
-  console.log(socket.handshake.auth);
   if (socket.handshake.auth && socket.handshake.auth.accessToken) {
     jwt.verify(
       socket.handshake.auth.accessToken,
@@ -76,7 +78,6 @@ io.use((socket, next) => {
     console.log(userId, "connected!");
 
     await addUser(userId, socket.id);
-    io.emit("getUsers", users);
   });
 
   //sending and getting message
@@ -242,6 +243,49 @@ io.use((socket, next) => {
       console.log("openMessage emitted");
       io.to(await getUser(senderId.toString())).emit("openMessage", { _id });
     }
+  });
+
+  //client removing friend
+  socket.on("removeFriend", async ({ removerId, toRemoveId }) => {
+    //if being removed is online
+    const beingRemovedSocket = await getUser(toRemoveId.toString());
+    const removingSocket = await getUser(removerId.toString());
+
+    //removing from friendslists
+    const resRemover = await User.updateOne(
+      { _id: removerId },
+      { $pull: { friendsList: toRemoveId } }
+    );
+    const resToRemove = await User.updateOne(
+      { _id: toRemoveId },
+      { $pull: { friendsList: removerId } }
+    );
+
+    //notify respective clients of removal
+    if (beingRemovedSocket) {
+      io.to(beingRemovedSocket).emit("friendRemoved", removerId);
+    }
+    io.to(removingSocket).emit("friendRemoved", toRemoveId);
+
+    //delete conversation
+    const deleteConversation = await Conversation.findOne({
+      members: { $size: 2, $all: [removerId, toRemoveId] },
+    });
+    if (!deleteConversation) return;
+
+    await Conversation.deleteOne({ _id: deleteConversation._id });
+
+    //delete messages
+    await Message.deleteMany({ conversationId: deleteConversation._id });
+
+    //notify clients to remove conversation
+    if (beingRemovedSocket) {
+      io.to(beingRemovedSocket).emit(
+        "removeConversation",
+        deleteConversation._id
+      );
+    }
+    io.to(removingSocket).emit("removeConversation", deleteConversation._id);
   });
 
   //when client disconnects from the socket

@@ -62,8 +62,8 @@
   position: absolute;
   background-color: #171717;
   top: 100%;
-  left: 50%;
-  width: 120px;
+  right: 50%;
+  width: max-content;
   cursor: auto;
   display: flex;
   flex-direction: column;
@@ -73,6 +73,15 @@
   -moz-animation: fadeIn 0.2s;
   -o-animation: fadeIn 0.2s;
   -ms-animation: fadeIn 0.2s;
+}
+
+.friendOptions__menu button {
+  height: fit-content;
+  margin: 0;
+}
+
+.friendOptions__menu button:hover {
+  cursor: pointer;
 }
 
 @keyframes fadeIn {

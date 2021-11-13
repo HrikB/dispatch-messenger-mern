@@ -18,6 +18,7 @@ function Sidebar() {
   const [names, setNames] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [arrivingConversation, setArrivingConversation] = useState();
+  const [toDeleteConversation, setToDeleteConversation] = useState();
   const [profileOptMenu, setProfileOptMenu] = useState(false);
   const [updateProfWin, setUpdateProfWin] = useState(false);
   const [viewPreview, setViewPreview] = useState(false);
@@ -25,9 +26,7 @@ function Sidebar() {
   const updateProfMenu = useRef();
   const profOptionsMenu = useRef();
 
-  const createConversation = () => {
-    console.log(socket.connected);
-  };
+  const createConversation = () => {};
 
   const logOut = async () => {
     const res = await logOutAPI();
@@ -81,9 +80,12 @@ function Sidebar() {
 
   useEffect(async () => {
     const conversationsData = await getConversations(user._id);
-    socket.on("getNewChat", (data) => {
+    socket?.on("getNewChat", (data) => {
       console.log("getNewChat", data);
       setArrivingConversation(data);
+    });
+    socket?.on("removeConversation", (conversationId) => {
+      setToDeleteConversation(conversationId);
     });
     setProfPic(user.prof_pic);
     setConversations(conversationsData.data);
@@ -93,6 +95,13 @@ function Sidebar() {
     arrivingConversation &&
       setConversations((prev) => [arrivingConversation, ...prev]);
   }, [arrivingConversation]);
+
+  useEffect(() => {
+    toDeleteConversation &&
+      setConversations(
+        conversations.filter((prev) => prev._id != toDeleteConversation)
+      );
+  }, [toDeleteConversation]);
   return (
     <div className="sidebar">
       {updateProfWin && (
