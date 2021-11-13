@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import createError from "http-errors";
+import Joi from "@hapi/joi";
 
 export let getDataById = async (req, res) => {
   let userId = req.params.id;
@@ -53,9 +54,10 @@ export let updateFirstName = async (req, res, next) => {
 
 export let updateLastName = async (req, res) => {
   const { userId, lastName } = req.body;
-  if (lastName === "")
-    throw createError.BadRequest("Last name cannot be empty");
+
   try {
+    if (lastName === "")
+      throw createError.BadRequest("Last name cannot be empty");
     const update = await User.updateOne(
       { _id: userId },
       { $set: { last_name: lastName } }
@@ -67,8 +69,28 @@ export let updateLastName = async (req, res) => {
   }
 };
 
-export let updateEmail = async (req, res) => {
+export let updateEmail = async (req, res, next) => {
   const { userId, email } = req.body;
+  try {
+    //validates email
+    const validation = await Joi.object({
+      email: Joi.string().email().lowercase().required(),
+    }).validateAsync({ email });
+
+    //checks if email is already in use
+    const emailUsed = await User.findOne({ email: validation.email });
+    if (emailUsed)
+      throw createError.Conflict(
+        `The email "${validation.email}" is already in use.`
+      );
+
+    const update = await User.updateOne({ _id: userId }, { $set: { email } });
+    res.status(200).json(update);
+  } catch (err) {
+    if (err.isJoi === true) err.status = 422;
+    console.log("email", err.message);
+    next(err);
+  }
 };
 
 export let updatePassword = async (req, res) => {

@@ -1,3 +1,18 @@
+.updateProfile__container {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(128, 128, 128, 0.5);
+  z-index: 100;
+  left: 0;
+  top: 0;
+  animation: fadeIn 0.2s;
+  -webkit-animation: fadeIn 0.2s;
+  -moz-animation: fadeIn 0.2s;
+  -o-animation: fadeIn 0.2s;
+  -ms-animation: fadeIn 0.2s;
+}
+
 .updateProfile__window {
   box-sizing: border-box;
   padding: 10px;
@@ -28,6 +43,32 @@
 .updateProfile__window .email {
 }
 
+.updateProfile__window label {
+  position: relative;
+  display: inline-block;
+  height: fit-content;
+  margin: 15px 0;
+  border-radius: 50%;
+  border: 10px solid black;
+}
+
+.picture__container {
+  width: 100%;
+  height: fit-content;
+}
+
+.picture__container .line {
+  height: 75%;
+  width: 100%;
+  position: absolute;
+  top: 25%;
+  background-color: rgb(2, 2, 2);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  z-index: -1;
+  margin-left: -10px;
+}
+
 .updateProfile__window label .MuiIconButton-root {
   position: relative;
   width: fit-content;
@@ -39,14 +80,23 @@
   pointer-events: none;
   position: absolute;
   bottom: 0;
-  height: 50%;
+  height: 100%;
+  border-radius: 50%;
   width: 100%;
   transition: 0.2s ease;
   opacity: 0;
-  background-color: darkslategrey;
+  background-color: rgba(47, 79, 79, 0.9);
   display: flex;
   flex-direction: column;
   z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay h5 {
+  font-size: small;
+  width: min-content;
 }
 
 .updateProfile__window label:hover .overlay {
@@ -117,6 +167,26 @@
 .updateProfile__window .save__button:hover {
   background-color: rgb(85, 0, 85);
   cursor: pointer;
+}
+
+.prof__header {
+  color: rgb(187, 187, 187);
+  margin: 2px 0;
+}
+
+.prof__section {
+  margin: 13px 0;
+}
+
+.defaultProf__options .MuiIconButton-root {
+  position: relative;
+  width: fit-content !important;
+  height: fit-content;
+}
+
+.defaultProf__options #avatar {
+  width: 128px;
+  height: 128px;
 }
 
 @keyframes fadeIn {

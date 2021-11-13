@@ -88,6 +88,10 @@ function Chat() {
     messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const scrollToBottomAuto = () => {
+    messagesEndRef?.current?.scrollIntoView({ behavior: "auto" });
+  };
+
   //checks for data from socket
   useEffect(() => {
     socket?.on("welcome", () => {
@@ -119,6 +123,7 @@ function Chat() {
       setMessages(messages.data);
       setConversation(conversation.data);
       setReceiver(receiverData.data);
+      scrollToBottomAuto();
     }
   }, [conversationId]);
 
@@ -126,6 +131,7 @@ function Chat() {
     arrivingMessage &&
       conversation?.members.includes(arrivingMessage.sender) &&
       setMessages((prev) => [...prev, arrivingMessage]);
+    scrollToBottomSmooth();
   }, [arrivingMessage, conversation]);
 
   const sendMessage = (e) => {
@@ -206,6 +212,7 @@ function Chat() {
         <div
           id="endRef__id"
           style={{
+            "margin-top": "30px",
             float: "left",
             clear: "both",
             width: "10px",

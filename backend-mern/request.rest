@@ -100,12 +100,12 @@ PUT http://localhost:7000/api/requests/respond/
 GET http://localhost:7000/api/requests/friends/61639307187a61187b5e20b1
 
 ###
-PUT http://localhost:7000/api/user/update-profile/first-name
+PUT http://localhost:7000/api/user/update-profile/email
 Content-Type: application/json
 
 {
     "userId": "617c40aa0cc7aeca24fc9f81",
-    "firstName": "Bor"
+    "email": "borispopov10@yahoo.com"
 }
 
 ###

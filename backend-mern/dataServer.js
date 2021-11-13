@@ -12,11 +12,7 @@ import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
-import {
-  removeFriend,
-  respondToRequest,
-  sendRequest,
-} from "./controllers/request.js";
+import { respondToRequest, sendRequest } from "./controllers/request.js";
 import redisClient from "./helpers/redis.js";
 import { sendMessage } from "./controllers/messages.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
@@ -24,7 +20,7 @@ import "./helpers/mongodb.js";
 
 dotenv.config();
 
-//App Config`x
+//App Config
 const app = express();
 const port = 7000;
 const httpServer = createServer(app);
@@ -313,7 +309,7 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(verifyAccessToken);
+//app.use(verifyAccessToken);
 
 //API Endpoints
 app.get("/", async (req, res) => {
