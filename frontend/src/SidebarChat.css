@@ -39,6 +39,15 @@ a {
   margin: 3px 0;
 }
 
+.infoContainer .lastMessage {
+  color: rgb(146, 146, 146);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+  white-space: nowrap;
+  max-width: 90%;
+}
+
 .infoContainer h5 {
   margin: 3px 0;
   color: #7b7776;

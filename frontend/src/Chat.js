@@ -16,10 +16,15 @@ import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { getConversation, getMessages, getUserDataById } from "./server/api.js";
+import {
+  getConversation,
+  getMessages,
+  getPicture,
+  getUserDataById,
+} from "./server/api.js";
 //import socket from "./server/socketio";
 
-function Chat() {
+function Chat({ conversations, setConversations, setLastMessage }) {
   const [input, setInput] = useState("");
   const [receiver, setReceiver] = useState({});
   const [personName, setPersonName] = useState("");
@@ -98,16 +103,20 @@ function Chat() {
       console.log("Welcome this is the socket server");
     });
     //getUsers to get online users
-    socket?.on("getUsers", (users) => {
-      console.log("gotten");
-    });
+    socket?.on("getUsers", (users) => {});
     socket?.on("getMessage", (data) => {
-      setArrivingMessage({
-        sender: data.sender,
+      const arrvMessage = {
+        conversationId: data.conversationId,
+        senderId: data.senderId,
+        senderName: data.senderName,
         receiver: user._id,
         text: data.text,
         createdAt: data.createdAt,
-      });
+      };
+      setArrivingMessage(arrvMessage);
+      //sets the recent message on the sidebar component
+      setLastMessage(arrvMessage);
+      //moves most recent conversation to the top
     });
   }, [user]);
 
@@ -117,9 +126,12 @@ function Chat() {
     if (conversationId) {
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
+      if (messages?.data?.error || conversation?.data?.error) return;
       const receiverData = await getUserDataById(
         conversation.data?.members.find((m) => m !== user._id)
       );
+      //get image metadata
+      receiverData.data.prof_pic = await getPicture(receiverData.data.prof_pic);
       setMessages(messages.data);
       setConversation(conversation.data);
       setReceiver(receiverData.data);
@@ -128,22 +140,56 @@ function Chat() {
   }, [conversationId]);
 
   useEffect(() => {
-    arrivingMessage &&
-      conversation?.members.includes(arrivingMessage.sender) &&
-      setMessages((prev) => [...prev, arrivingMessage]);
+    if (arrivingMessage) {
+      console.log("new arrived");
+      conversation?.members.includes(arrivingMessage.senderId) &&
+        setMessages((prev) => [...prev, arrivingMessage]);
+
+      //Moves conversation to top of the messages list
+      setConversations(() => {
+        const temp = conversations;
+        let moveToFront;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i]._id === arrivingMessage.conversationId) {
+            moveToFront = temp[i];
+            temp.splice(i, 1);
+            break;
+          }
+        }
+        temp.unshift(moveToFront);
+        return temp;
+      });
+    }
     scrollToBottomSmooth();
-  }, [arrivingMessage, conversation]);
+  }, [arrivingMessage]);
 
   const sendMessage = (e) => {
     e.preventDefault();
     const receiverId = conversation?.members.find((m) => m !== user._id);
     let outgoingMessage = {
       conversationId: conversationId,
-      sender: user._id,
+      senderId: user._id,
+      senderName: user.first_name,
       receiver: receiverId,
       text: input,
       createdAt: Date.now(),
     };
+    //sets the recent message on the sidebar component
+    setLastMessage(outgoingMessage);
+    //moves most recent conversation to the top
+    setConversations(() => {
+      const temp = conversations;
+      let moveToFront;
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i]._id === conversationId) {
+          moveToFront = temp[i];
+          temp.splice(i, 1);
+          break;
+        }
+      }
+      temp.unshift(moveToFront);
+      return temp;
+    });
     socket.emit("sendMessage", outgoingMessage);
 
     setMessages((prev) => [...prev, outgoingMessage]);
@@ -190,20 +236,20 @@ function Chat() {
             }
             <p
               className={`chat__message ${
-                message.sender == user._id && "chat__reciever"
+                message.senderId == user._id && "chat__reciever"
               } ${
                 !(
                   new Date(
                     new Date(messages[i - 1]?.createdAt).getTime() + 10 * 60000
                   ) < new Date(new Date(messages[i].createdAt).getTime())
                 ) &&
-                messages[i - 1]?.sender == messages[i].sender &&
+                messages[i - 1]?.senderId == messages[i].senderId &&
                 "same__sender"
               }`}
             >
-              <h6 className="chat__name">
-                {message.senderEmail !== user.email ? message.name : ""}
-              </h6>
+              {/*<h6 className="chat__name">
+                {message.senderId !== user._id ? message.senderName : ""}
+            </h6>*/}
 
               {message.text}
             </p>

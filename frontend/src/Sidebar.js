@@ -5,18 +5,22 @@ import { Avatar, IconButton, Slider } from "@material-ui/core";
 import { SearchOutlined, Photo } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
-import { getConversations, logOutAPI } from "./server/api.js";
+import {
+  getConversations,
+  getPicture,
+  logOutAPI,
+  _dataUrl,
+} from "./server/api.js";
 import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import { Link } from "react-router-dom";
 import { actionTypes } from "./reducer";
 import UpdateProfile from "./UpdateProfile";
 
-function Sidebar() {
+function Sidebar({ conversations, setConversations, lastMessage }) {
   const [searchInput, setSearchInput] = useState("");
   const [profPic, setProfPic] = useState("");
   const [{ user, socket }, dispatch] = useStateValue();
   const [names, setNames] = useState([]);
-  const [conversations, setConversations] = useState([]);
   const [arrivingConversation, setArrivingConversation] = useState();
   const [toDeleteConversation, setToDeleteConversation] = useState();
   const [profileOptMenu, setProfileOptMenu] = useState(false);
@@ -51,6 +55,18 @@ function Sidebar() {
   const profileOptions = () => {
     setProfileOptMenu(!profileOptMenu);
   };
+
+  //updates last message
+  useEffect(() => {
+    lastMessage &&
+      setConversations(
+        conversations.map((conv) => {
+          if (conv._id === lastMessage.conversationId)
+            conv.last_msg = lastMessage;
+          return conv;
+        })
+      );
+  }, [lastMessage]);
 
   useEffect(() => {
     const updateMenus = (e) => {
@@ -87,7 +103,8 @@ function Sidebar() {
     socket?.on("removeConversation", (conversationId) => {
       setToDeleteConversation(conversationId);
     });
-    setProfPic(user.prof_pic);
+    const res = await getPicture(user.prof_pic);
+    setProfPic(res);
     setConversations(conversationsData.data);
   }, [user]);
 
@@ -154,10 +171,12 @@ function Sidebar() {
         {conversations.map((conversation) => (
           <SidebarChat
             key={conversation.members.find((m) => m !== user._id)}
+            last_msg={conversation.last_msg}
             convId={conversation._id}
             memberId={conversation.members.find((m) => m !== user._id)}
             friendsTab={document.getElementById("friends")}
             searchInput={searchInput}
+            setSearchInput={setSearchInput}
           />
         ))}
       </div>

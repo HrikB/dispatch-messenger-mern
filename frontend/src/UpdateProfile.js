@@ -5,19 +5,31 @@ import { Avatar, IconButton, Slider } from "@material-ui/core";
 import { SearchOutlined, Photo } from "@material-ui/icons";
 import SidebarChat from "./SidebarChat";
 import { useStateValue } from "./StateProvider";
-import { updateProfilePic } from "./server/api.js";
+import {
+  uploadPicture,
+  updateProfilePic,
+  _dataUrl,
+  getPicture,
+} from "./server/api.js";
 import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
 import { Link } from "react-router-dom";
 import { actionTypes } from "./reducer";
+import EditProfileInfo from "./EditProfileInfo";
 import AvatarEditor from "react-avatar-editor";
+import Loading from "./Loading";
 
 export default forwardRef(({ profPic, setProfPic }, ref) => {
   const [viewPreview, setViewPreview] = useState(false);
   const [image, setImage] = useState(null);
+  const [editInfo, setEditInfo] = useState(false);
+  const [toUpdate, setToUpdate] = useState("");
   const [{ user }, dispatch] = useStateValue();
-  const [finalImage, setFinalImage] = useState(null);
+  const [firstName, setFirstName] = useState(user.first_name);
+  const [lastName, setLastName] = useState(user.last_name);
+  const [email, setEmail] = useState(user.email);
   const [slider, setSlider] = useState({ min: 0.5, max: 5, value: 0.5 });
   const [zoom, setZoom] = useState(slider.value);
+  const [loading, setLoading] = useState(false);
   const fileInput = useRef();
   const editor = useRef();
 
@@ -41,18 +53,39 @@ export default forwardRef(({ profPic, setProfPic }, ref) => {
     }
   };
 
+  const editProfInfo = (toEdit) => {
+    setToUpdate(toEdit);
+    setEditInfo(true);
+  };
+
   const save = async () => {
+    setLoading(true);
+    await handleSave();
+    setLoading(false);
+  };
+
+  const handleSave = async () => {
     if (editor) {
       const canvas = editor.current.getImageScaledToCanvas();
-      const updateRes = await updateProfilePic(user._id, canvas.toDataURL());
-      console.log("upRes", updateRes);
-      if (updateRes?.data.modifiedCount === 1) {
-        setProfPic(canvas.toDataURL());
-      }
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+      const formData = new FormData();
+      formData.append("image", blob);
+      //Uploads image using gridfs and multer
+      const uploadedId = await uploadPicture(user._id, formData);
+      if (!uploadedId) return;
+      //Uses returned file id to update prof pic link in database
+      const updateRes = await updateProfilePic(user._id, uploadedId.data);
+      if (!updateRes.data.acknowledged === true) return;
+
+      const newProfPic = await getPicture(uploadedId.data);
+      if (!newProfPic) return;
+      setProfPic(newProfPic);
+      setViewPreview(false);
     }
   };
 
   const cancel = () => {
+    setLoading(false);
     setViewPreview(false);
   };
 
@@ -91,7 +124,7 @@ export default forwardRef(({ profPic, setProfPic }, ref) => {
                 Cancel
               </button>
               <button className="save__button" onClick={save}>
-                Save
+                {loading ? <Loading /> : "Save"}
               </button>
             </div>
           </div>
@@ -127,17 +160,35 @@ export default forwardRef(({ profPic, setProfPic }, ref) => {
               onChange={previewImage}
             />
             <div className="prof__info">
+              {editInfo && (
+                <EditProfileInfo
+                  setEditInfo={setEditInfo}
+                  setFirstName={setFirstName}
+                  setLastName={setLastName}
+                  setEmail={setEmail}
+                  toUpdate={toUpdate}
+                />
+              )}
               <div className="first__name prof__section">
-                <p className="prof__header">FIRST NAME</p>
-                <p>{user.first_name}</p>
+                <div className="info__container">
+                  <p className="prof__header">FIRST NAME</p>
+                  <p>{firstName}</p>
+                </div>
+                <button onClick={() => editProfInfo("first name")}>Edit</button>
               </div>
               <div className="last__name prof__section">
-                <p className="prof__header">LAST NAME</p>
-                <p>{user.last_name}</p>
+                <div className="info__container">
+                  <p className="prof__header">LAST NAME</p>
+                  <p>{lastName}</p>
+                </div>
+                <button onClick={() => editProfInfo("last name")}>Edit</button>
               </div>
               <div className="email prof__section">
-                <p className="prof__header">EMAIL</p>
-                <p>{user.email}</p>
+                <div className="info__container">
+                  <p className="prof__header">EMAIL</p>
+                  <p>{email}</p>
+                </div>
+                <button onClick={() => editProfInfo("email")}>Edit</button>
               </div>
             </div>
           </div>

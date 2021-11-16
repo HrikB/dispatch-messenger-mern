@@ -12,9 +12,7 @@ import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
-import { respondToRequest, sendRequest } from "./controllers/request.js";
 import redisClient from "./helpers/redis.js";
-import { sendMessage } from "./controllers/messages.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
 import "./helpers/mongodb.js";
 
@@ -79,14 +77,23 @@ io.use((socket, next) => {
   //sending and getting message
   socket.on(
     "sendMessage",
-    async ({ conversationId, sender, receiver, text, createdAt }) => {
+    async ({
+      conversationId,
+      senderId,
+      senderName,
+      receiver,
+      text,
+      createdAt,
+    }) => {
       console.log("sendMessage received");
-      //if user is undefined, the client to recieve the message is offline
+      //if userSocket is undefined, the client to recieve the message is offline
       const userSocket = await getUser(receiver);
       if (userSocket) {
         console.log("sendMessage emitted");
         io.to(userSocket).emit("getMessage", {
-          sender,
+          conversationId,
+          senderId,
+          senderName,
           text,
           createdAt,
         });
@@ -94,14 +101,20 @@ io.use((socket, next) => {
         console.log(receiver, "is currently offline");
       }
 
-      //message sent to database asynchronously
       try {
-        const savedMessage = new Message({
-          conversationId: conversationId,
-          sender: sender,
-          text: text,
-          createdAt: createdAt,
+        const savedMessage = await new Message({
+          conversationId,
+          senderId,
+          senderName,
+          text,
+          createdAt,
         }).save();
+
+        //last message is updated async
+        await Conversation.updateOne(
+          { _id: conversationId },
+          { $set: { last_msg: savedMessage } }
+        );
       } catch (err) {
         console.error(err);
       }
@@ -111,10 +124,12 @@ io.use((socket, next) => {
   //sending and getting friend requests
   socket.on(
     "sendFriendRequest",
-    async ({ senderId, senderName, receiverEmail }) => {
+    async ({ senderId, senderName, senderProfPic, receiverEmail }) => {
       console.log("sendFriendRequest received");
       //get receiver object with the email
       const receiver = await User.findOne({ email: receiverEmail });
+      console.log(senderProfPic);
+      console.log(receiver.prof_pic);
       //if receiver email exists in database
       if (receiver) {
         const receiverSocket = await getUser(receiver._id.toString());
@@ -132,9 +147,7 @@ io.use((socket, next) => {
           ],
         });
         if (!receiver.friendsList.includes(senderId)) {
-          console.log("11");
           if (!existingRequest) {
-            console.log("22");
             const id = mongoose.Types.ObjectId();
             const savedFriendRequest = new FriendRequest({
               _id: id,
@@ -142,6 +155,8 @@ io.use((socket, next) => {
               recipientId: receiver._id,
               requesterName: senderName,
               recipientName: receiver.first_name + " " + receiver.last_name,
+              requesterProfPic: senderProfPic,
+              recipientProfPic: receiver.prof_pic,
             }).save();
             //if receiver is connected to socket
             if (receiverSocket) {
@@ -150,6 +165,7 @@ io.use((socket, next) => {
                 id,
                 senderId,
                 senderName,
+                senderProfPic,
               });
             }
           } else {
@@ -175,9 +191,9 @@ io.use((socket, next) => {
       console.log("respondToRequest received");
 
       await FriendRequest.deleteOne({ _id: requestId });
+      const requesterSocket = await getUser(requesterId.toString());
+      const receiverSocket = await getUser(recipientId.toString());
       if (response == 1) {
-        const requesterSocket = await getUser(requesterId.toString());
-        const receiverSocket = await getUser(recipientId.toString());
         const requesterObject = await User.findOneAndUpdate(
           { _id: requesterId },
           { $addToSet: { friendsList: recipientId } }
@@ -191,14 +207,37 @@ io.use((socket, next) => {
           const _id = receiverObject._id;
           const first = receiverObject.first_name;
           const last = receiverObject.last_name;
-          io.to(requesterSocket).emit("newFriend", { _id, first, last });
+          const prof_pic = receiverObject.prof_pic;
+          io.to(requesterSocket).emit("newFriend", {
+            _id,
+            first,
+            last,
+            prof_pic,
+          });
         }
         if (receiverSocket) {
           console.log("respondToRequest emitted");
           const _id = requesterObject._id;
           const first = requesterObject.first_name;
           const last = requesterObject.last_name;
-          io.to(receiverSocket).emit("newFriend", { _id, first, last });
+          const prof_pic = receiverObject.prof_pic;
+          io.to(receiverSocket).emit("newFriend", {
+            _id,
+            first,
+            last,
+            prof_pic,
+          });
+        }
+      } else {
+        if (requesterSocket) {
+          io.to(requesterSocket).emit("rejectRequest", {
+            requestId,
+          });
+        }
+        if (receiverSocket) {
+          io.to(receiverSocket).emit("rejectRequest", {
+            requestId,
+          });
         }
       }
     }
@@ -299,6 +338,7 @@ import conversationsRoute from "./routes/conversations.js";
 import messageRoute from "./routes/messages.js";
 import requestRoute from "./routes/friendsRequests.js";
 import userRoute from "./routes/user.js";
+import imageRoute from "./routes/images.js";
 
 //Middlewares
 app.use(express.json());
@@ -309,7 +349,7 @@ app.use(
   })
 );
 app.use(cookieParser());
-//app.use(verifyAccessToken);
+app.use(verifyAccessToken);
 
 //API Endpoints
 app.get("/", async (req, res) => {
@@ -320,6 +360,7 @@ app.use("/api/conversations", conversationsRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/requests", requestRoute);
 app.use("/api/user", userRoute);
+app.use("/api/images", imageRoute);
 
 //Error handling middleware
 app.use((err, req, res, next) => {

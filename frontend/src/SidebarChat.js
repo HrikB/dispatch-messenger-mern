@@ -4,13 +4,20 @@ import "./SidebarChat.css";
 import { Avatar } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
-import { getUserDataById } from "./server/api.js";
+import { getUserDataById, getPicture } from "./server/api.js";
 
-function SidebarChat({ convId, memberId, friendsTab, searchInput }) {
+function SidebarChat({
+  last_msg,
+  convId,
+  memberId,
+  friendsTab,
+  searchInput,
+  setSearchInput,
+}) {
   const [messages, setMessages] = useState("");
   const [{ user }, dispatch] = useStateValue();
-  const [conversations, setConversations] = useState([]);
-  const [profpic, setProfpic] = useState("");
+  const [inSearch, setInSearch] = useState(true);
+  const [conversation, setConversation] = useState([]);
   const location = useLocation();
 
   //there has to be a better way to implement selection
@@ -37,37 +44,50 @@ function SidebarChat({ convId, memberId, friendsTab, searchInput }) {
 
   useEffect(async () => {
     try {
+      //before setting members, changes profile photo key to the actual photo metadata
       const memberData = await getUserDataById(memberId);
-      setConversations(memberData.data);
+      memberData.data.prof_pic = await getPicture(memberData.data.prof_pic);
+      setConversation(memberData.data);
     } catch (err) {
       console.error(err);
     }
   }, [memberId]);
 
   useEffect(() => {
-    //setConversations(conversations.filter(prev => p)
+    if (
+      searchInput === "" ||
+      (conversation.first_name + " " + conversation.last_name)
+        .toLowerCase()
+        .includes(searchInput.toLowerCase())
+    )
+      setInSearch(true);
+    else {
+      setInSearch(false);
+    }
   }, [searchInput]);
 
   return (
     <div>
       <Link to={`/t/${convId}`}>
-        <div className="sidebarChat">
-          <div id={convId} className="allContainer">
-            <Avatar src={conversations.prof_pic} id="profpic" />
-            <div className="infoContainer">
-              <h4 className="name">
-                {conversations.first_name + " " + conversations.last_name}
-              </h4>
-              <h5 className="lastMessage">
-                {/*last_msg == null
+        {inSearch && (
+          <div className="sidebarChat">
+            <div id={convId} className="allContainer">
+              <Avatar src={conversation.prof_pic} id="profpic" />
+              <div className="infoContainer">
+                <h4 className="name">
+                  {conversation.first_name + " " + conversation.last_name}
+                </h4>
+                <h5 className="lastMessage">
+                  {!last_msg
                     ? "You are now connected on Dispatch!"
-                    : last_msg.length < 32
-                    ? last_msg
-                  : last_msg.substring(0, 31) + "..."*/}
-              </h5>
+                    : `${last_msg.senderId === user._id ? "You:" : ""} ${
+                        last_msg.text
+                      }`}
+                </h5>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </Link>
     </div>
 

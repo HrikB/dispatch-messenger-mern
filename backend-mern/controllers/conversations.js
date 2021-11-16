@@ -6,7 +6,7 @@ export let getConversations = async (req, res, next) => {
   try {
     const conversations = await Conversation.find({
       members: { $in: [req.params.userId] },
-    });
+    }).sort({ updatedAt: -1 });
     res.status(200).json(conversations);
   } catch (err) {
     console.log("3", err.message);
@@ -19,6 +19,9 @@ export let getConversation = async (req, res, next) => {
     const conversation = await Conversation.findOne({
       _id: req.params.conversationId,
     });
+
+    if (!conversation.members.includes(req.payload.sub))
+      throw new createError.Unauthorized();
     res.status(200).json(conversation);
   } catch (err) {
     console.log("4", err.message);

@@ -1,0 +1,130 @@
+.editProfile__background {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 200;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  position: absolute;
+  animation: fadeIn 0.2s;
+  -webkit-animation: fadeIn 0.2s;
+  -moz-animation: fadeIn 0.2s;
+  -o-animation: fadeIn 0.2s;
+  -ms-animation: fadeIn 0.2s;
+}
+
+.editProfile__container {
+  border-radius: 10px;
+  width: 500px;
+  height: fit-content;
+  position: absolute;
+  background-color: #2b2b2b;
+  z-index: 200;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  box-sizing: border-box;
+  padding: 0 15px;
+  animation: fadeIn 0.2s;
+  -webkit-animation: fadeIn 0.2s;
+  -moz-animation: fadeIn 0.2s;
+  -o-animation: fadeIn 0.2s;
+  -ms-animation: fadeIn 0.2s;
+}
+
+.editProfile__container h1 {
+  text-align: center;
+  font-weight: 750;
+  margin: 10px;
+}
+
+.editProfile__container h4 {
+  text-align: center;
+  font-weight: 500;
+  margin: 10px;
+}
+
+.editProfile__container p {
+  font-size: small;
+}
+
+.editProfile__container input {
+  background-color: #242424;
+  border: 2px solid #141414;
+  outline: none;
+  box-sizing: border-box;
+  border-radius: 3px;
+  width: 100%;
+  padding: 10px 7px;
+  margin: 7px 0;
+  transition: 0.5s;
+}
+
+.editProfile__container input:hover {
+  border: 2px solid #000000;
+}
+
+.editProfile__container input:focus {
+  transition: 0s;
+  border: 2px solid #006eff;
+}
+
+.editProfile__container .button__container {
+  display: flex;
+  justify-content: flex-end;
+}
+.editProfile__container .button__container button {
+  margin: 10px 3px;
+  width: 5rem;
+  color: white;
+  height: fit-content;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

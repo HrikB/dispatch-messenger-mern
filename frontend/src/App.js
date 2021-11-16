@@ -15,6 +15,8 @@ function App() {
   const [{ user, socket }, dispatch] = useStateValue();
   const [connected, setConnected] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [lastMessage, setLastMessage] = useState();
+  const [conversations, setConversations] = useState([]);
   const [searchEmail, setSearchEmail] = useState(() => {});
   const [loadingComponents, setLoadingComponents] = useState(true);
 
@@ -94,10 +96,19 @@ function App() {
       ) : (
         <div id="body" className="app__body">
           <Router>
-            <Sidebar />
+            <Sidebar
+              conversations={conversations}
+              setConversations={setConversations}
+              lastMessage={lastMessage}
+            />
             <Switch>
               <Route path="/t/:conversationId">
-                <Chat setShowEmoji={setShowEmoji} />
+                <Chat
+                  conversations={conversations}
+                  setConversations={setConversations}
+                  setLastMessage={setLastMessage}
+                  setShowEmoji={setShowEmoji}
+                />
               </Route>
               <Route path="/friends">
                 <Friends />

@@ -16,6 +16,12 @@ let friendRequestSchema = new mongoose.Schema({
   recipientName: {
     type: String,
   },
+  requesterProfPic: {
+    type: String,
+  },
+  recipientProfPic: {
+    type: String,
+  },
 });
 
 export default mongoose.model("FriendRequest", friendRequestSchema);

@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import createError from "http-errors";
 import Joi from "@hapi/joi";
+import { deleteimage } from "./images.js";
 
 export let getDataById = async (req, res) => {
   let userId = req.params.id;
@@ -22,9 +23,14 @@ export let getDataByEmail = async (req, res) => {
   }
 };
 
-export let updateProfilePic = async (req, res) => {
+export let updateProfilePic = async (req, res, next) => {
   const { userId, profPic } = req.body;
   try {
+    const userDoc = await User.findOne({ _id: userId });
+    console.log(userDoc.prof_pic);
+    if (userDoc.prof_pic && userDoc.prof_pic.length < 24)
+      await deleteimage(userDoc.prof_pic);
+
     const update = await User.updateOne(
       { _id: userId },
       { $set: { prof_pic: profPic } }
@@ -38,32 +44,49 @@ export let updateProfilePic = async (req, res) => {
 
 export let updateFirstName = async (req, res, next) => {
   const { userId, firstName } = req.body;
-  if (firstName === "")
-    throw createError.BadRequest("First name cannot be empty");
+
   try {
+    const validation = await Joi.object({
+      firstName: Joi.string()
+        .required()
+        .regex(/^[a-zA-Z]+$/),
+    }).validateAsync({ firstName });
+
+    const firstNameFormatted =
+      firstName[0]?.toUpperCase() + firstName.substring(1);
+
     const update = await User.updateOne(
       { _id: userId },
-      { $set: { first_name: firstName } }
+      { $set: { first_name: firstNameFormatted } }
     );
     res.status(200).json(update);
   } catch (err) {
+    if (err.isJoi === true) err.status = 422;
     console.log("first_name", err.message);
     next(err);
   }
 };
 
-export let updateLastName = async (req, res) => {
+export let updateLastName = async (req, res, next) => {
   const { userId, lastName } = req.body;
 
   try {
-    if (lastName === "")
-      throw createError.BadRequest("Last name cannot be empty");
+    const validation = await Joi.object({
+      lastName: Joi.string()
+        .required()
+        .regex(/[A-Za-z]/),
+    }).validateAsync({ lastName });
+
+    const lastNameFormatted =
+      lastName[0]?.toUpperCase() + lastName.substring(1);
+
     const update = await User.updateOne(
       { _id: userId },
-      { $set: { last_name: lastName } }
+      { $set: { last_name: lastNameFormatted } }
     );
     res.status(200).json(update);
   } catch (err) {
+    if (err.isJoi === true) err.status = 422;
     console.log("last_name", err.message);
     next(err);
   }

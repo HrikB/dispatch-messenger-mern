@@ -80,6 +80,9 @@ GET http://localhost:7000/api/messages/get-message/616191f552806676b11ced80
 GET http://localhost:7000/api/conversations/conversation-data/61730b08b41a3c7787d10edd
 
 ###
+GET http://localhost:7000/api/images/61930933adacba91eb2afe45
+
+###
 POST http://localhost:7000/api/requests/send-request
 Content-Type: application/json
 
@@ -100,12 +103,12 @@ PUT http://localhost:7000/api/requests/respond/
 GET http://localhost:7000/api/requests/friends/61639307187a61187b5e20b1
 
 ###
-PUT http://localhost:7000/api/user/update-profile/email
+PUT http://localhost:7000/api/user/update-profile/first-name
 Content-Type: application/json
 
 {
     "userId": "617c40aa0cc7aeca24fc9f81",
-    "email": "borispopov10@yahoo.com"
+    "firstName": ""
 }
 
 ###

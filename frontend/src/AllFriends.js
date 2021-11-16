@@ -4,7 +4,7 @@ import "./AllFriends.css";
 import { Avatar, IconButton } from "@material-ui/core";
 import MoreVert from "@material-ui/icons/MoreVert";
 import ModeComment from "@material-ui/icons/ModeComment";
-import { getAllFriends, removeFriend } from "./server/api.js";
+import { getAllFriends, removeFriend, getPicture } from "./server/api.js";
 import { useStateValue } from "./StateProvider";
 import { ContactPhoneOutlined } from "@material-ui/icons";
 
@@ -53,12 +53,15 @@ function AllFriends() {
 
   useEffect(async () => {
     const allFriends = await getAllFriends(user._id);
-    socket?.on("newFriend", (data) => {
-      console.log("socketNewFriend");
+    //before setting friends, changes profile photo key to the actual photo metadata
+
+    socket?.on("newFriend", async (data) => {
+      const prof_pic = await getPicture(data.prof_pic);
       setArrivingFriend({
         _id: data._id,
         first_name: data.first,
         last_name: data.last,
+        prof_pic,
       });
     });
     socket?.on("openMessage", (data) => {
@@ -67,7 +70,14 @@ function AllFriends() {
     socket?.on("friendRemoved", (toRemoveId) => {
       setToRemoveFriend(toRemoveId);
     });
-    setFriendsList(allFriends.data);
+    setFriendsList(
+      await Promise.all(
+        allFriends.data.map(async (friend) => {
+          friend.prof_pic = await getPicture(friend.prof_pic);
+          return friend;
+        })
+      )
+    );
   }, [user]);
 
   useEffect(() => {

@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
 
-const messageSchema = mongoose.Schema(
+export const messageSchema = mongoose.Schema(
   {
     conversationId: {
       type: String,
     },
-    sender: {
+    senderId: {
+      type: String,
+    },
+    senderName: {
       type: String,
     },
     text: {

@@ -1,5 +1,5 @@
 .updateProfile__container {
-  position: absolute;
+  position: absolute !important;
   width: 100vw;
   height: 100vh;
   background-color: rgba(128, 128, 128, 0.5);
@@ -17,8 +17,8 @@
   box-sizing: border-box;
   padding: 10px;
   border-radius: 10px;
-  position: absolute;
-  width: 31.25rem;
+  position: absolute !important;
+  width: 40rem;
   display: table;
   top: 50%;
   transform: translateY(-50%);
@@ -44,7 +44,6 @@
 }
 
 .updateProfile__window label {
-  position: relative;
   display: inline-block;
   height: fit-content;
   margin: 15px 0;
@@ -168,14 +167,36 @@
   background-color: rgb(85, 0, 85);
   cursor: pointer;
 }
+.prof__info {
+  box-sizing: border-box;
+  background-color: rgb(48, 48, 48);
+  margin: 15px;
+  padding: 5px 15px;
+  border-radius: 10px;
+}
 
-.prof__header {
+.prof__info .prof__section {
+  margin: 13px 0;
+  position: relative;
+}
+
+.prof__section .prof__header {
   color: rgb(187, 187, 187);
   margin: 2px 0;
 }
 
-.prof__section {
-  margin: 13px 0;
+.prof__section button {
+  width: min-content;
+  background-color: purple;
+  height: fit-content;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.prof__section button:hover {
+  cursor: pointer;
+  background-color: rgb(82, 0, 82);
 }
 
 .defaultProf__options .MuiIconButton-root {
@@ -187,6 +208,16 @@
 .defaultProf__options #avatar {
   width: 128px;
   height: 128px;
+}
+
+.edit__info {
+  background-color: blue;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
 }
 
 @keyframes fadeIn {

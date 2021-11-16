@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./AddFriends.css";
+import { getPicture } from "./server/api";
 import { useStateValue } from "./StateProvider";
-//import socket from "./server/socketio";
 
 function AddFriends({ friendsList }) {
   const [input, setInput] = useState("");
@@ -9,9 +9,11 @@ function AddFriends({ friendsList }) {
 
   const sendFriendRequests = async (e) => {
     e.preventDefault();
+
     let outgoingRequest = {
       senderId: user._id,
       senderName: user.first_name + " " + user.last_name,
+      senderProfPic: user.prof_pic,
       receiverEmail: input,
     };
     socket.emit("sendFriendRequest", outgoingRequest);

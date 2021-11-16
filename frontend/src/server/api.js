@@ -5,10 +5,21 @@ import { useStateValue } from "../StateProvider.js";
 dotenv.config();
 
 const _authUrl = `${window.location.origin}`;
-const _dataUrl = "http://localhost:7000";
+export const _dataUrl = "http://localhost:7000";
 const instance = axios.create();
 axios.defaults.withCredentials = true;
 let user;
+
+const blobToBase64 = (blob) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      const base64data = reader.result;
+      resolve(base64data);
+    };
+  });
+};
 
 export const injectUser = (_user) => {
   user = _user;
@@ -43,6 +54,9 @@ axios.interceptors.response.use(undefined, async (err) => {
       }
       if (config.method === "put") {
         return await axios.put(`${config.url}`, JSON.parse(config.data));
+      }
+      if (config.method === "post") {
+        return await axios.post(`${config.url}`, config.data);
       }
     }
   }
@@ -116,11 +130,65 @@ export const getUserDataByEmail = async (email) => {
   }
 };
 
-export const updateProfilePic = async (userId, picData) => {
+export const updateProfilePic = async (userId, picId) => {
   try {
     return await axios.put(`${_dataUrl}/api/user/update-profile/pic`, {
       userId,
-      profPic: picData,
+      profPic: picId,
+    });
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const uploadPicture = async (userId, formData) => {
+  try {
+    return await axios.post(`${_dataUrl}/api/images/upload`, formData);
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const getPicture = async (picId) => {
+  try {
+    //gets blob
+    const blob = await axios.get(`${_dataUrl}/api/images/${picId}`, {
+      responseType: "blob",
+    });
+    //turns blob into base64 and returns it
+    return await blobToBase64(blob.data);
+  } catch (err) {
+    return err.resposne;
+  }
+};
+
+export const updateFirstName = async (userId, firstName) => {
+  try {
+    return await axios.put(`${_dataUrl}/api/user/update-profile/first-name`, {
+      userId,
+      firstName,
+    });
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const updateLastName = async (userId, lastName) => {
+  try {
+    return await axios.put(`${_dataUrl}/api/user/update-profile/last-name`, {
+      userId,
+      lastName,
+    });
+  } catch (err) {
+    return err.response;
+  }
+};
+
+export const updateEmail = async (userId, email) => {
+  try {
+    return await axios.put(`${_dataUrl}/api/user/update-profile/email`, {
+      userId,
+      email,
     });
   } catch (err) {
     return err.response;
@@ -132,18 +200,6 @@ export const getMessages = async (conversationId) => {
     return await axios.get(
       `${_dataUrl}/api/messages/get-message/${conversationId}`
     );
-  } catch (err) {
-    return err.response;
-  }
-};
-
-export const sendMessageDatabase = async (conversationId, sender, message) => {
-  try {
-    return await axios.post(`${_dataUrl}/api/messages/send-message`, {
-      conversationId,
-      sender,
-      text: message,
-    });
   } catch (err) {
     return err.response;
   }

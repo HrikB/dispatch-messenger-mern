@@ -1,8 +1,16 @@
 import Message from "../models/Message.js";
+import createError from "http-errors";
+import Conversation from "../models/Conversation.js";
 
 //api routes
 export let getMessage = async (req, res, next) => {
   try {
+    const conversation = await Conversation.findOne({
+      _id: req.params.conversationId,
+    });
+
+    if (!conversation.members.includes(req.payload.sub))
+      throw new createError.Unauthorized();
     const messages = await Message.find({
       conversationId: req.params.conversationId,
     });
@@ -10,31 +18,5 @@ export let getMessage = async (req, res, next) => {
   } catch (err) {
     console.log("5", err.message);
     next(createError.InternalServerError());
-  }
-};
-
-//socket functions
-export let sendMessage = ({ conversationId, sender, receiver, text }) => {
-  //if user is undefined, the client to recieve the message is offline
-  const user = getUser(receiver);
-
-  if (user) {
-    io.to(user.socketId).emit("getMessage", {
-      sender,
-      text,
-    });
-  } else {
-    console.log(receiver, "is currently offline");
-  }
-
-  //message sent to database asynchronously
-  try {
-    const savedMessage = new Message({
-      conversationId: conversationId,
-      sender: sender,
-      text: text,
-    }).save();
-  } catch (err) {
-    console.error(err);
   }
 };

@@ -3,14 +3,17 @@ import dotenv from "dotenv";
 dotenv.config();
 
 //DB Config
-mongoose
-  .connect(process.env.DATABASE)
-  .then(() => {
-    console.log("DB Connected");
-  })
-  .catch((err) => {
-    console.log(err.message);
+
+export const promise = mongoose.connect(process.env.DATABASE, {
+  useNewUrlParser: true,
+});
+
+export let gfs;
+mongoose.connection.once("open", () => {
+  gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+    bucketName: "profile_pictures",
   });
+});
 
 mongoose.connection.on("connected", () => {
   console.log("Mongoose connected to DB");
