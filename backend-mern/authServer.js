@@ -39,6 +39,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log("fromReq", req.url, err.message, err.status);
   res.status(err.status || 500);
   res.send({
     error: {

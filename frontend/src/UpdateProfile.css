@@ -34,15 +34,6 @@
   -ms-animation: fadeIn 0.2s;
 }
 
-.updateProfile__window .first__name {
-}
-
-.updateProfile__window .last__name {
-}
-
-.updateProfile__window .email {
-}
-
 .updateProfile__window label {
   display: inline-block;
   height: fit-content;

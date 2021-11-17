@@ -43,11 +43,10 @@ export let signin = async (req, res, next) => {
 
     const isValidPassword = await user.validatePassword(validation.password);
     if (!isValidPassword)
-      throw createError.Unauthorized("Username/Password not valid");
+      throw createError.BadRequest("Username/Password not valid");
 
     const accessToken = await signAccessToken(user._id);
     const refreshToken = await signRefreshToken(user._id);
-    console.log("signedin");
     res
       .cookie("accessToken", accessToken, {
         sameSite: "lax",
@@ -61,9 +60,10 @@ export let signin = async (req, res, next) => {
       .cookie("refreshTokenID", true)
       .send({ user, accessToken, refreshToken });
   } catch (err) {
-    if (err.isJoi === true)
-      return next(createError.BadRequest("Invalid Username/Password"));
-    next(err);
+    if (err.isJoi === true) {
+      return next(createError.BadRequest(err.details));
+    }
+    next(createError.BadRequest("Email or password is incorrect"));
   }
 };
 

@@ -12,6 +12,7 @@ import { io } from "socket.io-client";
 
 function Login() {
   const [{ user, socket }, dispatch] = useStateValue();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -19,13 +20,27 @@ function Login() {
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regPassConfirm, setRegPassConfirm] = useState("");
-  const [errorMessage, setErrorMessage] = useState("/");
+
+  const [logEmailError, setLogEmailError] = useState(false);
+  const [logEmailErrorMessage, setLogEmailErrorMessage] = useState("");
+  const [logPasswordError, setLogPasswordError] = useState(false);
+  const [logPasswordErrorMessage, setLogPasswordErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [errVisibility, setErrVisibility] = useState("hidden");
+
   const [showRegModal, setShowRegModal] = useState(false);
+
+  const setDefaults = () => {
+    setLogEmailError(false);
+    setLogEmailErrorMessage("");
+    setLogPasswordError(false);
+    setLogPasswordErrorMessage("");
+  };
 
   const signIn = async () => {
     const logResponse = await login(email, password);
     if (logResponse) {
+      //if successful sign in
       if (logResponse.status === 200) {
         setErrorMessage("/");
         setErrVisibility("hidden");
@@ -62,8 +77,25 @@ function Login() {
           type: actionTypes.SET_USER,
           user: logResponse.data.user,
         });
-      } else {
-        setErrorMessage(logResponse.data.error.message);
+      }
+      //unsucessfull signin
+      else {
+        const error = logResponse.data.error.message;
+        if (Array.isArray(error)) {
+          if (error[0].path[0] === "email") {
+            setLogEmailError(true);
+            setLogEmailErrorMessage(error[0].message);
+          } else if (error[0].path[0] === "password") {
+            setLogPasswordError(true);
+            setLogPasswordErrorMessage(error[0].message);
+          }
+        } else {
+          setLogEmailError(true);
+          setLogPasswordError(true);
+          setLogEmailErrorMessage(error);
+          setLogPasswordErrorMessage(error);
+        }
+
         setErrVisibility("visible");
       }
     } else {
@@ -153,22 +185,45 @@ function Login() {
         </div>
         <div className="userInteract__container">
           <div className="login__container">
-            <input
-              type="text"
-              placeholder="Email"
-              className="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              className="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            />
+            <p style={{ color: logEmailError && "red" }}>
+              EMAIL
+              {logEmailError && ` - ${logEmailErrorMessage}`}
+            </p>
+            <form>
+              <input
+                style={{
+                  border: logEmailError && "2px solid red",
+                }}
+                type="text"
+                className="username"
+                value={email}
+                onChange={(e) => {
+                  setDefaults();
+                  setEmail(e.target.value);
+                }}
+              />
+            </form>
+
+            <p style={{ color: logPasswordError && "red" }}>
+              PASSWORD
+              {logPasswordError && ` - ${logPasswordErrorMessage}`}
+            </p>
+            <form>
+              <input
+                style={{
+                  border: logPasswordError && "2px solid red",
+                  transition: logPasswordError && "0s",
+                }}
+                type="password"
+                className="password"
+                value={password}
+                onChange={(e) => {
+                  setDefaults();
+                  setPassword(e.target.value);
+                }}
+              />
+            </form>
+
             <button className="login__button" onClick={signIn}>
               <h3>Log In</h3>
             </button>

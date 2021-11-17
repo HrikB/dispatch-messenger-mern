@@ -49,7 +49,12 @@ export let updateFirstName = async (req, res, next) => {
     const validation = await Joi.object({
       firstName: Joi.string()
         .required()
-        .regex(/^[a-zA-Z]+$/),
+        .regex(/^[a-zA-Z]+$/)
+        .messages({
+          "string.empty": "This field cannot be empty",
+          "string.pattern.base":
+            "This field cannot have spaces, numbers, or symbols",
+        }),
     }).validateAsync({ firstName });
 
     const firstNameFormatted =
@@ -74,7 +79,12 @@ export let updateLastName = async (req, res, next) => {
     const validation = await Joi.object({
       lastName: Joi.string()
         .required()
-        .regex(/[A-Za-z]/),
+        .regex(/[A-Za-z]/)
+        .messages({
+          "string.empty": "This field cannot be empty",
+          "string.pattern.base":
+            "This field cannot have spaces, numbers, or symbols",
+        }),
     }).validateAsync({ lastName });
 
     const lastNameFormatted =
@@ -97,7 +107,10 @@ export let updateEmail = async (req, res, next) => {
   try {
     //validates email
     const validation = await Joi.object({
-      email: Joi.string().email().lowercase().required(),
+      email: Joi.string().email().lowercase().required().messages({
+        "string.empty": "This field cannot be empty",
+        "string.email": "Must be a valid email",
+      }),
     }).validateAsync({ email });
 
     //checks if email is already in use
@@ -111,7 +124,7 @@ export let updateEmail = async (req, res, next) => {
     res.status(200).json(update);
   } catch (err) {
     if (err.isJoi === true) err.status = 422;
-    console.log("email", err.message);
+    console.log("email", err);
     next(err);
   }
 };

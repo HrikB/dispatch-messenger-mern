@@ -55,7 +55,7 @@ button {
   outline: none;
   border: none;
   margin-bottom: 10px;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 .error__message {
@@ -105,23 +105,19 @@ button {
 
 .userInteract__container {
   box-sizing: border-box;
-  padding: 0px 15px;
+  padding: 0px 15px 10px 15px;
   display: flex;
   flex-direction: column;
-  background-color: #2e2e2e;
-  width: 30%;
-  height: 50%;
-  border-radius: 10px;
-  box-shadow: 1px 2px 5px 5px rgb(88, 87, 87);
+  background-color: #202020;
+  width: 22rem;
+  height: fit-content;
+  border-radius: 3px;
+  box-shadow: 0px 0px 5px 2px rgb(88, 87, 87);
 }
 
 .userInteract__container .login__container {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  height: 70%;
+  padding: 10px 0;
+  height: fit-content;
 }
 
 .userInteract__container .register__container {
@@ -139,17 +135,31 @@ button {
   padding: 10px;
   height: 45px;
   width: 100%;
-  border-radius: 5px;
+  margin: 5px 0;
+  border-radius: 3px;
   color: #000;
 }
 
+.userInteract__container .login__container p {
+  font-size: small;
+}
+
 .userInteract__container .login__container input {
-  background-color: rgb(156, 153, 153);
-  border: rgb(156, 153, 153);
+  outline: none;
+  background-color: rgb(24, 24, 24);
+  border: 2px solid rgb(8, 8, 8);
+  color: white;
+}
+
+.userInteract__container .login__container input:hover {
+  transition: 0.5s;
+
+  border: 2px solid #000000;
 }
 
 .userInteract__container .login__container input:focus {
-  outline: 1.5px solid rgb(0, 100, 250);
+  transition: 0s;
+  border: 2px solid #006eff;
 }
 
 .userInteract__container .login__container button {

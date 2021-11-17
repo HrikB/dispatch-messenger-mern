@@ -61,10 +61,10 @@
   width: 100%;
   padding: 10px 7px;
   margin: 7px 0;
-  transition: 0.5s;
 }
 
 .editProfile__container input:hover {
+  transition: 0.5s;
   border: 2px solid #000000;
 }
 
