@@ -77,7 +77,13 @@
 
 .friendOptions__menu button {
   height: fit-content;
+  background-color: #171717;
+  color: red;
   margin: 0;
+}
+.friendOptions__menu button:hover {
+  background-color: red;
+  color: white;
 }
 
 .friendOptions__menu button:hover {
