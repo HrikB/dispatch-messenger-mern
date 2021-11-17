@@ -128,12 +128,22 @@ io.use((socket, next) => {
       console.log("sendFriendRequest received");
       //get receiver object with the email
       const receiver = await User.findOne({ email: receiverEmail });
-      console.log(senderProfPic);
-      console.log(receiver.prof_pic);
+
+      //get sender socket
+      const senderSocket = await getUser(senderId.toString());
+
       //if receiver email exists in database
       if (receiver) {
+        //get recevier socket
         const receiverSocket = await getUser(receiver._id.toString());
-        console.log("rSock", receiverSocket);
+
+        //check if user is sending request to themselves
+        if (receiver._id.toString() === senderId) {
+          io.to(senderSocket).emit("samePersonRequest", {
+            message: "Oops. You can't send yourself a friend request",
+          });
+          return;
+        }
         const existingRequest = await FriendRequest.findOne({
           $or: [
             {
@@ -168,16 +178,30 @@ io.use((socket, next) => {
                 senderProfPic,
               });
             }
+            io.to(senderSocket).emit("successfulRequest", {
+              message: "Success! Your friend request was sent",
+            });
           } else {
             //emit error that request already exists
+            io.to(senderSocket).emit("requestExists", {
+              message:
+                "There is already a pending request between you and this user",
+            });
             console.log("Already exists");
           }
         } else {
           //emit error that the requester and receiver are already friends
+          io.to(senderSocket).emit("alreadyFriends", {
+            message: "You and this user are already friends on Dispatch",
+          });
           console.log("Already friends");
         }
       } else {
         //the receiverEmail search did not yield a user
+        io.to(senderSocket).emit("emailNotFound", {
+          message:
+            "There is no dispatch account assoicated with that email. Please try again.",
+        });
         //emit an error
       }
     }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./AddFriends.css";
 import { getPicture } from "./server/api";
 import { useStateValue } from "./StateProvider";
@@ -6,6 +6,40 @@ import { useStateValue } from "./StateProvider";
 function AddFriends({ friendsList }) {
   const [input, setInput] = useState("");
   const [{ user, socket }, dispatch] = useStateValue();
+  const [message, setMessage] = useState();
+  const [success, setSuccess] = useState(false);
+  const inputContainer = useRef();
+
+  const setDefaults = () => {
+    setSuccess(false);
+    setMessage("");
+    inputContainer.current.style.border = "2px solid #4400ff";
+  };
+
+  const errorHandler = (_inp, message) => {
+    _inp.style.border = "2px solid red";
+    setMessage(message);
+  };
+
+  useEffect(() => {
+    socket?.on("alreadyFriends", (data) => {
+      errorHandler(inputContainer.current, data.message);
+    });
+    socket?.on("requestExists", (data) => {
+      errorHandler(inputContainer.current, data.message);
+    });
+    socket?.on("samePersonRequest", (data) => {
+      errorHandler(inputContainer.current, data.message);
+    });
+    socket?.on("emailNotFound", (data) => {
+      errorHandler(inputContainer.current, data.message);
+    });
+    socket?.on("successfulRequest", (data) => {
+      inputContainer.current.style.border = "2px solid green";
+      setMessage(data.message);
+      setSuccess(true);
+    });
+  }, [user]);
 
   const sendFriendRequests = async (e) => {
     e.preventDefault();
@@ -25,11 +59,14 @@ function AddFriends({ friendsList }) {
       <h3>ADD FRIEND</h3>
       <h5>You can add a friend using their email address.</h5>
       <form className="friendRequest__form">
-        <div className="input__container">
+        <div ref={inputContainer} className="input__contain">
           <input
             className="newFriend__email"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setDefaults();
+              setInput(e.target.value);
+            }}
             placeholder="Enter an email..."
             type="text"
           />
@@ -43,6 +80,13 @@ function AddFriends({ friendsList }) {
           </button>
         </div>
       </form>
+      {message && message !== "" && (
+        <div className="error__message">
+          <h5 style={{ color: success ? "green" : "red" }}>{`${
+            success ? "" : "Error: "
+          } ${message}`}</h5>
+        </div>
+      )}
     </div>
   );
 }

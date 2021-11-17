@@ -33,6 +33,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [openMic, setOpenMic] = useState(false);
   const [lastSentTime, setlastSentTime] = useState(new Date(0));
   const [conversation, setConversation] = useState({});
+  const [audioOutput, setAudioOutput] = useState();
   const { conversationId } = useParams();
   const [{ user, socket }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
@@ -50,7 +51,19 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     setInput(input + emojiObject.emoji);
   };
 
-  const onMicClick = () => {
+  const getMicrophone = async () => {
+    const audio = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
+    if (!audio) return;
+    return audio;
+  };
+
+  const onMicClick = async () => {
+    const micAudio = await getMicrophone();
+    if (!micAudio) return;
+    setAudioOutput(micAudio);
     setOpenMic(true);
     //replace typing section
     inputContainer.style.zIndex = "-1";
@@ -100,7 +113,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   //checks for data from socket
   useEffect(() => {
     socket?.on("welcome", () => {
-      console.log("Welcome this is the socket server");
+      console.log("Welcome this is the server");
     });
     //getUsers to get online users
     socket?.on("getUsers", (users) => {});
