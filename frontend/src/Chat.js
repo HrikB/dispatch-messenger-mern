@@ -3,14 +3,7 @@ import "./Chat.css";
 import { Avatar, IconButton } from "@material-ui/core";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from "@material-ui/icons/Mic";
-import {
-  SearchOutlined,
-  MoreVert,
-  SendOutlined,
-  DateRange,
-  LocalConvenienceStoreOutlined,
-  ContactPhoneOutlined,
-} from "@material-ui/icons";
+import { MoreVert, SendOutlined } from "@material-ui/icons";
 import { useParams } from "react-router-dom";
 import ReactDOM from "react-dom";
 import { useStateValue } from "./StateProvider";
@@ -22,16 +15,12 @@ import {
   getPicture,
   getUserDataById,
 } from "./server/api.js";
-//import socket from "./server/socketio";
+import Loading from "./Loading";
 
 function Chat({ conversations, setConversations, setLastMessage }) {
   const [input, setInput] = useState("");
   const [receiver, setReceiver] = useState({});
-  const [personName, setPersonName] = useState("");
-  const [chatWithPic, setChatWithPic] = useState("");
-  const [chatWithEmail, setChatWithEmail] = useState("");
   const [openMic, setOpenMic] = useState(false);
-  const [lastSentTime, setlastSentTime] = useState(new Date(0));
   const [conversation, setConversation] = useState({});
   const [audioOutput, setAudioOutput] = useState();
   const { conversationId } = useParams();
@@ -39,6 +28,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [messages, setMessages] = useState([]);
   const [arrivingMessage, setArrivingMessage] = useState(null);
   const messagesEndRef = useRef(null);
+  const [loading, setLoading] = useState(true);
   const [openEmoji, setOpenEmoji] = useState(false);
   const inputContainer = document.getElementsByClassName("input__container")[0];
   const inputOverlay = document.getElementsByClassName("input__overlay")[0];
@@ -137,6 +127,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   useEffect(async () => {
     //checks if there is conversationId in the link
     if (conversationId) {
+      setLoading(true);
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
       if (messages?.data?.error || conversation?.data?.error) return;
@@ -145,6 +136,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       );
       //get image metadata
       receiverData.data.prof_pic = await getPicture(receiverData.data.prof_pic);
+      setLoading(false);
       setMessages(messages.data);
       setConversation(conversation.data);
       setReceiver(receiverData.data);
@@ -217,7 +209,11 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       <div className="chat__header">
         <Avatar src={receiver.prof_pic} />
         <div className="chat__headerInfo">
-          <h3>{receiver.first_name + " " + receiver.last_name}</h3>
+          <h3>
+            {loading
+              ? "Loading..."
+              : receiver.first_name + " " + receiver.last_name}
+          </h3>
           <h6>Last seen at...</h6>
         </div>
 
@@ -227,47 +223,61 @@ function Chat({ conversations, setConversations, setLastMessage }) {
           </IconButton>
         </div>
       </div>
-      <style></style>
-      <div id="body__id" className="chat__body">
-        {messages.map((message, i) => (
-          <div id="container__id" className="dateMessageContainer">
-            {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
-            {
-              <h6 className="time">
-                {(!messages[i - 1] ||
-                  new Date(
-                    new Date(messages[i - 1]?.createdAt).getTime() + 10 * 60000
-                  ) < new Date(new Date(messages[i].createdAt).getTime())) &&
-                  new Date(message.createdAt).toLocaleTimeString([], {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                  })}
-              </h6>
-            }
-            <p
-              className={`chat__message ${
-                message.senderId == user._id && "chat__reciever"
-              } ${
-                !(
-                  new Date(
-                    new Date(messages[i - 1]?.createdAt).getTime() + 10 * 60000
-                  ) < new Date(new Date(messages[i].createdAt).getTime())
-                ) &&
-                messages[i - 1]?.senderId == messages[i].senderId &&
-                "same__sender"
-              }`}
-            >
-              {/*<h6 className="chat__name">
+
+      <div
+        id="body__id"
+        style={{
+          display: loading && "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        className="chat__body"
+      >
+        {loading ? (
+          <Loading />
+        ) : (
+          messages.map((message, i) => (
+            <div id="container__id" className="dateMessageContainer">
+              {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
+              {
+                <h6 className="time">
+                  {(!messages[i - 1] ||
+                    new Date(
+                      new Date(messages[i - 1]?.createdAt).getTime() +
+                        10 * 60000
+                    ) < new Date(new Date(messages[i].createdAt).getTime())) &&
+                    new Date(message.createdAt).toLocaleTimeString([], {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "numeric",
+                    })}
+                </h6>
+              }
+              <p
+                className={`chat__message ${
+                  message.senderId == user._id && "chat__reciever"
+                } ${
+                  !(
+                    new Date(
+                      new Date(messages[i - 1]?.createdAt).getTime() +
+                        10 * 60000
+                    ) < new Date(new Date(messages[i].createdAt).getTime())
+                  ) &&
+                  messages[i - 1]?.senderId == messages[i].senderId &&
+                  "same__sender"
+                }`}
+              >
+                {/*<h6 className="chat__name">
                 {message.senderId !== user._id ? message.senderName : ""}
             </h6>*/}
 
-              {message.text}
-            </p>
-          </div>
-        ))}
+                {message.text}
+              </p>
+            </div>
+          ))
+        )}
         <div
           id="endRef__id"
           style={{
@@ -280,6 +290,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
           ref={messagesEndRef}
         ></div>
       </div>
+
       <div className="emoji__container">
         {openEmoji && (
           <Picker
@@ -312,7 +323,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
           <IconButton id="delete__icon" onClick={onDeleteClick}>
             <DeleteIcon />
           </IconButton>
-          <IconButton id="mic__icon" onClick={onMicClick}>
+          <IconButton id="mic__icon" disabled={loading} onClick={onMicClick}>
             <MicIcon />
           </IconButton>
         </div>
@@ -322,6 +333,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
             <div className="input__overlay"></div>
             <input
               className="input__field"
+              disabled={loading}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type a Message..."
@@ -329,13 +341,14 @@ function Chat({ conversations, setConversations, setLastMessage }) {
             />
             <IconButton
               className="emoji__button"
+              disabled={loading}
               onClick={() => setOpenEmoji(!openEmoji)}
             >
               <InsertEmoticonIcon />
             </IconButton>
           </div>
           <button
-            disabled={!input.trim()}
+            disabled={!input.trim() || loading}
             id="submitbutton"
             onClick={sendMessage}
             type="submit"

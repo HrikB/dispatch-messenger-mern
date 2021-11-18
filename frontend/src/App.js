@@ -17,7 +17,6 @@ function App() {
   const [showEmoji, setShowEmoji] = useState(false);
   const [lastMessage, setLastMessage] = useState();
   const [conversations, setConversations] = useState([]);
-  const [searchEmail, setSearchEmail] = useState(() => {});
   const [loadingComponents, setLoadingComponents] = useState(true);
 
   useEffect(async () => {

@@ -6,17 +6,19 @@ import CheckCircle from "@material-ui/icons/CheckCircle";
 import Cancel from "@material-ui/icons/Cancel";
 import { getFriendRequests, getPicture } from "./server/api.js";
 import { ControlPointSharp } from "@material-ui/icons";
+import Loading from "./Loading";
 
 function Pending() {
   const [{ user, socket }, dispatch] = useStateValue();
   const [pending, setPending] = useState([]);
   const [rejectId, setRejectId] = useState();
   const [arrivingRequest, setArrivingRequest] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(async () => {
+    setLoading(true);
     const res = await getFriendRequests(user._id);
     const friendRequests = res.data;
-    console.log(friendRequests);
     friendRequests.sort((a, b) => {
       if (a.requesterId == b.requesterId || a.recipientId == b.recipientId) {
         return 0;
@@ -45,15 +47,15 @@ function Pending() {
     socket?.on("rejectRequest", (data) => {
       setRejectId(data.requestId);
     });
-    setPending(
-      await Promise.all(
-        friendRequests.map(async (friend) => {
-          friend.recipientProfPic = await getPicture(friend.recipientProfPic);
-          friend.requesterProfPic = await getPicture(friend.requesterProfPic);
-          return friend;
-        })
-      )
+    const newPending = await Promise.all(
+      friendRequests.map(async (friend) => {
+        friend.recipientProfPic = await getPicture(friend.recipientProfPic);
+        friend.requesterProfPic = await getPicture(friend.requesterProfPic);
+        return friend;
+      })
     );
+    setLoading(false);
+    setPending(newPending);
   }, [user]);
 
   useEffect(() => {
@@ -76,50 +78,64 @@ function Pending() {
   };
 
   return (
-    <div className="pending">
-      <h4 className="pending__heading">Pending - {`${pending.length}`}</h4>
-      {pending.map((friendRequest) => (
-        <div className="request__container">
-          <div className="request__info">
-            <Avatar
-              src={
-                user._id == friendRequest.requesterId
-                  ? friendRequest.recipientProfPic
-                  : friendRequest.requesterProfPic
-              }
-              className="accountPic"
-            />
-            <div className="info__text">
-              <p className="request__name">
-                {user._id == friendRequest.requesterId
-                  ? friendRequest.recipientName
-                  : friendRequest.requesterName}
-              </p>
-              <p className="request__direction">
-                {user._id == friendRequest.requesterId
-                  ? "Outgoing Friend Request"
-                  : "Incoming Friend Request"}
-              </p>
+    <div
+      style={{
+        display: loading && "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+      }}
+      className="pending"
+    >
+      <h4 className="pending__heading">
+        {loading ? "" : `Pending - ${pending.length}`}
+      </h4>
+      {loading ? (
+        <Loading />
+      ) : (
+        pending.map((friendRequest) => (
+          <div className="request__container">
+            <div className="request__info">
+              <Avatar
+                src={
+                  user._id == friendRequest.requesterId
+                    ? friendRequest.recipientProfPic
+                    : friendRequest.requesterProfPic
+                }
+                className="accountPic"
+              />
+              <div className="info__text">
+                <p className="request__name">
+                  {user._id == friendRequest.requesterId
+                    ? friendRequest.recipientName
+                    : friendRequest.requesterName}
+                </p>
+                <p className="request__direction">
+                  {user._id == friendRequest.requesterId
+                    ? "Outgoing Friend Request"
+                    : "Incoming Friend Request"}
+                </p>
+              </div>
+            </div>
+            <div className="request__response">
+              <IconButton
+                onClick={() => responseToReq(friendRequest, 1)}
+                style={
+                  friendRequest.requesterId != user._id
+                    ? { visbility: "visible" }
+                    : { visibility: "hidden" }
+                }
+              >
+                <CheckCircle style={{ fontSize: 40 }} />
+              </IconButton>
+
+              <IconButton onClick={() => responseToReq(friendRequest, 0)}>
+                <Cancel style={{ fontSize: 40 }} />
+              </IconButton>
             </div>
           </div>
-          <div className="request__response">
-            <IconButton
-              onClick={() => responseToReq(friendRequest, 1)}
-              style={
-                friendRequest.requesterId != user._id
-                  ? { visbility: "visible" }
-                  : { visibility: "hidden" }
-              }
-            >
-              <CheckCircle style={{ fontSize: 40 }} />
-            </IconButton>
-
-            <IconButton onClick={() => responseToReq(friendRequest, 0)}>
-              <Cancel style={{ fontSize: 40 }} />
-            </IconButton>
-          </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 }

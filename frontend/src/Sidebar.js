@@ -18,14 +18,14 @@ import UpdateProfile from "./UpdateProfile";
 
 function Sidebar({ conversations, setConversations, lastMessage }) {
   const [searchInput, setSearchInput] = useState("");
-  const [profPic, setProfPic] = useState("");
   const [{ user, socket }, dispatch] = useStateValue();
-  const [names, setNames] = useState([]);
   const [arrivingConversation, setArrivingConversation] = useState();
   const [toDeleteConversation, setToDeleteConversation] = useState();
   const [profileOptMenu, setProfileOptMenu] = useState(false);
   const [updateProfWin, setUpdateProfWin] = useState(false);
   const [viewPreview, setViewPreview] = useState(false);
+  const [profPic, setProfPic] = useState("");
+
   const updateProfMenu = useRef();
   const profOptionsMenu = useRef();
 
@@ -102,6 +102,7 @@ function Sidebar({ conversations, setConversations, lastMessage }) {
     socket?.on("removeConversation", (conversationId) => {
       setToDeleteConversation(conversationId);
     });
+
     const res = await getPicture(user.prof_pic);
     setProfPic(res);
     setConversations(conversationsData.data);
