@@ -32,8 +32,8 @@ function Pending() {
     });
 
     socket?.on("getFriendRequest", async (data) => {
-      const recipientProfPic = await getPicture(user.prof_pic);
-      const requesterProfPic = await getPicture(data.senderProfPic);
+      const recipientProfPic = await getPicture(user.prof_pic.toString());
+      const requesterProfPic = await getPicture(data.senderProfPic.toString());
       setArrivingRequest({
         _id: data.id,
         requesterId: data.senderId,
@@ -49,8 +49,12 @@ function Pending() {
     });
     const newPending = await Promise.all(
       friendRequests.map(async (friend) => {
-        friend.recipientProfPic = await getPicture(friend.recipientProfPic);
-        friend.requesterProfPic = await getPicture(friend.requesterProfPic);
+        friend.recipientProfPic = await getPicture(
+          friend.recipientProfPic.toString()
+        );
+        friend.requesterProfPic = await getPicture(
+          friend.requesterProfPic.toString()
+        );
         return friend;
       })
     );

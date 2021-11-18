@@ -84,6 +84,10 @@ export default forwardRef(({ profPic, setProfPic }, ref) => {
     }
   };
 
+  useEffect(() => {
+    setZoom(slider.min);
+  }, [viewPreview]);
+
   const cancel = () => {
     setLoading(false);
     setViewPreview(false);

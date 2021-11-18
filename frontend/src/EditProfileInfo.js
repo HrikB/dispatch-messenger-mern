@@ -18,7 +18,8 @@ function EditProfileInfo({
   const [updateErrorMessage, setUpdateErrorMessage] = useState("");
   const [{ user }, dispatch] = useStateValue();
 
-  const save = async () => {
+  const save = async (e) => {
+    e.preventDefault();
     setLoading(true);
     let response;
     let updateFunc;
@@ -69,7 +70,7 @@ function EditProfileInfo({
           {`${toUpdate}`.toUpperCase()}
           {updateError && ` - ${updateErrorMessage}`}
         </p>
-        <form>
+        <form onSubmit={save}>
           <input
             style={{
               border: updateError && "2px solid red",

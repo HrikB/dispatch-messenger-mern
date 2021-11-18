@@ -178,6 +178,10 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     scrollToBottomSmooth();
   }, [arrivingMessage]);
 
+  useEffect(() => {
+    scrollToBottomSmooth();
+  }, [messages]);
+
   const sendMessage = (e) => {
     e.preventDefault();
     const receiverId = conversation?.members.find((m) => m !== user._id);
@@ -211,7 +215,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
     setOpenMic(false);
     setInput("");
-    scrollToBottomSmooth();
   };
 
   return (
