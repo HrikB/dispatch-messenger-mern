@@ -3,7 +3,7 @@ import Joi from "@hapi/joi";
 export const registerSchema = Joi.object({
   first_name: Joi.string()
     .required()
-    .regex(/[A-Za-z]/)
+    .regex(/^[a-zA-Z]+$/)
     .messages({
       "string.empty": "This field is required",
       "string.pattern.base":
@@ -11,7 +11,7 @@ export const registerSchema = Joi.object({
     }),
   last_name: Joi.string()
     .required()
-    .regex(/[A-Za-z]/)
+    .regex(/^[a-zA-Z]+$/)
     .messages({
       "string.empty": "This field is required",
       "string.pattern.base":
@@ -31,7 +31,7 @@ export const registerSchema = Joi.object({
     .label("Confirm password")
     .messages({
       "string.empty": "This field is required",
-      "any.only": "{{#label}} does not match",
+      "any.only": "Passwords must be the same",
     }),
 });
 

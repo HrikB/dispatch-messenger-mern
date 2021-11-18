@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./AddFriends.css";
+import Loading from "./Loading";
 import { getPicture } from "./server/api";
 import { useStateValue } from "./StateProvider";
 
@@ -8,6 +9,7 @@ function AddFriends({ friendsList }) {
   const [{ user, socket }, dispatch] = useStateValue();
   const [message, setMessage] = useState();
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const inputContainer = useRef();
 
   const setDefaults = () => {
@@ -19,6 +21,7 @@ function AddFriends({ friendsList }) {
   const errorHandler = (_inp, message) => {
     _inp.style.border = "2px solid red";
     setMessage(message);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -38,12 +41,13 @@ function AddFriends({ friendsList }) {
       inputContainer.current.style.border = "2px solid green";
       setMessage(data.message);
       setSuccess(true);
+      setLoading(false);
     });
   }, [user]);
 
   const sendFriendRequests = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     let outgoingRequest = {
       senderId: user._id,
       senderName: user.first_name + " " + user.last_name,
@@ -76,7 +80,7 @@ function AddFriends({ friendsList }) {
             onClick={sendFriendRequests}
             type="submit"
           >
-            <p>Send Friend Request</p>
+            {loading ? <Loading /> : <p>Send Friend Request</p>}
           </button>
         </div>
       </form>

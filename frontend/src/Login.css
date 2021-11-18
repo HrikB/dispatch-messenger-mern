@@ -1,6 +1,10 @@
 .landingPage__container {
   width: 100%;
   height: 100%;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .registrationModal {
@@ -10,19 +14,26 @@
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .register__box {
   position: relative;
   width: 27rem;
-  background-color: #171717;
-  box-shadow: 0px 0px 15px 5px #454545;
-  border-radius: 10px;
+  height: fit-content;
+  background-color: #202020;
+  box-shadow: 0px 0px 5px 5px #454545;
+  border-radius: 5px;
   box-sizing: border-box;
   padding: 10px 15px;
   display: flex;
   flex-direction: column;
+}
+
+.register__box .regError__message {
+  margin-left: 2px;
+  font-style: italic;
+  color: red;
 }
 
 .cancel {
@@ -34,6 +45,11 @@
   padding-bottom: 10px;
   margin-bottom: 10px;
   border-bottom: 1px solid white;
+}
+
+.register__box p {
+  margin: 2px 0;
+  font-size: small;
 }
 
 .name__container {
@@ -51,11 +67,27 @@ button {
   padding: 10px;
   width: 100%;
   height: 45px;
-  background-color: #2c2a2a;
   outline: none;
   border: none;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border-radius: 3px;
+}
+
+.register__box input {
+  outline: none;
+  background-color: rgb(24, 24, 24);
+  border: 2px solid rgb(8, 8, 8);
+  color: white;
+}
+
+.register__box input:hover {
+  transition: 0.5s;
+  border: 2px solid #000000;
+}
+
+.register__box input:focus {
+  transition: 0s;
+  border: 2px solid #006eff;
 }
 
 .error__message {
@@ -70,14 +102,15 @@ button {
   width: 50% !important;
   background-color: green;
   align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .sign__up:hover {
   cursor: pointer;
-}
-
-.sign__up:focus {
-  background-color: grey;
+  background-color: rgb(2, 104, 2);
+  border: rgb(2, 104, 2);
 }
 
 .login {
@@ -85,15 +118,15 @@ button {
   height: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  width: 100%;
+  width: fit-content;
 }
 
 .app__info {
   display: flex;
-  width: 30%;
-  justify-content: space-around;
+  margin-right: 200px;
+  width: fit-content;
 }
 
 .app__info h1 {
@@ -109,7 +142,7 @@ button {
   display: flex;
   flex-direction: column;
   background-color: #202020;
-  width: 22rem;
+  width: 25rem;
   height: fit-content;
   border-radius: 3px;
   box-shadow: 0px 0px 5px 2px rgb(88, 87, 87);
@@ -133,7 +166,7 @@ button {
 button {
   box-sizing: border-box;
   padding: 10px;
-  height: 45px;
+  height: 2.82rem;
   width: 100%;
   margin: 5px 0;
   border-radius: 3px;
@@ -153,7 +186,6 @@ button {
 
 .userInteract__container .login__container input:hover {
   transition: 0.5s;
-
   border: 2px solid #000000;
 }
 
@@ -163,8 +195,12 @@ button {
 }
 
 .userInteract__container .login__container button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: purple;
   border: purple;
+  margin-bottom: 30px;
 }
 
 .userInteract__container .login__container button:hover {
@@ -174,6 +210,8 @@ button {
 
 .userInteract__container .register__container button {
   width: 60%;
+  margin-top: 25px;
+  margin-bottom: 15px;
   background-color: green;
   border: green;
 }
@@ -181,11 +219,6 @@ button {
 .userInteract__container .register__container button:hover {
   background-color: rgb(2, 104, 2);
   border: rgb(2, 104, 2);
-}
-
-.userInteract__container button:focus {
-  background-color: grey !important;
-  border: grey !important;
 }
 
 .userInteract__container button:hover {

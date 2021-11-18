@@ -8,11 +8,11 @@ import { DeckOutlined } from "@material-ui/icons";
 import CloseIcon from "@material-ui/icons/Close";
 import { login, register } from "./server/api";
 import { io } from "socket.io-client";
-//import socket, { connectSocket } from "./server/socketio";
-
+import Loading from "./Loading";
 function Login() {
   const [{ user, socket }, dispatch] = useStateValue();
 
+  //login and register fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -21,66 +21,113 @@ function Login() {
   const [regPassword, setRegPassword] = useState("");
   const [regPassConfirm, setRegPassConfirm] = useState("");
 
+  //loading variables
+  const [logLoading, setLogLoading] = useState(false);
+  const [regLoading, setRegLoading] = useState(false);
+
+  //login field error handlers
   const [logEmailError, setLogEmailError] = useState(false);
-  const [logEmailErrorMessage, setLogEmailErrorMessage] = useState("");
   const [logPasswordError, setLogPasswordError] = useState(false);
+  const [logEmailErrorMessage, setLogEmailErrorMessage] = useState("");
   const [logPasswordErrorMessage, setLogPasswordErrorMessage] = useState("");
+
+  //registration field error handlers
+  const [firstError, setFirstError] = useState(false);
+  const [lastError, setLastError] = useState(false);
+  const [regEmailError, setRegEmailError] = useState(false);
+  const [regPasswordError, setRegPasswordError] = useState(false);
+  const [confPasswordError, setConfPasswordError] = useState(false);
+  const [firstErrorMessage, setFirstErrorMessage] = useState("");
+  const [lastErrorMessage, setLastErrorMessage] = useState("");
+  const [regEmailErrorMessage, setRegEmailErrorMessage] = useState("");
+  const [regPasswordErrorMessage, setRegPasswordErrorMessage] = useState("");
+  const [confPasswordErrorMessage, setConfPasswordErrorMessage] = useState("");
+
   const [errorMessage, setErrorMessage] = useState("");
   const [errVisibility, setErrVisibility] = useState("hidden");
+  const [regErrorMessage, setRegErrorMessage] = useState("");
 
   const [showRegModal, setShowRegModal] = useState(false);
 
-  const setDefaults = () => {
+  const setLogDefaults = () => {
     setLogEmailError(false);
-    setLogEmailErrorMessage("");
     setLogPasswordError(false);
+    setLogEmailErrorMessage("");
     setLogPasswordErrorMessage("");
   };
 
-  const signIn = async () => {
-    const logResponse = await login(email, password);
-    if (logResponse) {
-      //if successful sign in
-      if (logResponse.status === 200) {
-        setErrorMessage("/");
-        setErrVisibility("hidden");
+  const setRegDefaults = () => {
+    setFirstError(false);
+    setLastError(false);
+    setRegEmailError(false);
+    setRegPasswordError(false);
+    setConfPasswordError(false);
+    setFirstErrorMessage("");
+    setLastErrorMessage("");
+    setRegEmailErrorMessage("");
+    setRegPasswordErrorMessage("");
+    setConfPasswordErrorMessage("");
+    setRegErrorMessage("");
+  };
 
-        sessionStorage.setItem("accessToken", logResponse.data.accessToken);
-        sessionStorage.setItem("refreshToken", logResponse.data.refreshToken);
+  const emptyRegFields = () => {
+    setFirstName("");
+    setLastName("");
+    setRegEmail("");
+    setRegPassword("");
+    setRegPassConfirm("");
+  };
 
-        if (!socket) {
-          const socket = io("http://localhost:7000", {
-            reconnection: false,
-            auth: {
-              accessToken: sessionStorage.getItem("accessToken"),
-              userId: logResponse.data.user._id,
-            },
-          });
-          socket?.on("disconnect", () => {
-            sessionStorage.clear();
-            dispatch({
-              type: actionTypes.SET_SOCKET,
-              socket: null,
-            });
-            dispatch({
-              type: actionTypes.SET_USER,
-              user: null,
-            });
-          });
-          dispatch({
-            type: actionTypes.SET_SOCKET,
-            socket: socket,
-          });
-          socket?.emit("sendUser", logResponse.data.user._id);
-        }
+  const grantUserAccess = (serverResponse) => {
+    sessionStorage.setItem("accessToken", serverResponse.data.accessToken);
+    sessionStorage.setItem("refreshToken", serverResponse.data.refreshToken);
+
+    if (!socket) {
+      const socket = io("http://localhost:7000", {
+        reconnection: false,
+        auth: {
+          accessToken: sessionStorage.getItem("accessToken"),
+          userId: serverResponse.data.user._id,
+        },
+      });
+      socket?.on("disconnect", () => {
+        sessionStorage.clear();
+        dispatch({
+          type: actionTypes.SET_SOCKET,
+          socket: null,
+        });
         dispatch({
           type: actionTypes.SET_USER,
-          user: logResponse.data.user,
+          user: null,
         });
+      });
+      dispatch({
+        type: actionTypes.SET_SOCKET,
+        socket: socket,
+      });
+      socket?.emit("sendUser", serverResponse.data.user._id);
+    }
+    dispatch({
+      type: actionTypes.SET_USER,
+      user: serverResponse.data.user,
+    });
+  };
+
+  const signIn = async (e) => {
+    e.preventDefault();
+    setLogLoading(true);
+    const logResponse = await login(email, password);
+
+    if (logResponse) {
+      console.log(logResponse);
+      //if successful signin
+      if (logResponse.status === 200) {
+        grantUserAccess(logResponse);
       }
       //unsucessfull signin
       else {
         const error = logResponse.data.error.message;
+
         if (Array.isArray(error)) {
           if (error[0].path[0] === "email") {
             setLogEmailError(true);
@@ -102,9 +149,12 @@ function Login() {
       setErrorMessage("Server Error");
       setErrVisibility("visible");
     }
+
+    setLogLoading(false);
   };
 
   const signUp = async () => {
+    setRegLoading(true);
     const regResponse = await register(
       firstName,
       lastName,
@@ -112,6 +162,35 @@ function Login() {
       regPassword,
       regPassConfirm
     );
+    console.log(regResponse);
+    if (regResponse.status === 200) {
+      grantUserAccess(regResponse);
+    } else {
+      const error = regResponse.data.error.message;
+      if (Array.isArray(error)) {
+        if (error[0].path[0] === "first_name") {
+          setFirstError(true);
+          setFirstErrorMessage(error[0].message);
+        } else if (error[0].path[0] === "last_name") {
+          setLastError(true);
+          setLastErrorMessage(error[0].message);
+        } else if (error[0].path[0] === "email") {
+          setRegEmailError(true);
+          setRegEmailErrorMessage(error[0].message);
+        } else if (error[0].path[0] === "password") {
+          setRegPasswordError(true);
+          setRegPasswordErrorMessage(error[0].message);
+        } else if (error[0].path[0] === "password_confirm") {
+          setConfPasswordError(true);
+          setConfPasswordErrorMessage(error[0].message);
+        }
+      } else {
+        setRegEmailError(true);
+        setRegEmailErrorMessage(error);
+      }
+    }
+
+    setRegLoading(false);
   };
 
   return (
@@ -120,60 +199,108 @@ function Login() {
         <div className="registrationModal">
           <form className="register__box">
             <div className="cancel">
-              <IconButton onClick={() => setShowRegModal(false)}>
+              <IconButton
+                onClick={() => {
+                  emptyRegFields();
+                  setShowRegModal(false);
+                }}
+              >
                 <CloseIcon />
               </IconButton>
             </div>
             <h1>Sign Up</h1>
-            <div className="name__container">
-              <input
-                type="text"
-                className="first__name"
-                placeholder="First name"
-                value={firstName}
-                onChange={(e) => {
-                  setFirstName(e.target.value);
-                }}
-              />
-              <input
-                type="text"
-                className="last__name"
-                placeholder="Last name"
-                value={lastName}
-                onChange={(e) => {
-                  setLastName(e.target.value);
-                }}
-              />
-            </div>
+            <p style={{ color: firstError && "red" }}>
+              FIRST NAME
+              {firstError && ` - ${firstErrorMessage}`}
+            </p>
+            <input
+              type="text"
+              className="first__name"
+              style={{
+                border: firstError && "2px solid red",
+                transition: firstError && "0s",
+              }}
+              value={firstName}
+              onChange={(e) => {
+                setRegDefaults();
+                setFirstName(e.target.value);
+              }}
+            />
+            <p style={{ color: lastError && "red" }}>
+              LAST NAME
+              {lastError && ` - ${lastErrorMessage}`}
+            </p>
+            <input
+              type="text"
+              className="last__name"
+              style={{
+                border: lastError && "2px solid red",
+                transition: lastError && "0s",
+              }}
+              value={lastName}
+              onChange={(e) => {
+                setRegDefaults();
+                setLastName(e.target.value);
+              }}
+            />
+            <p style={{ color: regEmailError && "red" }}>
+              EMAIL
+              {regEmailError && ` - ${regEmailErrorMessage}`}
+            </p>
             <input
               type="text"
               className="email"
-              placeholder="Email"
+              style={{
+                border: regEmailError && "2px solid red",
+                transition: regEmailError && "0s",
+              }}
               value={regEmail}
               onChange={(e) => {
+                setRegDefaults();
                 setRegEmail(e.target.value);
               }}
             />
+            <p style={{ color: regPasswordError && "red" }}>
+              PASSWORD
+              {regPasswordError && ` - ${regPasswordErrorMessage}`}
+            </p>
             <input
               type="password"
               className="new__password"
-              placeholder="New password"
+              style={{
+                border: regPasswordError && "2px solid red",
+                transition: regPasswordError && "0s",
+              }}
               value={regPassword}
               onChange={(e) => {
+                setRegDefaults();
                 setRegPassword(e.target.value);
               }}
             />
+            <p style={{ color: confPasswordError && "red" }}>
+              CONFIRM PASSWORD
+              {confPasswordError && ` - ${confPasswordErrorMessage}`}
+            </p>
             <input
               type="password"
               className="confirm__password"
-              placeholder="Confirm password"
+              style={{
+                border: confPasswordError && "2px solid red",
+                transition: confPasswordError && "0s",
+              }}
               value={regPassConfirm}
               onChange={(e) => {
+                setRegDefaults();
                 setRegPassConfirm(e.target.value);
               }}
             />
+            <p className="regError__message">
+              {regErrorMessage &&
+                regErrorMessage !== "" &&
+                `Error: ${regErrorMessage}`}
+            </p>
             <button type="button" className="sign__up" onClick={signUp}>
-              <h3>Sign Up</h3>
+              {regLoading ? <Loading /> : <h3>Sign Up</h3>}
             </button>
           </form>
         </div>
@@ -189,7 +316,7 @@ function Login() {
               EMAIL
               {logEmailError && ` - ${logEmailErrorMessage}`}
             </p>
-            <form>
+            <form onSubmit={signIn}>
               <input
                 style={{
                   border: logEmailError && "2px solid red",
@@ -198,7 +325,7 @@ function Login() {
                 className="username"
                 value={email}
                 onChange={(e) => {
-                  setDefaults();
+                  setLogDefaults();
                   setEmail(e.target.value);
                 }}
               />
@@ -208,7 +335,7 @@ function Login() {
               PASSWORD
               {logPasswordError && ` - ${logPasswordErrorMessage}`}
             </p>
-            <form>
+            <form onSubmit={signIn}>
               <input
                 style={{
                   border: logPasswordError && "2px solid red",
@@ -218,14 +345,14 @@ function Login() {
                 className="password"
                 value={password}
                 onChange={(e) => {
-                  setDefaults();
+                  setLogDefaults();
                   setPassword(e.target.value);
                 }}
               />
             </form>
 
             <button className="login__button" onClick={signIn}>
-              <h3>Log In</h3>
+              {logLoading ? <Loading /> : <h3>Log In</h3>}
             </button>
             <h5
               className="error__message"
@@ -237,20 +364,15 @@ function Login() {
           <div className="register__container">
             <button
               className="createNew__account"
-              onClick={() => setShowRegModal(true)}
+              onClick={() => {
+                setRegDefaults();
+                setShowRegModal(true);
+              }}
             >
               <h3>Create New Account</h3>
             </button>
           </div>
         </div>
-        {/*<div className="login__container">
-          <img src={DispatchLogo} alt="Logo" />
-          <div className="login__text">
-            <h1>Sign in to Dispatch</h1>
-          </div>
-
-          <Button onClick={signIn}>Sign In</Button>
-        </div>*/}
       </div>
     </div>
   );

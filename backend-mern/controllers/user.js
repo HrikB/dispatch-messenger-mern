@@ -79,7 +79,7 @@ export let updateLastName = async (req, res, next) => {
     const validation = await Joi.object({
       lastName: Joi.string()
         .required()
-        .regex(/[A-Za-z]/)
+        .regex(/^[a-zA-Z]+$/)
         .messages({
           "string.empty": "This field cannot be empty",
           "string.pattern.base":

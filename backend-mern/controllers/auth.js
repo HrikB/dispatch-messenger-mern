@@ -27,9 +27,13 @@ export let signup = async (req, res, next) => {
 
     const savedUser = await user.save();
     const accessToken = await signAccessToken(savedUser.id);
-    res.send({ accessToken });
+    const refreshToken = await signRefreshToken(savedUser.id);
+    res.status(200).send({ user, accessToken, refreshToken });
   } catch (err) {
-    if (err.isJoi === true) err.status = 422;
+    if (err.isJoi === true) {
+      err.message = err.details;
+      err.status = 422;
+    }
     next(err);
   }
 };
@@ -60,9 +64,10 @@ export let signin = async (req, res, next) => {
       .cookie("refreshTokenID", true)
       .send({ user, accessToken, refreshToken });
   } catch (err) {
-    if (err.isJoi === true) {
+    if (err.isJoi) {
       return next(createError.BadRequest(err.details));
     }
+
     next(createError.BadRequest("Email or password is incorrect"));
   }
 };

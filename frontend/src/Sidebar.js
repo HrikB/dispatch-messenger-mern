@@ -26,7 +26,6 @@ function Sidebar({ conversations, setConversations, lastMessage }) {
   const [profileOptMenu, setProfileOptMenu] = useState(false);
   const [updateProfWin, setUpdateProfWin] = useState(false);
   const [viewPreview, setViewPreview] = useState(false);
-  const [origNames, setOrigNames] = useState([]);
   const updateProfMenu = useRef();
   const profOptionsMenu = useRef();
 
