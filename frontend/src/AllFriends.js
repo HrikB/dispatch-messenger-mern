@@ -14,7 +14,7 @@ function AllFriends() {
   const openFriendMenu = useRef();
   const [arrivingFriend, setArrivingFriend] = useState();
   const [toRemoveFriend, setToRemoveFriend] = useState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [{ user, socket }, dispatch] = useStateValue();
   const history = useHistory();
 
@@ -58,7 +58,7 @@ function AllFriends() {
     //before setting friends, changes profile photo key to the actual photo metadata
 
     socket?.on("newFriend", async (data) => {
-      const prof_pic = await getPicture(data.prof_pic);
+      const prof_pic = await getPicture(data.prof_pic.toString());
       setArrivingFriend({
         _id: data._id,
         first_name: data.first,

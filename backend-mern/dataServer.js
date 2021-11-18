@@ -231,7 +231,7 @@ io.use((socket, next) => {
           const _id = receiverObject._id;
           const first = receiverObject.first_name;
           const last = receiverObject.last_name;
-          const prof_pic = receiverObject.prof_pic;
+          const prof_pic = receiverObject.prof_pic.toString();
           io.to(requesterSocket).emit("newFriend", {
             _id,
             first,
@@ -244,7 +244,7 @@ io.use((socket, next) => {
           const _id = requesterObject._id;
           const first = requesterObject.first_name;
           const last = requesterObject.last_name;
-          const prof_pic = receiverObject.prof_pic;
+          const prof_pic = receiverObject.prof_pic.toString();
           io.to(receiverSocket).emit("newFriend", {
             _id,
             first,

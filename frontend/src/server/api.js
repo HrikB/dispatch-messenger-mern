@@ -152,9 +152,11 @@ export const uploadPicture = async (userId, formData) => {
 export const getPicture = async (picId) => {
   try {
     //gets blob
+    console.log(picId);
     const blob = await axios.get(`${_dataUrl}/api/images/${picId}`, {
       responseType: "blob",
     });
+
     //turns blob into base64 and returns it
     return await blobToBase64(blob.data);
   } catch (err) {

@@ -55,11 +55,6 @@
   overflow: hidden;
 }
 
-.chat__headerRight {
-  display: flex;
-  justify-content: space-between;
-}
-
 .dateMessageContainer {
   position: relative;
   width: 100%;
@@ -85,6 +80,11 @@
   height: 60px;
   padding-right: 10px;
   width: 100%;
+}
+
+.remove__message {
+  color: red;
+  font-size: larger;
 }
 
 .chat__footer form {

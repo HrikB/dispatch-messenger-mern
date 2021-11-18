@@ -13,7 +13,7 @@ function Pending() {
   const [pending, setPending] = useState([]);
   const [rejectId, setRejectId] = useState();
   const [arrivingRequest, setArrivingRequest] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(async () => {
     setLoading(true);

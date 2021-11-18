@@ -45,7 +45,7 @@ a {
   overflow: hidden;
   display: block;
   white-space: nowrap;
-  max-width: 90%;
+  max-width: 100%;
 }
 
 .infoContainer h5 {

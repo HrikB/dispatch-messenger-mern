@@ -29,6 +29,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [arrivingMessage, setArrivingMessage] = useState(null);
   const messagesEndRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [removed, setRemoved] = useState(false);
   const [openEmoji, setOpenEmoji] = useState(false);
   const inputContainer = document.getElementsByClassName("input__container")[0];
   const inputOverlay = document.getElementsByClassName("input__overlay")[0];
@@ -106,7 +107,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       console.log("Welcome this is the server");
     });
     //getUsers to get online users
-    socket?.on("getUsers", (users) => {});
     socket?.on("getMessage", (data) => {
       const arrvMessage = {
         conversationId: data.conversationId,
@@ -121,6 +121,13 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       setLastMessage(arrvMessage);
       //moves most recent conversation to the top
     });
+    socket?.on("removeConversation", (removedConvId) => {
+      console.log(removedConvId);
+      if (removedConvId === conversationId) {
+        setRemoved(true);
+        setReceiver(null);
+      }
+    });
   }, [user]);
 
   //loads messages from the database
@@ -130,7 +137,10 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       setLoading(true);
       const messages = await getMessages(conversationId);
       const conversation = await getConversation(conversationId);
-      if (messages?.data?.error || conversation?.data?.error) return;
+      if (messages?.data?.error || conversation?.data?.error) {
+        setLoading(false);
+        return;
+      }
       const receiverData = await getUserDataById(
         conversation.data?.members.find((m) => m !== user._id)
       );
@@ -207,77 +217,81 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   return (
     <div id="chatid" className="chat">
       <div className="chat__header">
-        <Avatar src={receiver.prof_pic} />
-        <div className="chat__headerInfo">
-          <h3>
-            {loading
-              ? "Loading..."
-              : receiver.first_name + " " + receiver.last_name}
-          </h3>
-          <h6>Last seen at...</h6>
-        </div>
-
-        <div className="chat__headerRight">
-          <IconButton>
-            <MoreVert />
-          </IconButton>
-        </div>
+        <Avatar src={receiver?.prof_pic} />
+        {receiver?.first_name && receiver?.last_name && (
+          <div className="chat__headerInfo">
+            <h3>
+              {loading
+                ? "Loading..."
+                : receiver.first_name + " " + receiver.last_name}
+            </h3>
+            <h6>Last seen at...</h6>
+          </div>
+        )}
       </div>
 
       <div
         id="body__id"
         style={{
-          display: loading && "flex",
+          display: (loading || removed) && "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
         className="chat__body"
       >
-        {loading ? (
-          <Loading />
-        ) : (
-          messages.map((message, i) => (
-            <div id="container__id" className="dateMessageContainer">
-              {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
-              {
-                <h6 className="time">
-                  {(!messages[i - 1] ||
-                    new Date(
-                      new Date(messages[i - 1]?.createdAt).getTime() +
-                        10 * 60000
-                    ) < new Date(new Date(messages[i].createdAt).getTime())) &&
-                    new Date(message.createdAt).toLocaleTimeString([], {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                      hour: "numeric",
-                      minute: "numeric",
-                    })}
-                </h6>
-              }
-              <p
-                className={`chat__message ${
-                  message.senderId == user._id && "chat__reciever"
-                } ${
-                  !(
-                    new Date(
-                      new Date(messages[i - 1]?.createdAt).getTime() +
-                        10 * 60000
-                    ) < new Date(new Date(messages[i].createdAt).getTime())
-                  ) &&
-                  messages[i - 1]?.senderId == messages[i].senderId &&
-                  "same__sender"
-                }`}
-              >
-                {/*<h6 className="chat__name">
+        {removed && (
+          <p className="remove__message">
+            This user has removed you as a friend. You can no longer send them
+            messages.
+          </p>
+        )}
+        {!removed &&
+          (loading ? (
+            <Loading />
+          ) : (
+            messages.map((message, i) => (
+              <div id="container__id" className="dateMessageContainer">
+                {/*Checks if 10 mins passed since last message. If it has, redisplay time*/}
+                {
+                  <h6 className="time">
+                    {(!messages[i - 1] ||
+                      new Date(
+                        new Date(messages[i - 1]?.createdAt).getTime() +
+                          10 * 60000
+                      ) <
+                        new Date(new Date(messages[i].createdAt).getTime())) &&
+                      new Date(message.createdAt).toLocaleTimeString([], {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}
+                  </h6>
+                }
+                <p
+                  className={`chat__message ${
+                    message.senderId == user._id && "chat__reciever"
+                  } ${
+                    !(
+                      new Date(
+                        new Date(messages[i - 1]?.createdAt).getTime() +
+                          10 * 60000
+                      ) < new Date(new Date(messages[i].createdAt).getTime())
+                    ) &&
+                    messages[i - 1]?.senderId == messages[i].senderId &&
+                    "same__sender"
+                  }`}
+                >
+                  {/*<h6 className="chat__name">
                 {message.senderId !== user._id ? message.senderName : ""}
             </h6>*/}
 
-                {message.text}
-              </p>
-            </div>
-          ))
-        )}
+                  {message.text}
+                </p>
+              </div>
+            ))
+          ))}
         <div
           id="endRef__id"
           style={{
@@ -323,7 +337,11 @@ function Chat({ conversations, setConversations, setLastMessage }) {
           <IconButton id="delete__icon" onClick={onDeleteClick}>
             <DeleteIcon />
           </IconButton>
-          <IconButton id="mic__icon" disabled={loading} onClick={onMicClick}>
+          <IconButton
+            id="mic__icon"
+            disabled={loading || removed}
+            onClick={onMicClick}
+          >
             <MicIcon />
           </IconButton>
         </div>
@@ -333,7 +351,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
             <div className="input__overlay"></div>
             <input
               className="input__field"
-              disabled={loading}
+              disabled={loading || removed}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type a Message..."
@@ -341,14 +359,14 @@ function Chat({ conversations, setConversations, setLastMessage }) {
             />
             <IconButton
               className="emoji__button"
-              disabled={loading}
+              disabled={loading || removed}
               onClick={() => setOpenEmoji(!openEmoji)}
             >
               <InsertEmoticonIcon />
             </IconButton>
           </div>
           <button
-            disabled={!input.trim() || loading}
+            disabled={!input.trim() || loading || removed}
             id="submitbutton"
             onClick={sendMessage}
             type="submit"
