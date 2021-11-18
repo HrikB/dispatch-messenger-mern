@@ -24,7 +24,7 @@ export let getConversation = async (req, res, next) => {
       throw new createError.Unauthorized();
     res.status(200).json(conversation);
   } catch (err) {
-    console.log("4", err.message);
+    console.log("4", err);
     next(createError.InternalServerError());
   }
 };
