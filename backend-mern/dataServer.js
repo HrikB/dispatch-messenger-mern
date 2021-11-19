@@ -24,7 +24,7 @@ const port = 7000;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: `http://${process.env.SERVER_HOST}:3000`,
   },
 });
 
@@ -368,7 +368,7 @@ import imageRoute from "./routes/images.js";
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: `http://${process.env.SERVER_HOST}:3000`,
     credentials: true,
   })
 );

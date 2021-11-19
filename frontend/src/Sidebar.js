@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useHistory } from "react-router-dom";
 import "./Sidebar.css";
 import Compose from "./Compose.svg";
 import { Avatar, IconButton, Slider } from "@material-ui/core";
@@ -26,10 +27,13 @@ function Sidebar({ conversations, setConversations, lastMessage }) {
   const [viewPreview, setViewPreview] = useState(false);
   const [profPic, setProfPic] = useState("");
 
+  const history = useHistory();
   const updateProfMenu = useRef();
   const profOptionsMenu = useRef();
 
-  const createConversation = () => {};
+  const createConversation = () => {
+    history.push("/create");
+  };
 
   const logOut = async () => {
     const res = await logOutAPI();
@@ -95,6 +99,7 @@ function Sidebar({ conversations, setConversations, lastMessage }) {
 
   useEffect(async () => {
     const conversationsData = await getConversations(user._id);
+    console.log(conversationsData);
     socket?.on("getNewChat", (data) => {
       console.log("getNewChat", data);
       setArrivingConversation(data);

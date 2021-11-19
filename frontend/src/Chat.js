@@ -175,7 +175,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         return temp;
       });
     }
-    scrollToBottomSmooth();
   }, [arrivingMessage]);
 
   useEffect(() => {

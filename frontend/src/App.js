@@ -9,7 +9,8 @@ import Login from "./Login";
 import Friends from "./Friends";
 import Loading from "./Loading";
 import { useStateValue } from "./StateProvider";
-import { getUserDataById } from "./server/api.js";
+import { getUserDataById, _dataUrl } from "./server/api.js";
+import CreateChat from "./CreateChat";
 
 function App() {
   const [{ user, socket }, dispatch] = useStateValue();
@@ -27,7 +28,7 @@ function App() {
         ).sub;
         //this also refreshes token through interceptor if it is expired
         const user = await getUserDataById(userId);
-        const socket = io("http://localhost:7000", {
+        const socket = io(`${_dataUrl}`, {
           reconnection: false,
           auth: {
             accessToken: sessionStorage.getItem("accessToken"),
@@ -111,6 +112,9 @@ function App() {
               </Route>
               <Route path="/friends">
                 <Friends />
+              </Route>
+              <Route path="/create">
+                <CreateChat />
               </Route>
             </Switch>
           </Router>

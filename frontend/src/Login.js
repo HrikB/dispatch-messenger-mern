@@ -6,7 +6,7 @@ import { useStateValue } from "./StateProvider.js";
 import { actionTypes } from "./reducer";
 import { DeckOutlined } from "@material-ui/icons";
 import CloseIcon from "@material-ui/icons/Close";
-import { login, register } from "./server/api";
+import { login, register, _dataUrl } from "./server/api";
 import { io } from "socket.io-client";
 import Loading from "./Loading";
 function Login() {
@@ -83,7 +83,7 @@ function Login() {
     sessionStorage.setItem("refreshToken", serverResponse.data.refreshToken);
 
     if (!socket) {
-      const socket = io("http://localhost:7000", {
+      const socket = io(`${_dataUrl}`, {
         reconnection: false,
         auth: {
           accessToken: sessionStorage.getItem("accessToken"),

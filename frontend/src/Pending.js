@@ -33,7 +33,12 @@ function Pending() {
 
     socket?.on("getFriendRequest", async (data) => {
       const recipientProfPic = await getPicture(user.prof_pic.toString());
-      const requesterProfPic = await getPicture(data.senderProfPic.toString());
+      let requesterProfPic;
+      if (data.senderProfPic !== "undefined") {
+        requesterProfPic = await getPicture(data.senderProfPic?.toString());
+      } else {
+        requesterProfPic = null;
+      }
       setArrivingRequest({
         _id: data.id,
         requesterId: data.senderId,
@@ -53,7 +58,7 @@ function Pending() {
           friend.recipientProfPic.toString()
         );
         friend.requesterProfPic = await getPicture(
-          friend.requesterProfPic.toString()
+          friend.requesterProfPic?.toString()
         );
         return friend;
       })
