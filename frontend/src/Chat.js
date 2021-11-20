@@ -148,7 +148,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     if (conversationId) {
       setLoading(true);
       const messages = await getMessages(conversationId);
-      console.log(messages);
+      console.log("mesmse", messages);
       const conversation = await getConversation(conversationId);
       if (messages?.data?.error || conversation?.data?.error) {
         setLoading(false);
@@ -160,9 +160,9 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       //get image metadata
       receiverData.data.prof_pic = await getPicture(receiverData.data.prof_pic);
       setLoading(false);
-      setMessages(messages.data);
-      setConversation(conversation.data);
-      setReceiver(receiverData.data);
+      setMessages(messages ? messages.data : []);
+      setConversation(conversation?.data);
+      setReceiver(receiverData?.data);
       scrollToBottomAuto();
     }
   }, [conversationId]);

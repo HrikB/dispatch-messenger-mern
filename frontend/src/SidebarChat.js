@@ -6,14 +6,7 @@ import { Link } from "react-router-dom";
 import { useStateValue } from "./StateProvider";
 import { getUserDataById, getPicture } from "./server/api.js";
 
-function SidebarChat({
-  last_msg,
-  convId,
-  memberId,
-  friendsTab,
-  searchInput,
-  setSearchInput,
-}) {
+function SidebarChat({ last_msg, convId, memberId, searchInput }) {
   const [messages, setMessages] = useState("");
   const [{ user }, dispatch] = useStateValue();
   const [inSearch, setInSearch] = useState(true);
@@ -21,27 +14,18 @@ function SidebarChat({
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
-  //there has to be a better way to implement selection
   useEffect(() => {
-    const allContainer = document.getElementsByClassName("allContainer");
+    const allContainer = document.getElementById(convId.toString());
     const path = window.location.pathname.split("/");
+
     if (allContainer) {
-      for (let e of allContainer) {
-        if (e.id != path[2]) {
-          e.style.background = "#252525";
-        } else {
-          e.style.background = "#403d3d";
-        }
-      }
-    }
-    if (friendsTab) {
-      if (friendsTab.id != path[1]) {
-        friendsTab.style.background = "#252525";
+      if (allContainer.id != path[2]) {
+        allContainer.style.background = "#252525";
       } else {
-        friendsTab.style.background = "#403d3d";
+        allContainer.style.background = "#403d3d";
       }
     }
-  }, [location]);
+  });
 
   useEffect(async () => {
     try {

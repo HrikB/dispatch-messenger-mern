@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 import Compose from "./Compose.svg";
 import { Avatar, IconButton, Slider } from "@material-ui/core";
@@ -63,6 +63,22 @@ function Sidebar({
   const profileOptions = () => {
     setProfileOptMenu(!profileOptMenu);
   };
+
+  const location = useLocation();
+
+  //there has to be a better way to implement selection
+  useEffect(() => {
+    const friendsTab = document.getElementById("friends");
+    const path = window.location.pathname.split("/");
+
+    if (friendsTab) {
+      if (friendsTab.id != path[1]) {
+        friendsTab.style.background = "#252525";
+      } else {
+        friendsTab.style.background = "#403d3d";
+      }
+    }
+  }, [location]);
 
   //updates last message
   useEffect(() => {
@@ -194,9 +210,7 @@ function Sidebar({
             last_msg={conversation.last_msg}
             convId={conversation._id}
             memberId={conversation.members.find((m) => m !== user._id)}
-            friendsTab={document.getElementById("friends")}
             searchInput={searchInput}
-            setSearchInput={setSearchInput}
           />
         ))}
       </div>
