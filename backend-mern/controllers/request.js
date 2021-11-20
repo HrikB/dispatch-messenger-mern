@@ -25,7 +25,10 @@ export const getAllFriends = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.userId });
 
-    const friends = await User.find({ _id: { $in: user.friendsList } });
+    const friends = await User.find(
+      { _id: { $in: user.friendsList } },
+      { password: 0, email: 0, createdAt: 0, updatedAt: 0, friendList: 0 }
+    );
     res.status(200).json(friends);
   } catch (err) {
     next(createError.InternalServerError());

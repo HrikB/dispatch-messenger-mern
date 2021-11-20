@@ -47,6 +47,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MTY4MjUyN
 GET http://localhost:7000/api/user/user-id/61730b08b41a3c7787d10edd
 
 ###
+GET http://localhost:7000/api/user/online/617c40aa0cc7aeca24fc9f81
+
+
+###
 GET http://localhost:8000/auth/data-email/h
 
 ###

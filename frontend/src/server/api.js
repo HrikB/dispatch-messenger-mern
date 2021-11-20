@@ -114,6 +114,14 @@ export const getConversations = async (userId) => {
   }
 };
 
+export const getOnlineStatus = async (userId) => {
+  try {
+    return await axios.get(`${_dataUrl}/api/user/online/${userId}`);
+  } catch (err) {
+    return err.resposne;
+  }
+};
+
 export const getUserDataById = async (userId) => {
   try {
     return await axios.get(`${_dataUrl}/api/user/user-id/${userId}`);

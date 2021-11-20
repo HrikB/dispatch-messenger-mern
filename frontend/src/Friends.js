@@ -23,6 +23,7 @@ function Friends() {
   );
   useEffect(() => {
     //socket.emit("sendUser", user._id);
+    return () => {};
   }, []);
   useEffect(() => {
     //Handles tab highlighting

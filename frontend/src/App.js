@@ -9,7 +9,7 @@ import Login from "./Login";
 import Friends from "./Friends";
 import Loading from "./Loading";
 import { useStateValue } from "./StateProvider";
-import { getUserDataById, _dataUrl } from "./server/api.js";
+import { getUserDataById, _dataUrl, logOutAPI } from "./server/api.js";
 import CreateChat from "./CreateChat";
 
 function App() {
@@ -36,7 +36,8 @@ function App() {
           },
         });
 
-        socket?.on("disconnect", () => {
+        socket?.on("disconnect", async () => {
+          await logOutAPI();
           sessionStorage.clear();
           dispatch({
             type: actionTypes.SET_SOCKET,

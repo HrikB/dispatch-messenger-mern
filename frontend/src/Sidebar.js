@@ -99,7 +99,6 @@ function Sidebar({ conversations, setConversations, lastMessage }) {
 
   useEffect(async () => {
     const conversationsData = await getConversations(user._id);
-    console.log(conversationsData);
     socket?.on("getNewChat", (data) => {
       console.log("getNewChat", data);
       setArrivingConversation(data);

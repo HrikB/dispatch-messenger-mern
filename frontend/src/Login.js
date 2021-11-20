@@ -6,7 +6,7 @@ import { useStateValue } from "./StateProvider.js";
 import { actionTypes } from "./reducer";
 import { DeckOutlined } from "@material-ui/icons";
 import CloseIcon from "@material-ui/icons/Close";
-import { login, register, _dataUrl } from "./server/api";
+import { login, logOutAPI, register, _dataUrl } from "./server/api";
 import { io } from "socket.io-client";
 import Loading from "./Loading";
 function Login() {
@@ -90,7 +90,8 @@ function Login() {
           userId: serverResponse.data.user._id,
         },
       });
-      socket?.on("disconnect", () => {
+      socket?.on("disconnect", async () => {
+        await logOutAPI();
         sessionStorage.clear();
         dispatch({
           type: actionTypes.SET_SOCKET,

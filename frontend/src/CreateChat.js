@@ -33,6 +33,10 @@ function CreateChat() {
       }
     };
 
+    socket?.on("openMessage", (data) => {
+      history.push({ pathname: `/t/${data._id}` });
+    });
+
     document.addEventListener("mousedown", updateOptions);
 
     const allFriends = await getAllFriends(user._id);

@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router";
 import "./AllFriends.css";
-import { Avatar, IconButton } from "@material-ui/core";
-import MoreVert from "@material-ui/icons/MoreVert";
-import ModeComment from "@material-ui/icons/ModeComment";
-import { getAllFriends, removeFriend, getPicture } from "./server/api.js";
+import { getAllFriends, getPicture } from "./server/api.js";
 import { useStateValue } from "./StateProvider";
 import Loading from "./Loading";
+import FriendComponent from "./FriendComponent";
 
 function AllFriends() {
   const [friendsList, setFriendsList] = useState([]);
-  const [openFriendOptions, setOpenFriendOptions] = useState(-1);
-  const openFriendMenu = useRef();
   const [arrivingFriend, setArrivingFriend] = useState();
   const [toRemoveFriend, setToRemoveFriend] = useState();
   const [loading, setLoading] = useState(true);
@@ -24,33 +20,6 @@ function AllFriends() {
       receiverId: friend._id,
     });
   };
-
-  const friendOptions = (i) => {
-    setOpenFriendOptions(i);
-  };
-
-  const remove = async (friendId) => {
-    socket?.emit("removeFriend", { removerId: user._id, toRemoveId: friendId });
-    await removeFriend(user._id, friendId);
-  };
-
-  useEffect(() => {
-    const updateMenus = (e) => {
-      if (
-        openFriendMenu &&
-        openFriendMenu.current &&
-        !openFriendMenu.current.contains(e.target)
-      ) {
-        setOpenFriendOptions(-1);
-      }
-    };
-
-    document.addEventListener("mousedown", updateMenus);
-
-    return () => {
-      document.removeEventListener("mousedown", updateMenus);
-    };
-  }, [openFriendOptions]);
 
   useEffect(async () => {
     setLoading(true);
@@ -108,33 +77,7 @@ function AllFriends() {
         <Loading />
       ) : (
         friendsList.map((friend, i) => (
-          <div className="friendComponent__container">
-            <div className="friend__info">
-              <Avatar src={friend?.prof_pic} className="accountPic" />
-              <div className="info__text">
-                <p className="friend__name">
-                  {friend.first_name + " " + friend.last_name}
-                </p>
-                <p className="online__status">online status</p>
-              </div>
-            </div>
-            <div className="friend__options">
-              <IconButton onClick={() => createChat(friend)}>
-                <ModeComment style={{ fontSize: 30 }} />
-              </IconButton>
-
-              <IconButton onClick={() => friendOptions(i)}>
-                <MoreVert style={{ fontSize: 30 }} />
-                {openFriendOptions === i && (
-                  <div className="friendOptions__menu" ref={openFriendMenu}>
-                    <button onClick={() => remove(friend._id)}>
-                      Remove Friend
-                    </button>
-                  </div>
-                )}
-              </IconButton>
-            </div>
-          </div>
+          <FriendComponent friend={friend} i={i} createChat={createChat} />
         ))
       )}
     </div>

@@ -1,25 +1,43 @@
 import User from "../models/User.js";
 import createError from "http-errors";
 import Joi from "@hapi/joi";
+import { getUser } from "../helpers/redis.js";
 import { deleteimage } from "./images.js";
 
-export let getDataById = async (req, res) => {
-  let userId = req.params.id;
+export let getOnlineStatus = async (req, res, next) => {
   try {
-    const userData = await User.findOne({ _id: userId });
-    res.status(200).json(userData);
+    const { id } = req.params;
+    let online = false;
+    const userOnline = await getUser(id);
+
+    if (userOnline) online = true;
+
+    res.status(200).send({ isOnline: online });
   } catch (err) {
-    res.status(500).json(err);
+    next(err);
   }
 };
 
-export let getDataByEmail = async (req, res) => {
+export let getDataById = async (req, res, next) => {
+  let userId = req.params.id;
+  try {
+    const userData = await User.findOne(
+      { _id: userId },
+      { password: 0, email: 0, createdAt: 0, updatedAt: 0, friendsList: 0 }
+    );
+    res.status(200).json(userData);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export let getDataByEmail = async (req, res, next) => {
   let userEmail = req.params.email;
   try {
     const userData = await User.findOne({ email: userEmail });
     res.status(200).json(userData);
   } catch (err) {
-    res.status(500).json(err);
+    next(err);
   }
 };
 

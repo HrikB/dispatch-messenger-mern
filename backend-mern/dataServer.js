@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import util from "util";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
@@ -12,7 +11,7 @@ import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
-import redisClient from "./helpers/redis.js";
+import redisClient, { addUser, removeUser, getUser } from "./helpers/redis.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
 import "./helpers/mongodb.js";
 
@@ -27,23 +26,6 @@ const io = new Server(httpServer, {
     origin: `http://${process.env.SERVER_HOST}:3000`,
   },
 });
-
-//OK for now... eventually, move this array onto redis
-const addUser = async (userId, socketId) => {
-  redisClient.hset = util.promisify(redisClient.hset);
-  await redisClient.hset("socketConns", userId, socketId);
-};
-
-const removeUser = async (userId) => {
-  redisClient.hdel = util.promisify(redisClient.hdel);
-  await redisClient.hdel("socketConns", userId);
-};
-
-const getUser = async (userId) => {
-  redisClient.hget = util.promisify(redisClient.hget);
-  const socketId = await redisClient.hget("socketConns", userId);
-  return socketId;
-};
 
 //socket-io
 io.use((socket, next) => {

@@ -14,6 +14,7 @@ import {
   getMessages,
   getPicture,
   getUserDataById,
+  getOnlineStatus,
 } from "./server/api.js";
 import Loading from "./Loading";
 
@@ -24,6 +25,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [conversation, setConversation] = useState({});
   const [audioOutput, setAudioOutput] = useState();
   const { conversationId } = useParams();
+  const [onlineStatus, setOnlineStatus] = useState(false);
   const [{ user, socket }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
   const [arrivingMessage, setArrivingMessage] = useState(null);
@@ -101,6 +103,20 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     messagesEndRef?.current?.scrollIntoView({ behavior: "auto" });
   };
 
+  useEffect(() => {
+    const checkStatus = async () => {
+      const res = await getOnlineStatus(receiver._id);
+      res && setOnlineStatus(res.data.isOnline);
+    };
+    checkStatus();
+    const interval = setInterval(() => {
+      checkStatus();
+    }, 60000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [receiver]);
+
   //checks for data from socket
   useEffect(() => {
     socket?.on("welcome", () => {
@@ -156,7 +172,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
   useEffect(() => {
     if (arrivingMessage) {
-      console.log("new arrived");
       conversation?.members.includes(arrivingMessage.senderId) &&
         setMessages((prev) => [...prev, arrivingMessage]);
 
@@ -227,7 +242,9 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                 ? "Loading..."
                 : receiver.first_name + " " + receiver.last_name}
             </h3>
-            <h6>Last seen at...</h6>
+            <h6 style={{ color: onlineStatus ? "green" : "red" }}>
+              {onlineStatus ? "Online" : "Offline"}
+            </h6>
           </div>
         )}
       </div>

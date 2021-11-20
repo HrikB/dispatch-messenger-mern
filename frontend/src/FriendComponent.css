@@ -1,0 +1,132 @@
+.friendComponent__container {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid grey;
+}
+
+.friendComponent__container .friend__info {
+  display: flex;
+  align-items: center;
+  width: 50%;
+  justify-content: flex-start;
+}
+
+.friendComponent__container .friend__info .accountPic {
+  width: 3rem;
+  height: 3rem;
+  margin: 5px;
+}
+
+.friendComponent__container .friend__info .info__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.friendComponent__container .friend__info .info__text .friend__name {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.friendComponent__container .friend__info .info__text .online__status {
+  font-weight: lighter;
+  font-size: 12px;
+}
+
+.friendComponent__container .friend__options {
+  display: flex;
+  width: 50%;
+  justify-content: flex-end;
+}
+
+.friendComponent__container .friend__options .MuiIconButton-root {
+  padding: 0;
+  width: fit-content;
+  margin: 0 10px;
+}
+
+.friendComponent__container
+  .friend__options
+  .MuiIconButton-root
+  .MuiSvgIcon-root {
+  fill: rgba(216, 216, 216, 0.4) !important;
+}
+
+.friendOptions__menu {
+  box-sizing: border-box;
+  padding: 7px;
+  position: absolute;
+  background-color: #171717;
+  top: 100%;
+  right: 50%;
+  width: max-content;
+  cursor: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  animation: fadeIn 0.2s;
+  -webkit-animation: fadeIn 0.2s;
+  -moz-animation: fadeIn 0.2s;
+  -o-animation: fadeIn 0.2s;
+  -ms-animation: fadeIn 0.2s;
+}
+
+.friendOptions__menu button {
+  height: fit-content;
+  background-color: #171717;
+  color: red;
+  margin: 0;
+}
+.friendOptions__menu button:hover {
+  background-color: red;
+  color: white;
+}
+
+.friendOptions__menu button:hover {
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

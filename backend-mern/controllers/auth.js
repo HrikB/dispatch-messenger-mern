@@ -23,7 +23,7 @@ export let signup = async (req, res, next) => {
       );
 
     //creates new user object
-    const user = new User(validation);
+    const user = new User(Object.assign({}, validation, { online: true }));
 
     const savedUser = await user.save();
     const accessToken = await signAccessToken(savedUser.id);
@@ -49,6 +49,8 @@ export let signin = async (req, res, next) => {
     if (!isValidPassword)
       throw createError.BadRequest("Username/Password not valid");
 
+    //update online status
+    await User.updateOne({ _id: user._id }, { $set: { online: true } });
     const accessToken = await signAccessToken(user._id);
     const refreshToken = await signRefreshToken(user._id);
     res
@@ -93,6 +95,8 @@ export let logout = async (req, res, next) => {
     const { refreshToken } = req.body;
     if (!refreshToken) throw createError.BadRequest();
     const userId = await verifyRefreshToken(refreshToken);
+
+    await User.updateOne({ _id: userId }, { $set: { online: false } });
 
     redisClient.DEL(userId, (err, reply) => {
       if (err) {
