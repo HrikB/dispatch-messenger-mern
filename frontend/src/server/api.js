@@ -10,8 +10,8 @@ const instance = axios.create();
 axios.defaults.withCredentials = true;
 let user;
 
-const blobToBase64 = (blob) => {
-  return new Promise((resolve) => {
+const blobToBase64 = async (blob) => {
+  return await new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = () => {
@@ -50,6 +50,11 @@ axios.interceptors.response.use(undefined, async (err) => {
       sessionStorage.setItem("accessToken", newTokenPair.data.accessToken);
       sessionStorage.setItem("refreshToken", newTokenPair.data.refreshToken);
       if (config.method === "get") {
+        if (config.responseType) {
+          return await axios.get(`${config.url}`, {
+            responseType: config.responseType,
+          });
+        }
         return await axios.get(`${config.url}`);
       }
       if (config.method === "put") {
@@ -206,9 +211,11 @@ export const updateEmail = async (userId, email) => {
 
 export const getMessages = async (conversationId) => {
   try {
-    return await axios.get(
+    const res = await axios.get(
       `${_dataUrl}/api/messages/get-message/${conversationId}`
     );
+
+    return res;
   } catch (err) {
     return err.response;
   }

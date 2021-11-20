@@ -23,7 +23,6 @@ function EditProfileInfo({
     setLoading(true);
     let response;
     let updateFunc;
-    console.log("toUpdate", toUpdate);
     let formattedInfo = updatedInfo;
 
     switch (toUpdate) {
@@ -45,7 +44,6 @@ function EditProfileInfo({
         response = await updateEmail(user._id, formattedInfo);
         updateFunc = setEmail;
     }
-    console.log(response);
     setLoading(false);
     if (response.data.error) {
       setUpdateError(true);

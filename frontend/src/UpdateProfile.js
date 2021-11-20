@@ -77,9 +77,10 @@ export default forwardRef(({ profPic, setProfPic }, ref) => {
       const updateRes = await updateProfilePic(user._id, uploadedId.data);
       if (!updateRes.data.acknowledged === true) return;
 
-      const newProfPic = await getPicture(uploadedId.data);
-      if (!newProfPic) return;
-      setProfPic(newProfPic);
+      dispatch({
+        type: actionTypes.SET_USER,
+        user: Object.assign({ ...user }, { prof_pic: uploadedId.data }),
+      });
       setViewPreview(false);
     }
   };

@@ -17,7 +17,12 @@ import { Link } from "react-router-dom";
 import { actionTypes } from "./reducer";
 import UpdateProfile from "./UpdateProfile";
 
-function Sidebar({ conversations, setConversations, lastMessage }) {
+function Sidebar({
+  conversations,
+  setConversations,
+  setLastMessage,
+  lastMessage,
+}) {
   const [searchInput, setSearchInput] = useState("");
   const [{ user, socket }, dispatch] = useStateValue();
   const [arrivingConversation, setArrivingConversation] = useState();
@@ -100,11 +105,22 @@ function Sidebar({ conversations, setConversations, lastMessage }) {
   useEffect(async () => {
     const conversationsData = await getConversations(user._id);
     socket?.on("getNewChat", (data) => {
-      console.log("getNewChat", data);
       setArrivingConversation(data);
     });
     socket?.on("removeConversation", (conversationId) => {
       setToDeleteConversation(conversationId);
+    });
+    socket?.on("getMessage", (data) => {
+      const arrvMessage = {
+        conversationId: data.conversationId,
+        senderId: data.senderId,
+        senderName: data.senderName,
+        receiver: user._id,
+        text: data.text,
+        createdAt: data.createdAt,
+      };
+      //sets the recent message on the sidebar component
+      setLastMessage(arrvMessage);
     });
 
     const res = await getPicture(user.prof_pic);

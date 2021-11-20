@@ -105,7 +105,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
   useEffect(() => {
     const checkStatus = async () => {
-      const res = await getOnlineStatus(receiver._id);
+      const res = await getOnlineStatus(receiver?._id);
       res && setOnlineStatus(res.data.isOnline);
     };
     checkStatus();
@@ -133,12 +133,8 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         createdAt: data.createdAt,
       };
       setArrivingMessage(arrvMessage);
-      //sets the recent message on the sidebar component
-      setLastMessage(arrvMessage);
-      //moves most recent conversation to the top
     });
     socket?.on("removeConversation", (removedConvId) => {
-      console.log(removedConvId);
       if (removedConvId === conversationId) {
         setRemoved(true);
         setReceiver(null);
@@ -152,6 +148,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     if (conversationId) {
       setLoading(true);
       const messages = await getMessages(conversationId);
+      console.log(messages);
       const conversation = await getConversation(conversationId);
       if (messages?.data?.error || conversation?.data?.error) {
         setLoading(false);

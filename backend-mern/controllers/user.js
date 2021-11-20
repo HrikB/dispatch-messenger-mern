@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import createError from "http-errors";
 import Joi from "@hapi/joi";
 import { getUser } from "../helpers/redis.js";
-import { deleteimage } from "./images.js";
+import { deleteImage } from "./images.js";
 
 export let getOnlineStatus = async (req, res, next) => {
   try {
@@ -45,9 +45,9 @@ export let updateProfilePic = async (req, res, next) => {
   const { userId, profPic } = req.body;
   try {
     const userDoc = await User.findOne({ _id: userId });
-    console.log(userDoc.prof_pic);
-    if (userDoc.prof_pic && userDoc.prof_pic.length < 24)
-      await deleteimage(userDoc.prof_pic);
+    if (userDoc.prof_pic && userDoc.prof_pic.length <= 24) {
+      await deleteImage(userDoc.prof_pic);
+    }
 
     const update = await User.updateOne(
       { _id: userId },

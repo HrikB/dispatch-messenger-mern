@@ -108,6 +108,7 @@ io.use((socket, next) => {
     "sendFriendRequest",
     async ({ senderId, senderName, senderProfPic, receiverEmail }) => {
       console.log("sendFriendRequest received");
+      if (senderProfPic) senderProfPic = senderProfPic.toString();
       //get receiver object with the email
       const receiver = await User.findOne({ email: receiverEmail });
 
@@ -213,7 +214,7 @@ io.use((socket, next) => {
           const _id = receiverObject._id;
           const first = receiverObject.first_name;
           const last = receiverObject.last_name;
-          const prof_pic = receiverObject.prof_pic.toString();
+          const prof_pic = receiverObject.prof_pic?.toString();
           io.to(requesterSocket).emit("newFriend", {
             _id,
             first,
@@ -226,7 +227,7 @@ io.use((socket, next) => {
           const _id = requesterObject._id;
           const first = requesterObject.first_name;
           const last = requesterObject.last_name;
-          const prof_pic = receiverObject.prof_pic.toString();
+          const prof_pic = receiverObject.prof_pic?.toString();
           io.to(receiverSocket).emit("newFriend", {
             _id,
             first,
@@ -266,6 +267,7 @@ io.use((socket, next) => {
         hidden: false,
       });
       //checks if receiver is connected to socket
+      await newConversation.save();
 
       if (receiverSocket) {
         console.log("otherPerson emitted");
@@ -276,7 +278,6 @@ io.use((socket, next) => {
         "getNewChat",
         newConversation
       );
-      newConversation.save();
       io.to(await getUser(senderId.toString())).emit("openMessage", { _id });
     } else {
       //conversation between these two users already exists, simply open

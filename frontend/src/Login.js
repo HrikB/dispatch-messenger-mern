@@ -120,7 +120,6 @@ function Login() {
     const logResponse = await login(email, password);
 
     if (logResponse) {
-      console.log(logResponse);
       //if successful signin
       if (logResponse.status === 200) {
         grantUserAccess(logResponse);
@@ -163,7 +162,6 @@ function Login() {
       regPassword,
       regPassConfirm
     );
-    console.log(regResponse);
     if (regResponse.status === 200) {
       grantUserAccess(regResponse);
     } else {

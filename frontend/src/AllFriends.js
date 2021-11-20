@@ -27,7 +27,7 @@ function AllFriends() {
     //before setting friends, changes profile photo key to the actual photo metadata
 
     socket?.on("newFriend", async (data) => {
-      const prof_pic = await getPicture(data.prof_pic.toString());
+      const prof_pic = await getPicture(data.prof_pic?.toString());
       setArrivingFriend({
         _id: data._id,
         first_name: data.first,

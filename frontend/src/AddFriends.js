@@ -43,7 +43,6 @@ function AddFriends({ friendsList }) {
       errorHandler(inpContainer, data.message);
     });
     socket?.on("successfulRequest", (data) => {
-      console.log(inpContainer);
       inpContainer.style.border = "2px solid green";
 
       setMessage(data.message);

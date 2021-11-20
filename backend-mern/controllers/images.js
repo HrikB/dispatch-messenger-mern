@@ -8,7 +8,7 @@ export const uploadImage = async (req, res, next) => {
     const { id } = file;
 
     if (file.size > 5000000) {
-      deleteImage(id);
+      await deleteImage(id);
       throw new createError.BadRequest("File may not exceed 5mb");
     }
     return res.send(file.id);
@@ -36,9 +36,11 @@ export const getImage = async ({ params: { id } }, res, next) => {
   }
 };
 
-export const deleteimage = (id) => {
+export const deleteImage = (id) => {
   if (!id || id === "undefined ")
     throw new createError.BadRequest("No image id");
   const _id = new mongoose.Types.ObjectId(id);
-  gfs.delete(_id, (err) => {});
+  gfs.delete(_id, (err) => {
+    console.log(err);
+  });
 };

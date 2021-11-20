@@ -101,6 +101,7 @@ function App() {
               conversations={conversations}
               setConversations={setConversations}
               lastMessage={lastMessage}
+              setLastMessage={setLastMessage}
             />
             <Switch>
               <Route path="/t/:conversationId">

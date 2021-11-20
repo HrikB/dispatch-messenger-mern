@@ -13,7 +13,6 @@ export const getRequest = async (req, res, next) => {
         { recipientId: req.params.userId },
       ],
     });
-    console.log(requests);
     res.status(200).json(requests);
   } catch (err) {
     console.log("2", err.message);
