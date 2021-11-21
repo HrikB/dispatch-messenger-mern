@@ -193,7 +193,6 @@ io.use((socket, next) => {
   socket.on(
     "respondToRequest",
     async ({ requestId, requesterId, recipientId, response }) => {
-      //console.log(requestId, requesterId, recipientId, response);
       //response was rejected, delete from database
       console.log("respondToRequest received");
 

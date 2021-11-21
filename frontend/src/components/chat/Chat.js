@@ -13,6 +13,7 @@ import {
 import Picker from "emoji-picker-react";
 import Loading from "../Loading";
 import "./Chat.css";
+import Microphone from "./Microphone";
 
 function Chat({ conversations, setConversations, setLastMessage }) {
   const [input, setInput] = useState("");
@@ -41,19 +42,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     setInput(input + emojiObject.emoji);
   };
 
-  const getMicrophone = async () => {
-    const audio = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: false,
-    });
-    if (!audio) return;
-    return audio;
-  };
-
   const onMicClick = async () => {
-    const micAudio = await getMicrophone();
-    if (!micAudio) return;
-    setAudioOutput(micAudio);
     setOpenMic(true);
     //replace typing section
     inputContainer.style.zIndex = "-1";
@@ -68,6 +57,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     micIcon.style.display = "none";
     setTimeout(() => (deleteIcon.disabled = false), 1000);
   };
+
   const onDeleteClick = () => {
     setOpenMic(false);
     inputOverlay.style.transform = "translateX(-100%)";
@@ -80,16 +70,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       emojiButton.style.zIndex = "0";
     }, 333);
     setTimeout(() => (micIcon.disabled = false), 1000);
-  };
-
-  const onStop = async (recordedBlob) => {
-    const file = await fetch(recordedBlob.blobURL)
-      .then((r) => r.blob())
-      .then(
-        (blobFile) =>
-          new File([blobFile], "audioMessage", { type: blobFile.type })
-      );
-    setInput(file);
   };
 
   const scrollToBottomSmooth = () => {
@@ -360,6 +340,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         )}
       </div>
       <div className="mic__container">
+        {openMic && <Microphone />}
         {/*true && (
           <ReactMic
             record={openMic}
