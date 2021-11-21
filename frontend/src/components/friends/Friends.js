@@ -1,11 +1,10 @@
-import React, { useState, useEffect, Component } from "react";
-import "./Friends.css";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
+import React, { useState, useEffect } from "react";
+import { EmojiPeople } from "@material-ui/icons/EmojiPeople";
+import { useStateValue } from "../../redux/StateProvider";
 import AllFriends from "./AllFriends";
 import AddFriends from "./AddFriends";
 import Pending from "./Pending";
-//import socket from "./server/socketio";
-import { useStateValue } from "./StateProvider";
+import "./Friends.css";
 
 let friendsJson = {
   friendsList: [
@@ -69,7 +68,7 @@ function Friends() {
       <div className="friend__header">
         <div className="header__left">
           <div className="friends__icon">
-            <EmojiPeopleIcon style={{ fontSize: 30 }}></EmojiPeopleIcon>
+            <EmojiPeople style={{ fontSize: 30 }}></EmojiPeople>
             <h1>Friends</h1>
           </div>
 

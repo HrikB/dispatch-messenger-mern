@@ -1,12 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
-import reducer, { initialState } from "./reducer";
-import { StateProvider } from "./StateProvider";
-import user from "./reducer";
+import App from "./components/App";
+import reducer, { initialState } from "./redux/reducer";
+import { StateProvider } from "./redux/StateProvider";
 import { injectUser } from "./server/api.js";
-injectUser(user);
+injectUser(reducer);
 
 ReactDOM.render(
   <React.StrictMode>

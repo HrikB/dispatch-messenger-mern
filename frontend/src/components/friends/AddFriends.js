@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import { useStateValue } from "../../redux/StateProvider";
+import Loading from "../Loading";
 import "./AddFriends.css";
-import Loading from "./Loading";
-import { getPicture } from "./server/api";
-import { useStateValue } from "./StateProvider";
 
-function AddFriends({ friendsList }) {
+function AddFriends() {
   const [input, setInput] = useState("");
   const [{ user, socket }, dispatch] = useStateValue();
   const [message, setMessage] = useState();

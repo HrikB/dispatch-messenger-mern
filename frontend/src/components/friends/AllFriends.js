@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router";
-import "./AllFriends.css";
-import { getAllFriends, getPicture } from "./server/api.js";
-import { useStateValue } from "./StateProvider";
-import Loading from "./Loading";
+import { useStateValue } from "../../redux/StateProvider";
+import { getAllFriends, getPicture } from "../../server/api.js";
 import FriendComponent from "./FriendComponent";
+import Loading from "../Loading";
+import "./AllFriends.css";
 
 function AllFriends() {
   const [friendsList, setFriendsList] = useState([]);
@@ -21,35 +21,36 @@ function AllFriends() {
     });
   };
 
-  useEffect(async () => {
-    setLoading(true);
-    const allFriends = await getAllFriends(user._id);
-    //before setting friends, changes profile photo key to the actual photo metadata
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const allFriends = await getAllFriends(user._id);
+      //before setting friends, changes profile photo key to the actual photo metadata
 
-    socket?.on("newFriend", async (data) => {
-      const prof_pic = await getPicture(data.prof_pic?.toString());
-      setArrivingFriend({
-        _id: data._id,
-        first_name: data.first,
-        last_name: data.last,
-        prof_pic,
+      socket?.on("newFriend", async (data) => {
+        const prof_pic = await getPicture(data.prof_pic?.toString());
+        setArrivingFriend({
+          _id: data._id,
+          first_name: data.first,
+          last_name: data.last,
+          prof_pic,
+        });
       });
-    });
-    socket?.on("openMessage", (data) => {
-      history.push({ pathname: `/t/${data._id}` });
-    });
-    socket?.on("friendRemoved", (toRemoveId) => {
-      setToRemoveFriend(toRemoveId);
-    });
-    const newList = await Promise.all(
-      allFriends.data.map(async (friend) => {
-        friend.prof_pic = await getPicture(friend.prof_pic);
-        return friend;
-      })
-    );
-    setFriendsList(newList);
-
-    setLoading(false);
+      socket?.on("openMessage", (data) => {
+        history.push({ pathname: `/t/${data._id}` });
+      });
+      socket?.on("friendRemoved", (toRemoveId) => {
+        setToRemoveFriend(toRemoveId);
+      });
+      const newList = await Promise.all(
+        allFriends.data.map(async (friend) => {
+          friend.prof_pic = await getPicture(friend.prof_pic);
+          return friend;
+        })
+      );
+      setFriendsList(newList);
+      setLoading(false);
+    })();
   }, [user]);
 
   useEffect(() => {
@@ -57,7 +58,7 @@ function AllFriends() {
   }, [arrivingFriend]);
 
   useEffect(() => {
-    setFriendsList(friendsList.filter((prev) => prev._id != toRemoveFriend));
+    setFriendsList(friendsList.filter((prev) => prev._id !== toRemoveFriend));
   }, [toRemoveFriend]);
 
   return (

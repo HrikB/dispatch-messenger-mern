@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import "./Login.css";
-import { Button, IconButton } from "@material-ui/core";
-import DispatchLogo from "./DispatchLogo.svg";
-import { useStateValue } from "./StateProvider.js";
-import { actionTypes } from "./reducer";
-import { DeckOutlined } from "@material-ui/icons";
-import CloseIcon from "@material-ui/icons/Close";
-import { login, logOutAPI, register, _dataUrl } from "./server/api";
+import { IconButton } from "@material-ui/core";
+import { Close } from "@material-ui/icons";
+import { useStateValue } from "../../redux/StateProvider";
+import { actionTypes } from "../../redux/reducer";
+import { login, logOutAPI, register, _dataUrl } from "../../server/api";
 import { io } from "socket.io-client";
-import Loading from "./Loading";
+import DispatchLogo from "../../logos/DispatchLogo.svg";
+import Loading from "../Loading";
+import "./Login.css";
+
 function Login() {
   const [{ user, socket }, dispatch] = useStateValue();
 
@@ -204,7 +204,7 @@ function Login() {
                   setShowRegModal(false);
                 }}
               >
-                <CloseIcon />
+                <Close />
               </IconButton>
             </div>
             <h1>Sign Up</h1>

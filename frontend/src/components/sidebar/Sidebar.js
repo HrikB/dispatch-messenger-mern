@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useHistory, useLocation } from "react-router-dom";
-import "./Sidebar.css";
-import Compose from "./Compose.svg";
-import { Avatar, IconButton, Slider } from "@material-ui/core";
-import { SearchOutlined, Photo } from "@material-ui/icons";
-import SidebarChat from "./SidebarChat";
-import { useStateValue } from "./StateProvider";
+import { useHistory, useLocation, Link } from "react-router-dom";
+import { Avatar, IconButton } from "@material-ui/core";
+import { SearchOutlined, EmojiPeople } from "@material-ui/icons";
+import { useStateValue } from "../../redux/StateProvider";
+import { actionTypes } from "../../redux/reducer";
+import Compose from "../../logos/Compose.svg";
 import {
   getConversations,
   getPicture,
   logOutAPI,
   _dataUrl,
-} from "./server/api.js";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
-import { Link } from "react-router-dom";
-import { actionTypes } from "./reducer";
-import UpdateProfile from "./UpdateProfile";
+} from "../../server/api.js";
+import SidebarChat from "./SidebarChat";
+import UpdateProfile from "../user/UpdateProfile";
+import "./Sidebar.css";
 
 function Sidebar({
   conversations,
@@ -72,7 +70,7 @@ function Sidebar({
     const path = window.location.pathname.split("/");
 
     if (friendsTab) {
-      if (friendsTab.id != path[1]) {
+      if (friendsTab.id !== path[1]) {
         friendsTab.style.background = "#252525";
       } else {
         friendsTab.style.background = "#403d3d";
@@ -118,30 +116,32 @@ function Sidebar({
     };
   }, [profileOptMenu]);
 
-  useEffect(async () => {
-    const conversationsData = await getConversations(user._id);
-    socket?.on("getNewChat", (data) => {
-      setArrivingConversation(data);
-    });
-    socket?.on("removeConversation", (conversationId) => {
-      setToDeleteConversation(conversationId);
-    });
-    socket?.on("getMessage", (data) => {
-      const arrvMessage = {
-        conversationId: data.conversationId,
-        senderId: data.senderId,
-        senderName: data.senderName,
-        receiver: user._id,
-        text: data.text,
-        createdAt: data.createdAt,
-      };
-      //sets the recent message on the sidebar component
-      setLastMessage(arrvMessage);
-    });
+  useEffect(() => {
+    (async () => {
+      const conversationsData = await getConversations(user._id);
+      socket?.on("getNewChat", (data) => {
+        setArrivingConversation(data);
+      });
+      socket?.on("removeConversation", (conversationId) => {
+        setToDeleteConversation(conversationId);
+      });
+      socket?.on("getMessage", (data) => {
+        const arrvMessage = {
+          conversationId: data.conversationId,
+          senderId: data.senderId,
+          senderName: data.senderName,
+          receiver: user._id,
+          text: data.text,
+          createdAt: data.createdAt,
+        };
+        //sets the recent message on the sidebar component
+        setLastMessage(arrvMessage);
+      });
 
-    const res = await getPicture(user.prof_pic);
-    setProfPic(res);
-    setConversations(conversationsData.data);
+      const res = await getPicture(user.prof_pic);
+      setProfPic(res);
+      setConversations(conversationsData.data);
+    })();
   }, [user]);
 
   useEffect(() => {
@@ -152,7 +152,7 @@ function Sidebar({
   useEffect(() => {
     toDeleteConversation &&
       setConversations(
-        conversations.filter((prev) => prev._id != toDeleteConversation)
+        conversations.filter((prev) => prev._id !== toDeleteConversation)
       );
   }, [toDeleteConversation]);
   return (
@@ -199,7 +199,7 @@ function Sidebar({
       <div className="sidebar__chats">
         <Link to="/friends">
           <div id="friends" className="friends__tab">
-            <EmojiPeopleIcon style={{ fontSize: 30 }}></EmojiPeopleIcon>
+            <EmojiPeople style={{ fontSize: 30 }}></EmojiPeople>
             <p>Friends</p>
           </div>
         </Link>

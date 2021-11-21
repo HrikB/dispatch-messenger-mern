@@ -200,7 +200,7 @@ io.use((socket, next) => {
       await FriendRequest.deleteOne({ _id: requestId });
       const requesterSocket = await getUser(requesterId.toString());
       const receiverSocket = await getUser(recipientId.toString());
-      if (response == 1) {
+      if (response === 1) {
         const requesterObject = await User.findOneAndUpdate(
           { _id: requesterId },
           { $addToSet: { friendsList: recipientId } }

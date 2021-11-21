@@ -1,9 +1,8 @@
-import { UpdateTwoTone } from "@material-ui/icons";
 import React, { useState } from "react";
-import { updateFirstName, updateLastName, updateEmail } from "./server/api";
+import { useStateValue } from "../../redux/StateProvider";
+import { updateFirstName, updateLastName, updateEmail } from "../../server/api";
+import Loading from "../Loading";
 import "./EditProfile.css";
-import Loading from "./Loading";
-import { useStateValue } from "./StateProvider";
 
 function EditProfileInfo({
   setEditInfo,

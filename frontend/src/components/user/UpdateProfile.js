@@ -1,22 +1,13 @@
 import React, { useState, useEffect, useRef, forwardRef } from "react";
-import "./UpdateProfile.css";
-import Compose from "./Compose.svg";
 import { Avatar, IconButton, Slider } from "@material-ui/core";
-import { SearchOutlined, Photo } from "@material-ui/icons";
-import SidebarChat from "./SidebarChat";
-import { useStateValue } from "./StateProvider";
-import {
-  uploadPicture,
-  updateProfilePic,
-  _dataUrl,
-  getPicture,
-} from "./server/api.js";
-import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
-import { Link } from "react-router-dom";
-import { actionTypes } from "./reducer";
+import { Photo } from "@material-ui/icons";
+import { useStateValue } from "../../redux/StateProvider";
+import { actionTypes } from "../../redux/reducer";
+import { uploadPicture, updateProfilePic } from "../../server/api.js";
 import EditProfileInfo from "./EditProfileInfo";
 import AvatarEditor from "react-avatar-editor";
-import Loading from "./Loading";
+import Loading from "../Loading";
+import "./UpdateProfile.css";
 
 export default forwardRef(({ profPic, setProfPic }, ref) => {
   const [viewPreview, setViewPreview] = useState(false);

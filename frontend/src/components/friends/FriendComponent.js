@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getOnlineStatus, removeFriend } from "./server/api.js";
-import { useStateValue } from "./StateProvider.js";
 import { Avatar, IconButton } from "@material-ui/core";
-import { MoreVert, ModeComment } from "@material-ui/icons/";
+import { MoreVert, ModeComment } from "@material-ui/icons";
+import { useStateValue } from "../../redux/StateProvider";
+import { getOnlineStatus, removeFriend } from "../../server/api.js";
 import "./FriendComponent.css";
 
 function FriendComponent({ friend, i, createChat }) {

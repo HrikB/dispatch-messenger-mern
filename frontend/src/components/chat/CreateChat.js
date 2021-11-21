@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { getAllFriends, getPicture } from "./server/api.js";
-import "./CreateChat.css";
-import { useStateValue } from "./StateProvider";
 import { Avatar } from "@material-ui/core";
+import { useStateValue } from "../../redux/StateProvider";
+import { getAllFriends, getPicture } from "../../server/api.js";
+import "./CreateChat.css";
 
 function CreateChat() {
   const [friendsList, setFriendsList] = useState([]);
@@ -22,36 +22,38 @@ function CreateChat() {
     });
   };
 
-  useEffect(async () => {
-    const updateOptions = (e) => {
-      if (
-        searchOptions &&
-        searchOptions.current &&
-        !searchOptions.current.contains(e.target)
-      ) {
-        setOpenOptions(false);
-      }
-    };
+  useEffect(() => {
+    (async () => {
+      const updateOptions = (e) => {
+        if (
+          searchOptions &&
+          searchOptions.current &&
+          !searchOptions.current.contains(e.target)
+        ) {
+          setOpenOptions(false);
+        }
+      };
 
-    socket?.on("openMessage", (data) => {
-      history.push({ pathname: `/t/${data._id}` });
-    });
+      socket?.on("openMessage", (data) => {
+        history.push({ pathname: `/t/${data._id}` });
+      });
 
-    document.addEventListener("mousedown", updateOptions);
+      document.addEventListener("mousedown", updateOptions);
 
-    const allFriends = await getAllFriends(user._id);
-    const newList = await Promise.all(
-      allFriends.data.map(async (friend) => {
-        friend.prof_pic = await getPicture(friend.prof_pic);
-        return friend;
-      })
-    );
-    setOriginalLlist(newList);
-    setFriendsList(newList);
+      const allFriends = await getAllFriends(user._id);
+      const newList = await Promise.all(
+        allFriends.data.map(async (friend) => {
+          friend.prof_pic = await getPicture(friend.prof_pic);
+          return friend;
+        })
+      );
+      setOriginalLlist(newList);
+      setFriendsList(newList);
 
-    return () => {
-      document.removeEventListener("mousedown", updateOptions);
-    };
+      return () => {
+        document.removeEventListener("mousedown", updateOptions);
+      };
+    })();
   }, []);
 
   useEffect(() => {

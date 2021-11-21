@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Chat.css";
-import { Avatar, IconButton } from "@material-ui/core";
-import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-import MicIcon from "@material-ui/icons/Mic";
-import { MoreVert, SendOutlined } from "@material-ui/icons";
 import { useParams } from "react-router-dom";
-import ReactDOM from "react-dom";
-import { useStateValue } from "./StateProvider";
-import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
-import DeleteIcon from "@material-ui/icons/Delete";
+import { Avatar, IconButton } from "@material-ui/core";
+import { SendOutlined, InsertEmoticon, Mic, Delete } from "@material-ui/icons";
+import { useStateValue } from "../../redux/StateProvider";
 import {
   getConversation,
   getMessages,
   getPicture,
   getUserDataById,
   getOnlineStatus,
-} from "./server/api.js";
-import Loading from "./Loading";
+} from "../../server/api.js";
+import Picker from "emoji-picker-react";
+import Loading from "../Loading";
+import "./Chat.css";
 
 function Chat({ conversations, setConversations, setLastMessage }) {
   const [input, setInput] = useState("");
@@ -135,6 +131,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       setArrivingMessage(arrvMessage);
     });
     socket?.on("removeConversation", (removedConvId) => {
+      console.log("remv", removedConvId);
       if (removedConvId === conversationId) {
         setRemoved(true);
         setReceiver(null);
@@ -143,28 +140,32 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   }, [user]);
 
   //loads messages from the database
-  useEffect(async () => {
+  useEffect(() => {
     //checks if there is conversationId in the link
-    if (conversationId) {
-      setLoading(true);
-      const messages = await getMessages(conversationId);
-      console.log("mesmse", messages);
-      const conversation = await getConversation(conversationId);
-      if (messages?.data?.error || conversation?.data?.error) {
+    (async () => {
+      if (conversationId) {
+        setLoading(true);
+        const messages = await getMessages(conversationId);
+        console.log("mesmse", messages);
+        const conversation = await getConversation(conversationId);
+        if (messages?.data?.error || conversation?.data?.error) {
+          setLoading(false);
+          return;
+        }
+        const receiverData = await getUserDataById(
+          conversation.data?.members.find((m) => m !== user._id)
+        );
+        //get image metadata
+        receiverData.data.prof_pic = await getPicture(
+          receiverData.data.prof_pic
+        );
         setLoading(false);
-        return;
+        setMessages(messages ? messages.data : []);
+        setConversation(conversation?.data);
+        setReceiver(receiverData?.data);
+        scrollToBottomAuto();
       }
-      const receiverData = await getUserDataById(
-        conversation.data?.members.find((m) => m !== user._id)
-      );
-      //get image metadata
-      receiverData.data.prof_pic = await getPicture(receiverData.data.prof_pic);
-      setLoading(false);
-      setMessages(messages ? messages.data : []);
-      setConversation(conversation?.data);
-      setReceiver(receiverData?.data);
-      scrollToBottomAuto();
-    }
+    })();
   }, [conversationId]);
 
   useEffect(() => {
@@ -287,7 +288,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                 }
                 <p
                   className={`chat__message ${
-                    message.senderId == user._id && "chat__reciever"
+                    message.senderId === user._id && "chat__reciever"
                   } ${
                     !(
                       new Date(
@@ -295,7 +296,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                           10 * 60000
                       ) < new Date(new Date(messages[i].createdAt).getTime())
                     ) &&
-                    messages[i - 1]?.senderId == messages[i].senderId &&
+                    messages[i - 1]?.senderId === messages[i].senderId &&
                     "same__sender"
                   }`}
                 >
@@ -351,14 +352,14 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       <div className="chat__footer">
         <div className="icon__container">
           <IconButton id="delete__icon" onClick={onDeleteClick}>
-            <DeleteIcon />
+            <Delete />
           </IconButton>
           <IconButton
             id="mic__icon"
             disabled={loading || removed}
             onClick={onMicClick}
           >
-            <MicIcon />
+            <Mic />
           </IconButton>
         </div>
 
@@ -378,7 +379,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
               disabled={loading || removed}
               onClick={() => setOpenEmoji(!openEmoji)}
             >
-              <InsertEmoticonIcon />
+              <InsertEmoticon />
             </IconButton>
           </div>
           <button

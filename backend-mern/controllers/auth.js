@@ -107,12 +107,4 @@ export let logout = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-
-  /*let { user_id, token } = req.body;
-  await redisClient.del(user_id.toString());
-
-  //blacklist current access token
-  await redisClient.set("BL_" + user_id, token);
-  //refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
-  res.sendStatus(204);*/
 };
