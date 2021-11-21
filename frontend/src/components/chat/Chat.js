@@ -26,6 +26,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [messages, setMessages] = useState([]);
   const [arrivingMessage, setArrivingMessage] = useState(null);
   const messagesEndRef = useRef(null);
+  const emojiPickerRef = useRef();
   const [loading, setLoading] = useState(true);
   const [removed, setRemoved] = useState(false);
   const [openEmoji, setOpenEmoji] = useState(false);
@@ -99,6 +100,26 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     messagesEndRef?.current?.scrollIntoView({ behavior: "auto" });
   };
 
+  //closes emoji picker if clicked outside area
+  useEffect(() => {
+    const updateMenu = (e) => {
+      if (
+        emojiPickerRef &&
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(e.target)
+      ) {
+        setOpenEmoji(false);
+      }
+    };
+
+    document.addEventListener("mousedown", updateMenu);
+
+    return () => {
+      document.removeEventListener("mousedown", updateMenu);
+    };
+  }, [openEmoji]);
+
+  //Every 60 seconds, checks status of current receiver
   useEffect(() => {
     const checkStatus = async () => {
       const res = await getOnlineStatus(receiver?._id);
@@ -190,6 +211,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     }
   }, [arrivingMessage]);
 
+  //scrolls to bottom after new message (sent or received)
   useEffect(() => {
     scrollToBottomSmooth();
   }, [messages]);
@@ -322,7 +344,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         ></div>
       </div>
 
-      <div className="emoji__container">
+      <div ref={emojiPickerRef} className="emoji__container">
         {openEmoji && (
           <Picker
             onEmojiClick={onEmojiClick}

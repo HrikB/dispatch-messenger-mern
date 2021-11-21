@@ -1,29 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { EmojiPeople } from "@material-ui/icons/EmojiPeople";
-import { useStateValue } from "../../redux/StateProvider";
+import EmojiPeople from "@material-ui/icons/EmojiPeople";
 import AllFriends from "./AllFriends";
 import AddFriends from "./AddFriends";
 import Pending from "./Pending";
 import "./Friends.css";
 
-let friendsJson = {
-  friendsList: [
-    { first_name: "Sara", last_name: "Blake" },
-    { first_name: "Jake", last_name: "Towers" },
-    { first_name: "Lois", last_name: "Sky" },
-  ],
-};
-
 function Friends() {
-  const [{ user, socket }, dispatch] = useStateValue();
-  const [friendsList, setFriendsList] = useState(friendsJson.friendsList);
-  const [currentTab, setCurrentTab] = useState(
-    <AllFriends friendsList={friendsList} />
-  );
-  useEffect(() => {
-    //socket.emit("sendUser", user._id);
-    return () => {};
-  }, []);
+  const [currentTab, setCurrentTab] = useState(<AllFriends />);
+
   useEffect(() => {
     //Handles tab highlighting
     const allButton = document.getElementsByClassName("all")[0];
@@ -52,7 +36,7 @@ function Friends() {
   }, [currentTab]);
 
   const all = () => {
-    setCurrentTab(<AllFriends friendsList={friendsList} />);
+    setCurrentTab(<AllFriends />);
   };
 
   const pending = () => {
