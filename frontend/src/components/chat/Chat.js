@@ -13,14 +13,23 @@ import {
 import Picker from "emoji-picker-react";
 import Loading from "../Loading";
 import "./Chat.css";
-import Microphone from "./Microphone";
+import Microphone from "./audiohandler/Microphone";
+
+//settings for microphone
+const visualizerOptions = {
+  strokeWidth: 5,
+  strokeColor: "blue",
+  canvasColor: "purple",
+  cssWidth: "100%",
+  cssHeight: "100%",
+};
 
 function Chat({ conversations, setConversations, setLastMessage }) {
   const [input, setInput] = useState("");
   const [receiver, setReceiver] = useState({});
   const [openMic, setOpenMic] = useState(false);
+  const [deleteAudio, setDeleteAudio] = useState(false);
   const [conversation, setConversation] = useState({});
-  const [audioOutput, setAudioOutput] = useState();
   const { conversationId } = useParams();
   const [onlineStatus, setOnlineStatus] = useState(false);
   const [{ user, socket }, dispatch] = useStateValue();
@@ -31,45 +40,9 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [loading, setLoading] = useState(true);
   const [removed, setRemoved] = useState(false);
   const [openEmoji, setOpenEmoji] = useState(false);
-  const inputContainer = document.getElementsByClassName("input__container")[0];
-  const inputOverlay = document.getElementsByClassName("input__overlay")[0];
-  const inputField = document.getElementsByClassName("input__field")[0];
-  const emojiButton = document.getElementsByClassName("emoji__button")[0];
-  const micIcon = document.getElementById("mic__icon");
-  const deleteIcon = document.getElementById("delete__icon");
 
   const onEmojiClick = (e, emojiObject) => {
     setInput(input + emojiObject.emoji);
-  };
-
-  const onMicClick = async () => {
-    setOpenMic(true);
-    //replace typing section
-    inputContainer.style.zIndex = "-1";
-    inputField.style.zIndex = "-1";
-    emojiButton.style.zIndex = "-1";
-    inputOverlay.style.transition = "transform 0.3s ease";
-    inputOverlay.style.transform = "translateX(0)";
-
-    //transform mic icon to delete icon
-    deleteIcon.style.display = "initial";
-    deleteIcon.disabled = true;
-    micIcon.style.display = "none";
-    setTimeout(() => (deleteIcon.disabled = false), 1000);
-  };
-
-  const onDeleteClick = () => {
-    setOpenMic(false);
-    inputOverlay.style.transform = "translateX(-100%)";
-    micIcon.style.display = "initial";
-    micIcon.disabled = true;
-    deleteIcon.style.display = "none";
-    setTimeout(() => {
-      inputContainer.style.zIndex = "0";
-      inputField.style.zIndex = "0";
-      emojiButton.style.zIndex = "0";
-    }, 333);
-    setTimeout(() => (micIcon.disabled = false), 1000);
   };
 
   const scrollToBottomSmooth = () => {
@@ -132,7 +105,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       setArrivingMessage(arrvMessage);
     });
     socket?.on("removeConversation", (removedConvId) => {
-      console.log("remv", removedConvId);
       if (removedConvId === conversationId) {
         setRemoved(true);
         setReceiver(null);
@@ -339,28 +311,16 @@ function Chat({ conversations, setConversations, setLastMessage }) {
           />
         )}
       </div>
-      <div className="mic__container">
-        {openMic && <Microphone />}
-        {/*true && (
-          <ReactMic
-            record={openMic}
-            visualSetting="frequencyBars"
-            onStop={onStop}
-            strokeColor="white"
-            backgroundColor="#FF4081"
-          />
-        )*/}
-      </div>
 
       <div className="chat__footer">
         <div className="icon__container">
-          <IconButton id="delete__icon" onClick={onDeleteClick}>
+          <IconButton id="delete__icon" onClick={() => setDeleteAudio(true)}>
             <Delete />
           </IconButton>
           <IconButton
             id="mic__icon"
             disabled={loading || removed}
-            onClick={onMicClick}
+            onClick={() => setOpenMic(true)}
           >
             <Mic />
           </IconButton>
@@ -368,7 +328,17 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
         <form className="form">
           <div id="type_message" className="input__container">
-            <div className="input__overlay"></div>
+            <div className="input__overlay">
+              {openMic && (
+                <Microphone
+                  openMic={openMic}
+                  setOpenMic={setOpenMic}
+                  deleteAudio={deleteAudio}
+                  setDeleteAudio={setDeleteAudio}
+                  {...visualizerOptions}
+                />
+              )}
+            </div>
             <input
               className="input__field"
               disabled={loading || removed}

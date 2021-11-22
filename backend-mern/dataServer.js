@@ -181,11 +181,11 @@ io.use((socket, next) => {
         }
       } else {
         //the receiverEmail search did not yield a user
+        //emit an error
         io.to(senderSocket).emit("emailNotFound", {
           message:
             "There is no dispatch account assoicated with that email. Please try again.",
         });
-        //emit an error
       }
     }
   );
