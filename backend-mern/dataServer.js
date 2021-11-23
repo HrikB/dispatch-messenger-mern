@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import cookieParser from "cookie-parser";
+import path from "path";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
@@ -90,34 +91,46 @@ io.use((socket, next) => {
         console.log(receiver, "is currently offline");
       }
 
-      // try {
-      //   const savedMessage = await new Message({
-      //     conversationId,
-      //     senderId,
-      //     senderName,
-      //     text,
-      //     createdAt,
-      //   }).save();
+      const audMessageId = isAudio ? mongoose.Types.ObjectId() : "";
 
-      //   //last message is updated async
-      //   await Conversation.updateOne(
-      //     { _id: conversationId },
-      //     { $set: { last_msg: savedMessage } }
-      //   );
-      // } catch (err) {
-      //   console.error(err);
-      // }
+      try {
+        const savedMessage = await new Message({
+          conversationId,
+          senderId,
+          senderName,
+          text,
+          isAudio,
+          media: audMessageId,
+          createdAt,
+        }).save();
+
+        //last message is updated async
+        await Conversation.updateOne(
+          { _id: conversationId },
+          {
+            $set: {
+              last_msg: {
+                text: savedMessage.text,
+                senderId: savedMessage.senderId,
+              },
+            },
+          }
+        );
+      } catch (err) {
+        console.error(err);
+      }
 
       //save audio message in database
-      const writeStream = gfsAudio.createWriteStream({
-        filename: crypto.randomBytes(16, (err, buf) => {
-          if (err) return err;
-          const fileName = buf.toString(
-            "hex" + path.extname(file.originalname)
-          );
-          return fileName;
+      const filename = await new Promise((resolve, reject) => [
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) return reject(err);
+          resolve(buf.toString("hex"));
         }),
-      });
+      ]);
+      const writeStream = gfsAudio.openUploadStreamWithId(
+        audMessageId,
+        filename
+      );
       const stream = Readable.from(media.toString());
       stream.pipe(writeStream);
     }

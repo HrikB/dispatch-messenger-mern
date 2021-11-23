@@ -15,11 +15,13 @@ mongoose.connection.once("open", () => {
   gfsImage = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
     bucketName: "profile_pictures",
   });
+  gfsAudio = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+    bucketName: "voice_messages",
+  });
 });
 
 mongoose.connection.on("connected", () => {
   console.log("Mongoose connected to DB");
-  gfsAudio = Grid(mongoose.connection.db, mongoose.mongo);
 });
 
 mongoose.connection.on("error", (err) => {

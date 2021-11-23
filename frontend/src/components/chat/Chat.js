@@ -273,6 +273,8 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       senderName: user.first_name,
       receiver: receiverId,
       text: input,
+      isAudio: sendAudio,
+      media: null,
       createdAt: Date.now(),
     };
     //sets the recent message on the sidebar component

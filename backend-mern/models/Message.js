@@ -14,6 +14,12 @@ export const messageSchema = mongoose.Schema(
     text: {
       type: String,
     },
+    isAudio: {
+      type: Boolean,
+    },
+    media: {
+      type: String,
+    },
     createdAt: {
       type: Date,
     },
