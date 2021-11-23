@@ -27,8 +27,6 @@ const visualizerOptions = {
 function Chat({ conversations, setConversations, setLastMessage }) {
   const [input, setInput] = useState("");
   const [receiver, setReceiver] = useState({});
-  const [openMic, setOpenMic] = useState(false);
-  const [deleteAudio, setDeleteAudio] = useState(false);
   const [conversation, setConversation] = useState({});
   const { conversationId } = useParams();
   const [onlineStatus, setOnlineStatus] = useState(false);
@@ -40,9 +38,41 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   const [loading, setLoading] = useState(true);
   const [removed, setRemoved] = useState(false);
   const [openEmoji, setOpenEmoji] = useState(false);
+  const [record, setRecord] = useState(false);
+
+  const inputContainer = document.getElementsByClassName("input__container")[0];
+  const inputOverlay = document.getElementsByClassName("input__overlay")[0];
+  const inputField = document.getElementsByClassName("input__field")[0];
+  const emojiButton = document.getElementsByClassName("emoji__button")[0];
+  const micIcon = document.getElementById("mic__icon");
+  const deleteIcon = document.getElementById("delete__icon");
+
+  //mic hooks
+  const [openMic, setOpenMic] = useState(false);
+  const [disableAudio, setDisableAudio] = useState(false);
+  const [sendAudio, setSendAudio] = useState(false);
+  const [audioMessage, setAudioMessage] = useState();
 
   const onEmojiClick = (e, emojiObject) => {
     setInput(input + emojiObject.emoji);
+  };
+
+  const onAudioOptionClick = () => {
+    inputOverlay.style.transform = "translateX(-100%)";
+    micIcon.style.display = "initial";
+    micIcon.disabled = true;
+    deleteIcon.style.display = "none";
+    setTimeout(() => {
+      inputContainer.style.zIndex = "0";
+      inputField.style.zIndex = "0";
+      emojiButton.style.zIndex = "0";
+    }, 333);
+    setTimeout(() => (micIcon.disabled = false), 1000);
+  };
+
+  const onStop = (blobObj) => {
+    console.log("stopped in chat", blobObj);
+    setAudioMessage(blobObj);
   };
 
   const scrollToBottomSmooth = () => {
@@ -168,8 +198,47 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     scrollToBottomSmooth();
   }, [messages]);
 
+  useEffect(() => {
+    sendAudio && sendAudioMessage();
+  }, [audioMessage]);
+
+  useEffect(() => {
+    console.log("chattt");
+  }, [sendAudio]);
+
+  const sendAudioMessage = () => {
+    console.log("message sent");
+    setSendAudio(false);
+    onAudioOptionClick();
+    const receiverId = conversation?.members.find((m) => m !== user._id);
+
+    let outgoingMessage = {
+      conversationId: conversationId,
+      senderId: user._id,
+      senderName: user.first_name,
+      receiver: receiverId,
+      text: sendAudio ? "Audio Message" : input,
+      isAudio: sendAudio,
+      media: audioMessage.blobURL,
+      createdAt: Date.now(),
+    };
+
+    setMessages((prev) => [...prev, outgoingMessage]);
+
+    console.log("aasdsadsd", audioMessage.blobURL);
+    setOpenMic(false);
+  };
+
   const sendMessage = (e) => {
     e.preventDefault();
+
+    //checks if this is an audio message
+    if (openMic) {
+      setSendAudio(true);
+      setDisableAudio(true);
+      return;
+    }
+
     const receiverId = conversation?.members.find((m) => m !== user._id);
     let outgoingMessage = {
       conversationId: conversationId,
@@ -198,8 +267,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     socket.emit("sendMessage", outgoingMessage);
 
     setMessages((prev) => [...prev, outgoingMessage]);
-
-    setOpenMic(false);
     setInput("");
   };
 
@@ -277,8 +344,12 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                   {/*<h6 className="chat__name">
                 {message.senderId !== user._id ? message.senderName : ""}
             </h6>*/}
-
-                  {message.text}
+                  {/*console.log("onRender", message.isAudio, message.media)*/}
+                  {message.isAudio ? (
+                    <audio src={message.media} controls />
+                  ) : (
+                    message.text
+                  )}
                 </p>
               </div>
             ))
@@ -314,7 +385,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
       <div className="chat__footer">
         <div className="icon__container">
-          <IconButton id="delete__icon" onClick={() => setDeleteAudio(true)}>
+          <IconButton id="delete__icon" onClick={() => setDisableAudio(true)}>
             <Delete />
           </IconButton>
           <IconButton
@@ -333,8 +404,10 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                 <Microphone
                   openMic={openMic}
                   setOpenMic={setOpenMic}
-                  deleteAudio={deleteAudio}
-                  setDeleteAudio={setDeleteAudio}
+                  disableAudio={disableAudio}
+                  setDisableAudio={setDisableAudio}
+                  onAudioOptionClick={onAudioOptionClick}
+                  onStop={onStop}
                   {...visualizerOptions}
                 />
               )}
@@ -356,7 +429,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
             </IconButton>
           </div>
           <button
-            disabled={!input.trim() || loading || removed}
+            disabled={openMic ? false : !input.trim() || loading || removed}
             id="submitbutton"
             onClick={sendMessage}
             type="submit"

@@ -6,8 +6,11 @@ function Microphone(props) {
   const {
     openMic,
     setOpenMic,
-    deleteAudio,
-    setDeleteAudio,
+    disableAudio,
+    setDisableAudio,
+    onAudioOptionClick,
+    sendAudio,
+    onStop,
     ...visualizerOptions
   } = props;
 
@@ -17,25 +20,88 @@ function Microphone(props) {
   const emojiButton = document.getElementsByClassName("emoji__button")[0];
   const micIcon = document.getElementById("mic__icon");
   const deleteIcon = document.getElementById("delete__icon");
+
   const [micAudio, setMicAudio] = useState(null);
-  const micAudRef = useRef(micAudio);
-  micAudRef.current = micAudio;
+  const [stream, setStream] = useState({
+    access: false,
+    recorder: null,
+  });
+  const [recording, setRecording] = useState({
+    active: false,
+    available: false,
+    url: "",
+  });
+
+  const chunks = useRef([]);
 
   const getMicrophone = async () => {
     const audio = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: false,
     });
-    onMicClick();
+    if (!audio) {
+      setOpenMic(false);
+      return;
+    }
+
+    let mediaRecorder;
+
+    try {
+      mediaRecorder = new MediaRecorder(audio);
+    } catch (err) {
+      console.log("medRecErr", err);
+    }
+
+    const track = mediaRecorder.stream.getTracks()[0];
+    track.onended = () => console.log("ended");
+
+    mediaRecorder.onstart = () => {
+      console.log("started");
+      setRecording({
+        ...recording,
+        active: true,
+      });
+    };
+
+    mediaRecorder.ondataavailable = (e) => {
+      chunks.current.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      console.log("stopped");
+
+      const url = URL.createObjectURL(chunks.current[0]);
+      const blob = new Blob(chunks.current, { type: "audio/ogg; codecs=opus" });
+      chunks.current = [];
+
+      const blobObj = {
+        blob,
+        blobURL: url,
+      };
+
+      setRecording({
+        active: false,
+        available: true,
+        url,
+      });
+      onStop(blobObj);
+    };
+
+    setStream({
+      ...stream,
+      access: true,
+      recorder: mediaRecorder,
+    });
+
     setMicAudio(audio);
+    onMicClick();
   };
 
   const stopMic = () => {
-    console.log("micAudRef.current.getTracks()[0]");
-    micAudRef.current.getTracks().forEach((track) => track.stop());
+    stream.recorder.stop();
     setOpenMic(false);
-    onDeleteClick();
-    setDeleteAudio(false);
+    onAudioOptionClick();
+    setDisableAudio(false);
   };
 
   const onMicClick = async () => {
@@ -53,57 +119,29 @@ function Microphone(props) {
     setTimeout(() => (deleteIcon.disabled = false), 1000);
   };
 
-  const onDeleteClick = () => {
-    inputOverlay.style.transform = "translateX(-100%)";
-    micIcon.style.display = "initial";
-    micIcon.disabled = true;
-    deleteIcon.style.display = "none";
-    setTimeout(() => {
-      inputContainer.style.zIndex = "0";
-      inputField.style.zIndex = "0";
-      emojiButton.style.zIndex = "0";
-    }, 333);
-    setTimeout(() => (micIcon.disabled = false), 1000);
-  };
+  useEffect(() => {
+    stream.recorder && stream.recorder.start();
+  }, [stream]);
 
   useEffect(() => {
     (async () => {
-      if (openMic) await getMicrophone();
-      if (deleteAudio) stopMic();
-
-      /*let chunks = [];
-
-      getMicrophone();
-      if (!micAudio) return;
-
-      const player = document.getElementById("player");
-
-      const mediaRecorder = new MediaRecorder(micAudio);
-      mediaRecorder.start();
-      
-      console.log("started");
-      setTimeout(() => {
-        console.log("stopped");
-        mediaRecorder.stop();
-      }, 5000);
-
-      mediaRecorder.onstop = () => {
-        onDeleteClick();
-        const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
-        chunks = [];
-        const audioURL = window.URL.createObjectURL(blob);
-        player.src = audioURL;
-        console.log("finished");
-      };
-      mediaRecorder.ondataavailable = (e) => {
-        chunks.push(e.data);
-      };*/
+      console.log("running");
+      if (disableAudio) stopMic();
+      else if (openMic) await getMicrophone();
+      else if (stream.recorder) stream.recorder.start();
     })();
-  }, [openMic, deleteAudio]);
+  }, [openMic, disableAudio, sendAudio]);
 
   return (
     <div className="mic__container">
-      {micAudio && <AudioAnalyzer micAudio={micAudio} {...visualizerOptions} />}
+      {micAudio && (
+        <AudioAnalyzer
+          micAudio={micAudio}
+          onStop={onStop}
+          sendAudio={sendAudio}
+          {...visualizerOptions}
+        />
+      )}
     </div>
   );
 }

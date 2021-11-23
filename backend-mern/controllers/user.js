@@ -23,7 +23,7 @@ export let getDataById = async (req, res, next) => {
   try {
     const userData = await User.findOne(
       { _id: userId },
-      { password: 0, email: 0, createdAt: 0, updatedAt: 0, friendsList: 0 }
+      { password: 0, createdAt: 0, updatedAt: 0, friendsList: 0 }
     );
     res.status(200).json(userData);
   } catch (err) {

@@ -4,7 +4,7 @@ import AudioVisualizer from "./AudioVisualizer";
 const context = new AudioContext();
 
 function AudioAnalyzer(props) {
-  const { micAudio, ...visualizerOptions } = props;
+  const { micAudio, onAudioData, onStop, ...visualizerOptions } = props;
 
   const [audioData, setAudioData] = useState(new Uint8Array(0));
   const [analyzer, setAnalyzer] = useState(context.createAnalyser());
@@ -24,15 +24,31 @@ function AudioAnalyzer(props) {
   };
 
   useEffect(() => {
+    let chunks = [];
+
+    //for visualizer
     const source = context.createMediaStreamSource(micAudio);
     source.connect(analyzerRef.current);
-
     rafId.current = requestAnimationFrame(tick);
 
     return () => {
+      /*mediaRecorder.stop();
+      console.log(chunks);
+      const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+      chunks = [];
+
+      const blobObj = {
+        blob,
+        blobURL: window.URL.createObjectURL(blob),
+      };*/
+
       cancelAnimationFrame(rafId.current);
       analyzerRef.current.disconnect();
       source.disconnect();
+
+      /*if (!onStop) return;
+
+      onStop(blobObj);*/
     };
   }, []);
 
