@@ -1,6 +1,6 @@
 import createError from "http-errors";
 import mongoose from "mongoose";
-import { gfs } from "../helpers/mongodb.js";
+import { gfsImage } from "../helpers/mongodb.js";
 
 export const uploadImage = async (req, res, next) => {
   try {
@@ -22,11 +22,11 @@ export const getImage = async ({ params: { id } }, res, next) => {
     if (!id || id === "undefined")
       throw new createError.BadRequest("No image id");
     const _id = new mongoose.Types.ObjectId(id);
-    gfs.find({ _id }).toArray((err, files) => {
+    gfsImage.find({ _id }).toArray((err, files) => {
       try {
         if (!files || files.length === 0)
           throw new createError.BadRequest("No files exist");
-        gfs.openDownloadStream(_id).pipe(res);
+        gfsImage.openDownloadStream(_id).pipe(res);
       } catch (err) {
         next(err);
       }
@@ -40,7 +40,7 @@ export const deleteImage = (id) => {
   if (!id || id === "undefined ")
     throw new createError.BadRequest("No image id");
   const _id = new mongoose.Types.ObjectId(id);
-  gfs.delete(_id, (err) => {
+  gfsImage.delete(_id, (err) => {
     console.log(err);
   });
 };

@@ -124,12 +124,15 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     });
     //getUsers to get online users
     socket?.on("getMessage", (data) => {
+      data.media = URL.createObjectURL(new Blob([data.media]));
       const arrvMessage = {
         conversationId: data.conversationId,
         senderId: data.senderId,
         senderName: data.senderName,
         receiver: user._id,
         text: data.text,
+        isAudio: data.isAudio,
+        media: data.media,
         createdAt: data.createdAt,
       };
       setArrivingMessage(arrvMessage);
@@ -162,8 +165,19 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         receiverData.data.prof_pic = await getPicture(
           receiverData.data.prof_pic
         );
+        let newMessages;
+        if (messages) {
+          newMessages = await Promise.all(
+            messages.data.map(async (message) => {
+              if (message.media)
+                message.media = URL.createObjectURL(message.media);
+              return message;
+            })
+          );
+        }
+
         setLoading(false);
-        setMessages(messages ? messages.data : []);
+        setMessages(messages ? newMessages : []);
         setConversation(conversation?.data);
         setReceiver(receiverData?.data);
         scrollToBottomAuto();
@@ -207,7 +221,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   }, [sendAudio]);
 
   const sendAudioMessage = () => {
-    console.log("message sent");
     setSendAudio(false);
     onAudioOptionClick();
     const receiverId = conversation?.members.find((m) => m !== user._id);
@@ -217,15 +230,29 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       senderId: user._id,
       senderName: user.first_name,
       receiver: receiverId,
-      text: sendAudio ? "Audio Message" : input,
+      text: "Audio Message",
       isAudio: sendAudio,
-      media: audioMessage.blobURL,
+      media: audioMessage.blob,
       createdAt: Date.now(),
     };
-
-    setMessages((prev) => [...prev, outgoingMessage]);
-
-    console.log("aasdsadsd", audioMessage.blobURL);
+    setConversations(() => {
+      const temp = conversations;
+      let moveToFront;
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i]._id === conversationId) {
+          moveToFront = temp[i];
+          temp.splice(i, 1);
+          break;
+        }
+      }
+      temp.unshift(moveToFront);
+      return temp;
+    });
+    socket.emit("sendMessage", outgoingMessage);
+    setMessages((prev) => [
+      ...prev,
+      { ...outgoingMessage, media: audioMessage.blobURL },
+    ]);
     setOpenMic(false);
   };
 

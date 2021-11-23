@@ -69,7 +69,7 @@ function Microphone(props) {
 
     mediaRecorder.onstop = () => {
       console.log("stopped");
-
+      track.stop();
       const url = URL.createObjectURL(chunks.current[0]);
       const blob = new Blob(chunks.current, { type: "audio/ogg; codecs=opus" });
       chunks.current = [];

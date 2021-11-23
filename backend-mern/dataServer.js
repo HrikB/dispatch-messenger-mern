@@ -2,16 +2,19 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import crypto from "crypto";
 import cookieParser from "cookie-parser";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { Readable } from "stream";
 import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
 import Conversation from "./models/Conversation.js";
-import redisClient, { addUser, removeUser, getUser } from "./helpers/redis.js";
+import { addUser, removeUser, getUser } from "./helpers/redis.js";
+import { gfsAudio } from "./helpers/mongodb.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
 import "./helpers/mongodb.js";
 
@@ -65,6 +68,8 @@ io.use((socket, next) => {
       senderName,
       receiver,
       text,
+      isAudio,
+      media,
       createdAt,
     }) => {
       console.log("sendMessage received");
@@ -77,29 +82,44 @@ io.use((socket, next) => {
           senderId,
           senderName,
           text,
+          isAudio,
+          media,
           createdAt,
         });
       } else {
         console.log(receiver, "is currently offline");
       }
 
-      try {
-        const savedMessage = await new Message({
-          conversationId,
-          senderId,
-          senderName,
-          text,
-          createdAt,
-        }).save();
+      // try {
+      //   const savedMessage = await new Message({
+      //     conversationId,
+      //     senderId,
+      //     senderName,
+      //     text,
+      //     createdAt,
+      //   }).save();
 
-        //last message is updated async
-        await Conversation.updateOne(
-          { _id: conversationId },
-          { $set: { last_msg: savedMessage } }
-        );
-      } catch (err) {
-        console.error(err);
-      }
+      //   //last message is updated async
+      //   await Conversation.updateOne(
+      //     { _id: conversationId },
+      //     { $set: { last_msg: savedMessage } }
+      //   );
+      // } catch (err) {
+      //   console.error(err);
+      // }
+
+      //save audio message in database
+      const writeStream = gfsAudio.createWriteStream({
+        filename: crypto.randomBytes(16, (err, buf) => {
+          if (err) return err;
+          const fileName = buf.toString(
+            "hex" + path.extname(file.originalname)
+          );
+          return fileName;
+        }),
+      });
+      const stream = Readable.from(media.toString());
+      stream.pipe(writeStream);
     }
   );
 
