@@ -175,6 +175,18 @@ export const getPicture = async (picId) => {
   }
 };
 
+export const getVoiceMessage = async (audioId) => {
+  try {
+    const blob = await axios.get(`${_dataUrl}/api/audio/${audioId}`, {
+      responseType: "blob",
+    });
+    //turns blob into base64 and returns it
+    return blob.data;
+  } catch (err) {
+    return err.response;
+  }
+};
+
 export const updateFirstName = async (userId, firstName) => {
   try {
     return await axios.put(`${_dataUrl}/api/user/update-profile/first-name`, {

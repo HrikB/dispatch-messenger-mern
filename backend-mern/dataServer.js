@@ -6,6 +6,7 @@ import crypto from "crypto";
 import cookieParser from "cookie-parser";
 import path from "path";
 import createError from "http-errors";
+import fs from "fs";
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -121,6 +122,7 @@ io.use((socket, next) => {
       }
 
       //save audio message in database
+      if (!isAudio) return;
       const filename = await new Promise((resolve, reject) => [
         crypto.randomBytes(16, (err, buf) => {
           if (err) return reject(err);
@@ -129,9 +131,12 @@ io.use((socket, next) => {
       ]);
       const writeStream = gfsAudio.openUploadStreamWithId(
         audMessageId,
-        filename
+        filename,
+        {
+          contentType: "audio/ogg; codecs=opus",
+        }
       );
-      const stream = Readable.from(media.toString());
+      const stream = Readable.from(media);
       stream.pipe(writeStream);
     }
   );
@@ -378,6 +383,7 @@ import messageRoute from "./routes/messages.js";
 import requestRoute from "./routes/friendsRequests.js";
 import userRoute from "./routes/user.js";
 import imageRoute from "./routes/images.js";
+import audioRoute from "./routes/audio.js";
 
 //Middlewares
 app.use(express.json());
@@ -400,6 +406,7 @@ app.use("/api/messages", messageRoute);
 app.use("/api/requests", requestRoute);
 app.use("/api/user", userRoute);
 app.use("/api/images", imageRoute);
+app.use("/api/audio", audioRoute);
 
 //Error handling middleware
 app.use((err, req, res, next) => {

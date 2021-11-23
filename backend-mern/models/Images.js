@@ -44,6 +44,7 @@ export const uploadMiddleware = (req, res, next) => {
   const upload = store.single("image");
   try {
     upload(req, res, (err) => {
+      console.log("req", req);
       if (err instanceof multer.MulterError) {
         throw new createError.BadRequest();
       } else if (err) {

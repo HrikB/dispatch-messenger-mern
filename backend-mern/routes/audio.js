@@ -4,3 +4,5 @@ import { getVoiceMessage } from "../controllers/audio.js";
 const router = express.Router();
 
 router.get("/:id", getVoiceMessage);
+
+export default router;

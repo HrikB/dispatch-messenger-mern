@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import fs from "fs";
 import { useParams } from "react-router-dom";
 import { Avatar, IconButton } from "@material-ui/core";
 import { SendOutlined, InsertEmoticon, Mic, Delete } from "@material-ui/icons";
@@ -9,6 +10,7 @@ import {
   getPicture,
   getUserDataById,
   getOnlineStatus,
+  getVoiceMessage,
 } from "../../server/api.js";
 import Picker from "emoji-picker-react";
 import Loading from "../Loading";
@@ -152,7 +154,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       if (conversationId) {
         setLoading(true);
         const messages = await getMessages(conversationId);
-        console.log("mesmse", messages);
         const conversation = await getConversation(conversationId);
         if (messages?.data?.error || conversation?.data?.error) {
           setLoading(false);
@@ -169,8 +170,11 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         if (messages) {
           newMessages = await Promise.all(
             messages.data.map(async (message) => {
-              if (message.media)
-                message.media = URL.createObjectURL(message.media);
+              console.log(message.isAudio);
+              if (message.isAudio) {
+                const blob = await getVoiceMessage(message.media);
+                message.media = URL.createObjectURL(blob);
+              }
               return message;
             })
           );
@@ -216,10 +220,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
     sendAudio && sendAudioMessage();
   }, [audioMessage]);
 
-  useEffect(() => {
-    console.log("chattt");
-  }, [sendAudio]);
-
   const sendAudioMessage = () => {
     setSendAudio(false);
     onAudioOptionClick();
@@ -235,6 +235,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       media: audioMessage.blob,
       createdAt: Date.now(),
     };
+    console.log("pre", audioMessage.blob);
     setConversations(() => {
       const temp = conversations;
       let moveToFront;
