@@ -374,7 +374,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                   {/*<h6 className="chat__name">
                 {message.senderId !== user._id ? message.senderName : ""}
             </h6>*/}
-                  {/*console.log("onRender", message.isAudio, message.media)*/}
                   {message.isAudio ? (
                     <audio src={message.media} controls />
                   ) : (

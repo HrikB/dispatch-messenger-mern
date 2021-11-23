@@ -35,6 +35,11 @@
   margin-bottom: 30px;
   overflow-wrap: break-word;
   max-width: 60%;
+  display: flex;
+}
+
+.chat__message audio {
+  padding-top: 4px;
 }
 
 .same__sender {
@@ -173,9 +178,4 @@
 .icon__container #delete__icon {
   position: absolute;
   display: none;
-}
-
-.react__mic {
-  width: 95%;
-  height: 19px;
 }
