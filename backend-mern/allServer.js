@@ -22,7 +22,7 @@ dotenv.config();
 
 //App Config
 const app = express();
-const port = 7000;
+const port = 4000;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -376,6 +376,7 @@ io.use((socket, next) => {
 });
 
 //Routes Import
+import authRoute from "./routes/auth.js";
 import conversationsRoute from "./routes/conversations.js";
 import messageRoute from "./routes/messages.js";
 import requestRoute from "./routes/friendsRequests.js";
@@ -392,11 +393,12 @@ app.use(
   })
 );
 app.use(cookieParser());
+app.use("/auth", authRoute);
 app.use(verifyAccessToken);
 
 //API Endpoints
 app.get("/", async (req, res) => {
-  res.status(200).send("Data Server Up");
+  res.status(200).send("All Server Up");
 });
 
 app.use("/api/conversations", conversationsRoute);

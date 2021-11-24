@@ -5,8 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "start": "nodemon allServer.js",
     "authStart": "nodemon authServer.js",
-    "start": "nodemon dataServer.js",
+    "dataStart": "nodemon dataServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

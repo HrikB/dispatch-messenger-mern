@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const _authUrl = `${window.location.origin}`;
-export const _dataUrl = "http://localhost:7000";
+export const _dataUrl = "http://localhost:4000";
 const instance = axios.create();
 axios.defaults.withCredentials = true;
 let user;

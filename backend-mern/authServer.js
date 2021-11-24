@@ -1,8 +1,6 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import morgan from "morgan";
 import createError from "http-errors";
 import cookieParser from "cookie-parser";
 dotenv.config();
