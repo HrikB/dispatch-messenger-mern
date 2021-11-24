@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import fs from "fs";
 import { useParams } from "react-router-dom";
 import { Avatar, IconButton } from "@material-ui/core";
 import { SendOutlined, InsertEmoticon, Mic, Delete } from "@material-ui/icons";
@@ -120,7 +119,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
   //checks for data from socket
   useEffect(() => {
-    //getUsers to get online users
     socket?.on("getMessage", (data) => {
       data.media = URL.createObjectURL(new Blob([data.media]));
       const arrvMessage = {
@@ -369,7 +367,7 @@ function Chat({ conversations, setConversations, setLastMessage }) {
                 {message.senderId !== user._id ? message.senderName : ""}
             </h6>*/}
                   {message.isAudio ? (
-                    <audio src={message.media} controls />
+                    <audio id="player" src={message.media} controls />
                   ) : (
                     message.text
                   )}
