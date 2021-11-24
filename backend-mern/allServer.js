@@ -17,12 +17,11 @@ import { addUser, removeUser, getUser } from "./helpers/redis.js";
 import { gfsAudio } from "./helpers/mongodb.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
 import "./helpers/mongodb.js";
-
 dotenv.config();
 
 //App Config
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -417,6 +416,12 @@ app.use((err, req, res, next) => {
       message: err.message,
     },
   });
+});
+
+//heroku deployment
+app.use(express.static(path.join(__dirname, "/_frontend/build")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/_frontend/build", "index.html"));
 });
 
 //Listener

@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const _authUrl = `${window.location.origin}`;
-export const _dataUrl = "http://localhost:4000";
+const _authUrl = "https://dispatch-messenger.herokuapp.com"; //`${window.location.origin}`;
+export const _dataUrl = "https://dispatch-messenger.herokuapp.com"; //"http://localhost:4000";
 const instance = axios.create();
 axios.defaults.withCredentials = true;
 let user;
