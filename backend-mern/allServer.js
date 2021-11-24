@@ -397,13 +397,20 @@ app.use(
 );
 app.use(cookieParser());
 app.use("/auth", authRoute);
-app.use(verifyAccessToken);
 
-//API Endpoints
 app.get("/", async (req, res) => {
   res.status(200).send("All Server Up");
 });
 
+//heroku deployment
+app.use(express.static(path.join(__dirname, "/_frontend/build")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/_frontend/build", "index.html"));
+});
+
+app.use(verifyAccessToken);
+
+//protected routes
 app.use("/api/conversations", conversationsRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/requests", requestRoute);
@@ -420,12 +427,6 @@ app.use((err, req, res, next) => {
       message: err.message,
     },
   });
-});
-
-//heroku deployment
-app.use(express.static(path.join(__dirname, "/_frontend/build")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/_frontend/build", "index.html"));
 });
 
 //Listener
