@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import path from "path";
 import cookieParser from "cookie-parser";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
