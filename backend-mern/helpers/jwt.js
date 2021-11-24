@@ -68,6 +68,7 @@ export const signRefreshToken = (userId) => {
 };
 
 export const verifyAccessToken = async (req, res, next) => {
+  c;
   if (!req.headers["authorization"]) return next(createError.Unauthorized());
   const authHeader = req.headers["authorization"].split(" ");
   const accessToken = authHeader[1];
