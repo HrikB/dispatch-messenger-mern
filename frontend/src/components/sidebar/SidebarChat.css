@@ -21,7 +21,7 @@
   background-color: #403d3d !important;
 }
 
-.infoContainer {
+.info__container {
   box-sizing: border-box;
   padding: 2px 10px;
   display: flex;
@@ -35,11 +35,11 @@ a {
   text-decoration: none !important;
 }
 
-.infoContainer h4 {
+.info__container h4 {
   margin: 3px 0;
 }
 
-.infoContainer .lastMessage {
+.info__container .lastMessage {
   color: rgb(146, 146, 146);
   text-overflow: ellipsis;
   overflow: hidden;
@@ -48,7 +48,7 @@ a {
   max-width: 100%;
 }
 
-.infoContainer h5 {
+.info__container h5 {
   margin: 3px 0;
   color: #7b7776;
   font-weight: lighter;
@@ -57,4 +57,15 @@ a {
 #profpic {
   width: 3rem;
   height: 3rem;
+}
+
+@media (max-width: 792px) {
+  .allContainer {
+    display: flex;
+    justify-content: center;
+  }
+
+  .info__container {
+    display: none;
+  }
 }

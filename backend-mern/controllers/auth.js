@@ -76,6 +76,7 @@ export let signin = async (req, res, next) => {
 
 export let token = async (req, res, next) => {
   try {
+    console.log("refreshing token");
     const { refreshToken } = req.body;
 
     if (!refreshToken) throw createError.BadRequest();
@@ -86,6 +87,7 @@ export let token = async (req, res, next) => {
 
     res.send({ accessToken, refreshToken: refToken });
   } catch (err) {
+    console.log("refreshing failed", err.message);
     next(err);
   }
 };

@@ -19,13 +19,17 @@
 }
 
 .friendComponent__container .friend__info .info__text {
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
 }
 
 .friendComponent__container .friend__info .info__text .friend__name {
   font-weight: bold;
   font-size: 20px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .friendComponent__container .friend__info .info__text .online__status {

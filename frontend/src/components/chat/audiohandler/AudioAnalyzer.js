@@ -32,23 +32,9 @@ function AudioAnalyzer(props) {
     rafId.current = requestAnimationFrame(tick);
 
     return () => {
-      /*mediaRecorder.stop();
-      console.log(chunks);
-      const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
-      chunks = [];
-
-      const blobObj = {
-        blob,
-        blobURL: window.URL.createObjectURL(blob),
-      };*/
-
       cancelAnimationFrame(rafId.current);
       analyzerRef.current.disconnect();
       source.disconnect();
-
-      /*if (!onStop) return;
-
-      onStop(blobObj);*/
     };
   }, []);
 

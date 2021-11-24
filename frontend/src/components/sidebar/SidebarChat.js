@@ -60,7 +60,7 @@ function SidebarChat({ last_msg, convId, memberId, searchInput }) {
             <div className="sidebarChat">
               <div id={convId} className="allContainer">
                 <Avatar src={conversation.prof_pic} id="profpic" />
-                <div className="infoContainer">
+                <div className="info__container">
                   <h4 className="name">
                     {conversation.first_name + " " + conversation.last_name}
                   </h4>

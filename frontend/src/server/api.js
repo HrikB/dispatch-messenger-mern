@@ -46,6 +46,8 @@ axios.interceptors.response.use(undefined, async (err) => {
       user.dispatch({ type: "SET_USER", user: null });
       return Promise.resolve({ data: [] });
     } else {
+      console.log(config);
+
       sessionStorage.setItem("accessToken", newTokenPair.data.accessToken);
       sessionStorage.setItem("refreshToken", newTokenPair.data.refreshToken);
       if (config.method === "get") {
@@ -283,6 +285,7 @@ export const logOutAPI = async () => {
 
 export const refreshAccessToken = async () => {
   try {
+    console.log("attempting refresh");
     return await instance.post(`${_authUrl}/auth/token`, {
       refreshToken: sessionStorage.getItem("refreshToken"),
     });

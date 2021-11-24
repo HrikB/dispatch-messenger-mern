@@ -12,7 +12,6 @@ export const getVoiceMessage = async (req, res, next) => {
       try {
         if (!files || files.length === 0)
           throw new createError.BadRequest("No files exists");
-        console.log(files);
         res.set("Content-Type", files[0].contentType);
         gfsAudio.openDownloadStream(_id).pipe(res);
       } catch (err) {

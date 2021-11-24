@@ -23,18 +23,34 @@
 }
 
 .request__container .request__info .info__text {
-  display: flex;
-  flex-direction: column;
+  width: 500px;
+  overflow: hidden;
+}
+
+.request__container .request__info .info__text .requestDir__container {
+  width: max-content;
 }
 
 .request__container .request__info .info__text .request__name {
   font-weight: bold;
   font-size: 20px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.request__container .request__info .info__text .request__direction {
+.request__container
+  .request__info
+  .info__text
+  .requestDir__container
+  .request__direction,
+.extra__text {
+  display: inline-block;
+  width: fit-content;
   font-weight: lighter;
   font-size: 12px;
+  white-space: normal;
 }
 
 .request__container .request__response {
@@ -51,4 +67,10 @@
 
 .request__container .request__response .MuiIconButton-root .MuiSvgIcon-root {
   fill: rgba(216, 216, 216, 0.4) !important;
+}
+
+@media (max-width: 560px) {
+  .extra__text {
+    display: none;
+  }
 }

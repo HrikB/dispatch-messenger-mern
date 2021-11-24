@@ -155,6 +155,7 @@ function Sidebar({
         conversations.filter((prev) => prev._id !== toDeleteConversation)
       );
   }, [toDeleteConversation]);
+
   return (
     <div className="sidebar">
       {updateProfWin && (
@@ -181,7 +182,7 @@ function Sidebar({
           )}
         </IconButton>
         <h3>Dispatch</h3>
-        <IconButton onClick={createConversation}>
+        <IconButton id="composeIcButton" onClick={createConversation}>
           <img id="compose" src={Compose} alt="Compose"></img>
         </IconButton>
       </div>

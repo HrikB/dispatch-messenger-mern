@@ -73,7 +73,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
   };
 
   const onStop = (blobObj) => {
-    console.log("stopped in chat", blobObj);
     setAudioMessage(blobObj);
   };
 
@@ -121,9 +120,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
 
   //checks for data from socket
   useEffect(() => {
-    socket?.on("welcome", () => {
-      console.log("Welcome this is the server");
-    });
     //getUsers to get online users
     socket?.on("getMessage", (data) => {
       data.media = URL.createObjectURL(new Blob([data.media]));
@@ -170,7 +166,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
         if (messages) {
           newMessages = await Promise.all(
             messages.data.map(async (message) => {
-              console.log(message.isAudio);
               if (message.isAudio) {
                 const blob = await getVoiceMessage(message.media);
                 message.media = URL.createObjectURL(blob);
@@ -235,7 +230,6 @@ function Chat({ conversations, setConversations, setLastMessage }) {
       media: audioMessage.blob,
       createdAt: Date.now(),
     };
-    console.log("pre", audioMessage.blob);
     setConversations(() => {
       const temp = conversations;
       let moveToFront;

@@ -53,10 +53,8 @@ function Microphone(props) {
     }
 
     const track = mediaRecorder.stream.getTracks()[0];
-    track.onended = () => console.log("ended");
 
     mediaRecorder.onstart = () => {
-      console.log("started");
       setRecording({
         ...recording,
         active: true,
@@ -68,7 +66,6 @@ function Microphone(props) {
     };
 
     mediaRecorder.onstop = () => {
-      console.log("stopped");
       track.stop();
       const url = URL.createObjectURL(chunks.current[0]);
       const blob = new Blob(chunks.current, { type: "audio/ogg; codecs=opus" });
@@ -125,7 +122,6 @@ function Microphone(props) {
 
   useEffect(() => {
     (async () => {
-      console.log("running");
       if (disableAudio) stopMic();
       else if (openMic) await getMicrophone();
       else if (stream.recorder) stream.recorder.start();

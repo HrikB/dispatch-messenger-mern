@@ -224,3 +224,13 @@ button {
 .userInteract__container button:hover {
   cursor: pointer;
 }
+
+@media (max-width: 1080px) {
+  .login {
+    flex-direction: column;
+  }
+  .app__info {
+    margin-right: 0px;
+    margin-bottom: 50px;
+  }
+}

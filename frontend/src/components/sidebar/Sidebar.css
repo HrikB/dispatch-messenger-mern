@@ -182,3 +182,26 @@
     opacity: 1;
   }
 }
+
+@media (max-width: 792px) {
+  #composeIcButton,
+  .sidebar__header h3,
+  .sidebar__search,
+  .friends__tab p {
+    display: none !important;
+  }
+
+  .sidebar__header {
+    display: flex;
+    justify-content: center;
+  }
+
+  .friends__tab {
+    display: flex;
+    justify-content: center;
+  }
+  .sidebar {
+    width: fit-content;
+    min-width: 0rem;
+  }
+}

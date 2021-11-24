@@ -125,11 +125,14 @@ function Pending() {
                     ? friendRequest.recipientName
                     : friendRequest.requesterName}
                 </p>
-                <p className="request__direction">
-                  {user._id === friendRequest.requesterId
-                    ? "Outgoing Friend Request"
-                    : "Incoming Friend Request"}
-                </p>
+                <div className="requestDir__container">
+                  <p className="request__direction">
+                    {user._id === friendRequest.requesterId
+                      ? "Outgoing"
+                      : "Incoming"}
+                  </p>
+                  <p className="extra__text"> &nbsp;Friend Request</p>
+                </div>
               </div>
             </div>
             <div className="request__response">
