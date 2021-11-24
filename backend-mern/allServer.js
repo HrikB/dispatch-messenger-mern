@@ -398,10 +398,6 @@ app.use(
 app.use(cookieParser());
 app.use("/auth", authRoute);
 
-app.get("/", async (req, res) => {
-  res.status(200).send("All Server Up");
-});
-
 //heroku deployment
 app.use(express.static(path.join(__dirname, "/_frontend/build")));
 app.get("*", (req, res) => {
