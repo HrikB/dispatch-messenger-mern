@@ -3,13 +3,14 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import path from "path";
+import path, { dirname } from "path";
 import cookieParser from "cookie-parser";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { Readable } from "stream";
+import { fileURLToPath } from "url";
 import User from "./models/User.js";
 import Message from "./models/Message.js";
 import FriendRequest from "./models/FriendRequest.js";
@@ -19,6 +20,8 @@ import { gfsAudio } from "./helpers/mongodb.js";
 import { verifyAccessToken } from "./helpers/jwt.js";
 import "./helpers/mongodb.js";
 dotenv.config();
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 //App Config
 const app = express();
