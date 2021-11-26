@@ -28,7 +28,20 @@ export let signup = async (req, res, next) => {
     const savedUser = await user.save();
     const accessToken = await signAccessToken(savedUser.id);
     const refreshToken = await signRefreshToken(savedUser.id);
-    res.status(200).send({ user, accessToken, refreshToken });
+
+
+    res
+      .cookie("accessToken", accessToken, {
+        sameSite: "lax",
+        httpOnly: true,
+      })
+      .cookie("authSession", true)
+      .cookie("refreshToken", refreshToken, {
+        sameSite: "lax",
+        httpOnly: true,
+      })
+      .cookie("refreshTokenID", true)
+      .send({ user, accessToken, refreshToken }).status(200).send({ user, accessToken, refreshToken });
   } catch (err) {
     if (err.isJoi === true) {
       err.message = err.details;
@@ -64,6 +77,7 @@ export let signin = async (req, res, next) => {
         httpOnly: true,
       })
       .cookie("refreshTokenID", true)
+      .status(200)
       .send({ user, accessToken, refreshToken });
   } catch (err) {
     if (err.isJoi) {
