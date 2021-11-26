@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node allServer.js",
     "startDev": "nodemon allServer.js",
-    "heroku-postbuild": "cd _frontend && npm install && npm run build",
+    "heroku-postbuild": "npm install",
     "authStart": "nodemon authServer.js",
     "dataStart": "nodemon dataServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
