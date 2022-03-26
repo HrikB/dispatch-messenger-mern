@@ -204,7 +204,7 @@ button {
 }
 
 .userInteract__container .login__container button:hover {
-  background-color: rgb(105, 1, 105);
+  background-color: #690169;
   border: rgb(105, 1, 105);
 }
 
@@ -212,12 +212,12 @@ button {
   width: 60%;
   margin-top: 25px;
   margin-bottom: 15px;
-  background-color: green;
+  background-color: #008000;
   border: green;
 }
 
 .userInteract__container .register__container button:hover {
-  background-color: rgb(2, 104, 2);
+  background-color: #026802;
   border: rgb(2, 104, 2);
 }
 

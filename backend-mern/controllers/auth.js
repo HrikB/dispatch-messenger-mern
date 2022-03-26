@@ -31,16 +31,16 @@ export let signup = async (req, res, next) => {
 
 
     res
-      .cookie("accessToken", accessToken, {
-        sameSite: "lax",
-        httpOnly: true,
-      })
-      .cookie("authSession", true)
-      .cookie("refreshToken", refreshToken, {
-        sameSite: "lax",
-        httpOnly: true,
-      })
-      .cookie("refreshTokenID", true)
+      // .cookie("accessToken", accessToken, {
+      //   sameSite: "lax",
+      //   httpOnly: true,
+      // })
+      // .cookie("authSession", true)
+      // .cookie("refreshToken", refreshToken, {
+      //   sameSite: "lax",
+      //   httpOnly: true,
+      // })
+      // .cookie("refreshTokenID", true)
       .send({ user, accessToken, refreshToken }).status(200).send({ user, accessToken, refreshToken });
   } catch (err) {
     if (err.isJoi === true) {
@@ -67,16 +67,16 @@ export let signin = async (req, res, next) => {
     const accessToken = await signAccessToken(user._id);
     const refreshToken = await signRefreshToken(user._id);
     res
-      .cookie("accessToken", accessToken, {
-        sameSite: "lax",
-        httpOnly: true,
-      })
-      .cookie("authSession", true)
-      .cookie("refreshToken", refreshToken, {
-        sameSite: "lax",
-        httpOnly: true,
-      })
-      .cookie("refreshTokenID", true)
+      // .cookie("accessToken", accessToken, {
+      //   sameSite: "lax",
+      //   httpOnly: true,
+      // })
+      // .cookie("authSession", true)
+      // .cookie("refreshToken", refreshToken, {
+      //   sameSite: "lax",
+      //   httpOnly: true,
+      // })
+      // .cookie("refreshTokenID", true)
       .status(200)
       .send({ user, accessToken, refreshToken });
   } catch (err) {

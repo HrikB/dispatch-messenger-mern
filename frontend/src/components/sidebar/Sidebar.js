@@ -83,6 +83,7 @@ function Sidebar({
     lastMessage &&
       setConversations(
         conversations.map((conv) => {
+          console.log(conv)
           if (conv._id === lastMessage.conversationId)
             conv.last_msg = lastMessage;
           return conv;

@@ -96,9 +96,8 @@ function AddFriends() {
       </form>
       {message && message !== "" && (
         <div className="error__message">
-          <h5 style={{ color: success ? "green" : "red" }}>{`${
-            success ? "" : "Error: "
-          } ${message}`}</h5>
+          <h5 style={{ color: success ? "green" : "red" }}>{`${success ? "" : "Error: "
+            } ${message}`}</h5>
         </div>
       )}
     </div>

@@ -128,7 +128,7 @@ export default forwardRef(({ profPic, setProfPic }, ref) => {
           <div className="defaultProf__options">
             <div className="picture__container">
               <div className="line" />
-              <label htmlFor="file__input-button-file" onClick={uploadFile}>
+              <label htmlFor="file__input" onClick={uploadFile}>
                 <IconButton>
                   <Avatar id="avatar" src={profPic}>
                     <svg
