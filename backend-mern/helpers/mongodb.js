@@ -5,9 +5,13 @@ dotenv.config();
 
 //DB Config
 
-export const promise = mongoose.connect(process.env.DATABASE, {
-  useNewUrlParser: true,
-});
+export const promise = mongoose.connect(
+  "mongodb://localhost:27017/",
+  // process.env.DATABASE,
+  {
+    useNewUrlParser: true,
+  }
+);
 
 export let gfsImage;
 export let gfsAudio;

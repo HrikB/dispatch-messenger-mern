@@ -4,8 +4,8 @@ import util from "util";
 dotenv.config();
 
 const redisClient = redis.createClient(
-  process.env.REDIS_PORT,
-  process.env.REDIS_HOST
+  // process.env.REDIS_PORT,
+  // process.env.REDIS_HOST
 );
 
 redisClient.auth(process.env.REDIS_PASSWORD, (err) => {

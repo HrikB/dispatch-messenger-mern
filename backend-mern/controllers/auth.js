@@ -54,10 +54,10 @@ export let signin = async (req, res, next) => {
     const accessToken = await signAccessToken(user._id);
     const refreshToken = await signRefreshToken(user._id);
     res
-      .cookie("accessToken", accessToken, {
-        sameSite: "lax",
-        httpOnly: true,
-      })
+      // .cookie("accessToken", accessToken, {
+      //   sameSite: "lax",
+      //   httpOnly: true,
+      // })
       .cookie("authSession", true)
       .cookie("refreshToken", refreshToken, {
         sameSite: "lax",

@@ -3,6 +3,8 @@
 .env.test
 .env.production
 
+READ.md
+
 # Optional REPL history
 .node_repl_history
 
